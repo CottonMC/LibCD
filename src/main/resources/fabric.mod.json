@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "libcd",
+  "version": "$version",
+
+  "name": "LibConditionalData",
+  "icon": "assets/libcd/icon.png",
+  "description": "Load data pack elements conditionally!",
+  "licence": "MIT",
+  "contact": {
+    "sources": "https://github.com/CottonMC/LibCD"
+  },
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.cottonmc.libcd.LibConditionalData"
+    ]
+  },
+  "mixins": [
+    "mixins.libcd.json"
+  ],
+  "requires": {
+    "fabricloader": ">=0.4.0",
+    "fabric": "*"
+  }
+}
