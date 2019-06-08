@@ -23,7 +23,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 archivesBaseName = "libcd"
-version = "1.0.1+1.14.2"
+version = "1.0.2+1.14.2"
 
 minecraft {
 	refmapName = 'mixins.libcd.refmap.json'
