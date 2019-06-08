@@ -1,6 +1,7 @@
 package io.github.cottonmc.libcd.mixin;
 
 import io.github.cottonmc.libcd.LibConditionalData;
+import net.minecraft.resource.NamespaceResourceManager;
 import net.minecraft.resource.ReloadableResourceManager;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
 import net.minecraft.resource.Resource;
@@ -29,7 +30,7 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 
 	@Inject(method = "findResources", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void checkConditioalRecipes(String parent, Predicate<String> loadFilter, CallbackInfoReturnable cir,
-										Set<Identifier> foundResources, Iterator itr, List<Identifier> sortedResources) {
+										Set<Identifier> foundResources, List<Identifier> sortedResources) {
 		List<Identifier> sortedCopy = new ArrayList<>(sortedResources);
 		for (Identifier id : sortedCopy) {
 			//don't try to load for things that use mcmetas already!
