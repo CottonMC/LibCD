@@ -4,7 +4,6 @@ import io.github.cottonmc.libcd.LibConditionalData;
 import net.minecraft.resource.ReloadableResourceManager;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
 import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceReloadListener;
 import net.minecraft.util.Identifier;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.Logger;
