@@ -1,10 +1,11 @@
 package io.github.cottonmc.libcd.mixin;
 
-import io.github.cottonmc.libcd.LibConditionalData;
-import net.minecraft.resource.NamespaceResourceManager;
+import io.github.cottonmc.libcd.condition.ConditionalData;
+import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
 import net.minecraft.resource.ReloadableResourceManager;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
 import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceReloadListener;
 import net.minecraft.util.Identifier;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.Logger;
@@ -18,15 +19,16 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
 @Mixin(ReloadableResourceManagerImpl.class)
-public abstract class MixinResourceManagerImpl implements ReloadableResourceManager {
+public abstract class MixinResourceManagerImpl implements ReloadableResourceManager, ReloadListenersAccessor {
 
 	@Shadow @Final private static Logger LOGGER;
+
+	@Shadow @Final private List<ResourceReloadListener> listeners;
 
 	@Inject(method = "findResources", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void checkConditioalRecipes(String parent, Predicate<String> loadFilter, CallbackInfoReturnable cir,
@@ -40,7 +42,7 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 				try {
 					Resource meta = getResource(metaId);
 					String metaText = IOUtils.toString(meta.getInputStream());
-					if (!LibConditionalData.shouldLoad(id, metaText)) {
+					if (!ConditionalData.shouldLoad(id, metaText)) {
 						sortedResources.remove(id);
 					}
 				} catch (IOException e) {
@@ -48,5 +50,10 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 				}
 			}
 		}
+	}
+
+	@Override
+	public List<ResourceReloadListener> libcd_getListeners() {
+		return listeners;
 	}
 }

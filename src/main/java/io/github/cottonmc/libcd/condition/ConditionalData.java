@@ -1,14 +1,12 @@
-package io.github.cottonmc.libcd;
+package io.github.cottonmc.libcd.condition;
 
 import blue.endless.jankson.*;
 import blue.endless.jankson.impl.SyntaxError;
-import net.fabricmc.api.ModInitializer;
+import io.github.cottonmc.libcd.LibCD;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -16,37 +14,33 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class LibConditionalData implements ModInitializer {
-	public static final String MODID = "libcd";
-
-	private static final Logger LOGGER = LogManager.getLogger();
+public class ConditionalData {
 	private static final Map<Identifier, Predicate<Object>> conditions = new HashMap<>();
 
-	@Override
-	public void onInitialize() {
-		registerCondition(new Identifier(MODID, "mod_loaded"), (value) -> value instanceof String && FabricLoader.getInstance().isModLoaded((String)value));
-		registerCondition(new Identifier(MODID, "item_exists"), (value) -> value instanceof String && Registry.ITEM.get(new Identifier((String)value)) != Items.AIR);
-		registerCondition(new Identifier(MODID, "not"), (value) -> {
+	public static void init() {
+		registerCondition(new Identifier(LibCD.MODID, "mod_loaded"), (value) -> value instanceof String && FabricLoader.getInstance().isModLoaded((String)value));
+		registerCondition(new Identifier(LibCD.MODID, "item_exists"), (value) -> value instanceof String && Registry.ITEM.get(new Identifier((String)value)) != Items.AIR);
+		registerCondition(new Identifier(LibCD.MODID, "not"), (value) -> {
 			if (value instanceof JsonObject) {
 				JsonObject json = (JsonObject)value;
 				for (String key : json.keySet()) {
 					Identifier id = new Identifier(key);
 					Object result = parseElement(json.get(key));
-					if (conditions.containsKey(id)) {
-						return !conditions.get(id).test(result);
+					if (hasCondition(id)) {
+						return !testCondition(id, result);
 					} else return false;
 				}
 			}
 			return false;
 		});
-		registerCondition(new Identifier(MODID, "any_of"), (value) -> {
+		registerCondition(new Identifier(LibCD.MODID, "any_of"), (value) -> {
 			if (value instanceof JsonObject) {
 				JsonObject json = (JsonObject)value;
 				for (String key : json.keySet()) {
 					Identifier id = new Identifier(key);
 					Object result = parseElement(json.get(key));
-					if (conditions.containsKey(id)) {
-						if (conditions.get(id).test(result)) return true;
+					if (hasCondition(id)) {
+						if (testCondition(id, result)) return true;
 					} else return false;
 				}
 			}
@@ -61,16 +55,16 @@ public class LibConditionalData implements ModInitializer {
 			for (String key : json.keySet()) {
 				Identifier id = new Identifier(key);
 				Object result = parseElement(json.get(key));
-				if (conditions.containsKey(id)) {
-					if (!conditions.get(id).test(result)) return false;
+				if (hasCondition(id)) {
+					if (!testCondition(id, result)) return false;
 				} else {
-					LOGGER.error("Error parsing meta for {}: could not find condition {}", resourceId, id.toString());
+					LibCD.logger.error("Error parsing meta for {}: could not find condition {}", resourceId, id.toString());
 					return false;
 				}
 			}
 			return true;
 		} catch (SyntaxError e) {
-			LOGGER.error("Error parsing meta for {}: {}", resourceId, e.getLineMessage());
+			LibCD.logger.error("Error parsing meta for {}: {}", resourceId, e.getLineMessage());
 		}
 		return false;
 	}
@@ -95,5 +89,14 @@ public class LibConditionalData implements ModInitializer {
 	 */
 	public static void registerCondition(Identifier id, Predicate<Object> condition) {
 		conditions.put(id, condition);
+	}
+
+	public static boolean hasCondition(Identifier id) {
+		return conditions.containsKey(id);
+	}
+
+	public static boolean testCondition(Identifier id, Object toTest) {
+		if (!hasCondition(id)) return false;
+		return conditions.get(id).test(toTest);
 	}
 }

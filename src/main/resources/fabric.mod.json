@@ -3,9 +3,9 @@
   "id": "libcd",
   "version": "$version",
 
-  "name": "LibConditionalData",
+  "name": "LibCapableData",
   "icon": "assets/libcd/icon.png",
-  "description": "Load data pack elements conditionally!",
+  "description": "Various tweaks to make data packs even more useful!",
   "licence": "MIT",
   "contact": {
     "sources": "https://github.com/CottonMC/LibCD"
@@ -13,7 +13,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "io.github.cottonmc.libcd.LibConditionalData"
+      "io.github.cottonmc.libcd.LibCD"
     ]
   },
   "mixins": [
