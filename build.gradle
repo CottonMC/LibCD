@@ -24,6 +24,10 @@ apply plugin: net.fabricmc.loom.LoomGradlePlugin
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+if(rootProject.file('private.gradle').exists()) { //Publishing details
+	apply from: 'private.gradle'
+}
+
 archivesBaseName = "libcd"
 version = "1.1.0+1.14.2"
 
