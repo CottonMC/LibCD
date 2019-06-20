@@ -4,13 +4,17 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.cottonmc.libcd.LibCD;
 import net.minecraft.block.Block;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
@@ -126,6 +130,61 @@ public class TweakerUtils {
 		} catch (CommandSyntaxException e) {
 			LibCD.logger.error("Error adding NBT to stack: " + e.getMessage());
 		}
+		return stack;
+	}
+
+	/**
+	 * Add an enchantment to an ItemStack. Will ignore whether the enchantment fits on the stack.
+	 * @param stack The stack to enchant.
+	 * @param enchantment The ID of the enchantment to add.
+	 * @param level The level of the enchantment to add.
+	 * @return The stack with the new enchantment.
+	 */
+	public static ItemStack enchant(ItemStack stack, String enchantment, int level) {
+		Enchantment ench = Registry.ENCHANTMENT.get(new Identifier(enchantment));
+		stack.addEnchantment(ench, level);
+		return stack;
+	}
+
+	/**
+	 * Add lore messages to an ItemStack.
+	 * @param stack The stack to add lroe to.
+	 * @param lore The lines to add to lore. Use § to change the color of the messages.
+	 * @return The stack with the new lore.
+	 */
+	public static ItemStack addLore(ItemStack stack, String[] lore) {
+		CompoundTag display = stack.getOrCreateSubTag("display");
+		if (!display.containsKey("Lore")) display.put("Lore", new ListTag());
+		if (display.containsKey("Lore", 9)) {
+			ListTag list = display.getList("Lore", 8);
+			for (int i = 0; i < lore.length; i++) {
+				String line = lore[i];
+				list.addTag(i, new StringTag(line));
+			}
+		}
+		return stack;
+	}
+
+	/**
+	 * Set the damage on an ItemStack. Counts up from 0 to the item's max damage.
+	 * @param stack The stack to set damage on.
+	 * @param amount How much damage to apply, or -1 to make unbreakable.
+	 * @return The stack with the new damage.
+	 */
+	public static ItemStack setDamage(ItemStack stack, int amount) {
+		if (amount == -1) stack.getOrCreateTag().putBoolean("Unbreakable", true);
+		else stack.setDamage(amount);
+		return stack;
+	}
+
+	/**
+	 * Set the custom name on an ItemStack.
+	 * @param stack The stack to set the name on.
+	 * @param name The name to set to. Use § to change the color of the name.
+	 * @return The stack with the new name.
+	 */
+	public static ItemStack setName(ItemStack stack, String name) {
+		stack.setCustomName(new TextComponent(name));
 		return stack;
 	}
 
