@@ -4,6 +4,7 @@ import blue.endless.jankson.Jankson;
 import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 import io.github.cottonmc.libcd.condition.ConditionalData;
 import io.github.cottonmc.libcd.tweaker.RecipeTweaker;
 import io.github.cottonmc.libcd.tweaker.Tweaker;
@@ -22,6 +23,7 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,15 +52,18 @@ public class LibCD implements ModInitializer {
 		});
 		CommandRegistry.INSTANCE.register(false, dispatcher -> dispatcher.register((
 				CommandManager.literal("cd_subset").requires(source -> source.hasPermissionLevel(3))
-						.then(CommandManager.argument("subset", StringArgumentType.string()))
-						.executes(context -> {
-							config.tweaker_subset = context.getArgument("subset", String.class);
-							saveConfig(config);
-							context.getSource().sendFeedback(new TranslatableComponent("libcd.reload.success"), false);
-							(context.getSource()).getMinecraftServer().reload();
-							return 1;
-						})
-				)));
+						.then(CommandManager.argument("subset", StringArgumentType.string())
+								.executes(context -> changeSubset(context, context.getArgument("subset", String.class))))
+						.then(CommandManager.literal("-reset").executes(context -> changeSubset(context, "")))
+		)));
+	}
+
+	private int changeSubset(CommandContext<ServerCommandSource> context, String setTo) {
+		config.tweaker_subset = setTo;
+		saveConfig(config);
+		context.getSource().sendFeedback(new TranslatableComponent("libcd.reload.success"), false);
+		(context.getSource()).getMinecraftServer().reload();
+		return 1;
 	}
 
 	/**
