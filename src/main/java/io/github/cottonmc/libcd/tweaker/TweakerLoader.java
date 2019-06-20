@@ -33,7 +33,22 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 					Identifier scriptId = new Identifier(fileId.getNamespace(), fileId.getPath().substring(localPath));
 					TWEAKERS.put(scriptId, script);
 				} catch (IOException e) {
-					LibCD.logger.error("Error when accessing tweaker script %s: %s", fileId.toString(), e.getMessage());
+					LibCD.logger.error("Error when accessing tweaker script {}: {}", fileId.toString(), e.getMessage());
+				}
+			}
+			String subset = LibCD.config.tweaker_subset;
+			if (!subset.equals("")) {
+				Collection<Identifier> setResources = manager.findResources("tweakers_"+subset, name -> true);
+				for (Identifier fileId : setResources) {
+					try {
+						Resource res = manager.getResource(fileId);
+						String script = IOUtils.toString(res.getInputStream());
+						int localPath = fileId.getPath().indexOf('/')+1;
+						Identifier scriptId = new Identifier(fileId.getNamespace(), fileId.getPath().substring(localPath));
+						TWEAKERS.put(scriptId, script);
+					} catch (IOException e) {
+						LibCD.logger.error("Error when accessing tweaker script {} in subset {}: {}", fileId.toString(), subset, e.getMessage());
+					}
 				}
 			}
 			return TWEAKERS;
@@ -62,7 +77,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 				try {
 					engine.eval(script);
 				} catch (ScriptException e) {
-					LibCD.logger.error("Error executing tweaker script %s: %s", tweaker.toString(), e.getMessage());
+					LibCD.logger.error("Error executing tweaker script {}: {}", tweaker.toString(), e.getMessage());
 					continue;
 				}
 				loaded++;
@@ -72,7 +87,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 				applied.add(tweaker.getApplyMessage());
 			}
 			String confirm = formatApplied(applied);
-			if (loaded > 0) LibCD.logger.info("Applied %s tweaker %s, including %s", loaded, (loaded == 1? "script" : "scripts"), confirm);
+			if (loaded > 0) LibCD.logger.info("Applied {} tweaker {}, including {}", loaded, (loaded == 1? "script" : "scripts"), confirm);
 		});
 	}
 
