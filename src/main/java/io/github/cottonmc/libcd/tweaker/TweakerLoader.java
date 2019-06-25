@@ -84,6 +84,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 			}
 			List<String> applied = new ArrayList<>();
 			for (Tweaker tweaker : Tweaker.TWEAKERS) {
+				tweaker.applyReload(manager, executor);
 				applied.add(tweaker.getApplyMessage());
 			}
 			String confirm = formatApplied(applied);

@@ -17,13 +17,13 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,7 +61,7 @@ public class LibCD implements ModInitializer {
 	private int changeSubset(CommandContext<ServerCommandSource> context, String setTo) {
 		config.tweaker_subset = setTo;
 		saveConfig(config);
-		context.getSource().sendFeedback(new TranslatableComponent("libcd.reload.success"), false);
+		context.getSource().sendFeedback(new TranslatableText("libcd.reload.success"), false);
 		(context.getSource()).getMinecraftServer().reload();
 		return 1;
 	}

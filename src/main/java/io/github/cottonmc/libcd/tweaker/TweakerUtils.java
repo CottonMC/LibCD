@@ -14,13 +14,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.DefaultedList;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -184,7 +184,7 @@ public class TweakerUtils {
 	 * @return The stack with the new name.
 	 */
 	public static ItemStack setName(ItemStack stack, String name) {
-		stack.setCustomName(new TextComponent(name));
+		stack.setCustomName(new LiteralText(name));
 		return stack;
 	}
 

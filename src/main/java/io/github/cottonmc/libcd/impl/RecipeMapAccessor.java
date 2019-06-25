@@ -8,4 +8,5 @@ import java.util.Map;
 
 public interface RecipeMapAccessor {
 	Map<RecipeType<?>, Map<Identifier, Recipe<?>>> libcd_getRecipeMap();
+	void libcd_setRecipeMap(Map<RecipeType<?>, Map<Identifier, Recipe<?>>> map);
 }
