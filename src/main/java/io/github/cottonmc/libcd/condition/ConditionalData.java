@@ -77,17 +77,20 @@ public class ConditionalData {
 	}
 
 	public static boolean shouldLoad(Identifier resourceId, String meta) {
-		Jankson jankson = new Jankson.Builder().build();
 		try {
-			JsonObject json = jankson.load(meta);
-			for (String key : json.keySet()) {
-				Identifier id = new Identifier(key);
-				Object result = parseElement(json.get(key));
-				if (hasCondition(id)) {
-					if (!testCondition(id, result)) return false;
-				} else {
-					LibCD.logger.error("Error parsing meta for {}: could not find condition {}", resourceId, id.toString());
-					return false;
+			JsonObject json = LibCD.jankson.load(meta);
+			JsonElement elem = json.get("conditions");
+			if (elem instanceof JsonArray) {
+				JsonArray array = (JsonArray)elem;
+				for (JsonElement condition : array) {
+					if (!(condition instanceof JsonObject)) {
+						LibCD.logger.error("Error parsing meta for {}: item {} in condition list not a JsonObject", resourceId, condition.toString());
+						return false;
+					}
+					JsonObject obj = (JsonObject)condition;
+					for (String key : obj.keySet()) {
+						if (!testCondition(new Identifier(key), obj)) return false;
+					}
 				}
 			}
 			return true;
@@ -103,8 +106,6 @@ public class ConditionalData {
 			return ((JsonPrimitive)element).getValue();
 		} else if (element instanceof JsonNull) {
 			return null;
-		} else if (element instanceof JsonArray) {
-			return new ArrayList<>((JsonArray) element);
 		} else {
 			return element;
 		}
@@ -124,7 +125,10 @@ public class ConditionalData {
 	}
 
 	public static boolean testCondition(Identifier id, Object toTest) {
-		if (!hasCondition(id)) return false;
+		if (!hasCondition(id)) {
+			//put a log here if I can find a way to get it to trace back to which file it should check?
+			return false;
+		}
 		return conditions.get(id).test(toTest);
 	}
 }
