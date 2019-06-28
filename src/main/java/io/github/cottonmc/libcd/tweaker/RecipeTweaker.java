@@ -21,7 +21,7 @@ public class RecipeTweaker implements Tweaker {
 	private int recipeCount;
 	private int removeCount;
 	private Map<RecipeType<?>, List<Recipe<?>>> toAdd = new HashMap<>();
-	private List<Identifier> toRemove = new ArrayList<>();
+	private Map<RecipeType<?>, List<Identifier>> toRemove = new HashMap<>();
 
 	/**
 	 * Used during data pack loading to set up recipe adding.
@@ -73,7 +73,7 @@ public class RecipeTweaker implements Tweaker {
 					LibCD.logger.error("Failed to add recipe from tweaker - " + e.getMessage());
 				}
 			}
-			for (Identifier recipeId : toRemove) {
+			for (Identifier recipeId : toRemove.get(type)) {
 				if (map.containsKey(recipeId)) {
 					map.remove(recipeId);
 					INSTANCE.removeCount++;
@@ -103,7 +103,15 @@ public class RecipeTweaker implements Tweaker {
 	 * @param id The id of the recipe to remove.
 	 */
 	public static void removeRecipe(String id) {
-		INSTANCE.toRemove.add(new Identifier(id));
+		Identifier formatted = new Identifier(id);
+		Optional<? extends Recipe<?>> opt = INSTANCE.manager.get(formatted);
+		if (opt.isPresent()) {
+			Recipe<?> recipe = opt.get();
+			RecipeType<?> type = recipe.getType();
+			if (!INSTANCE.toRemove.containsKey(type)) INSTANCE.toRemove.put(type, new ArrayList<>());
+			List<Identifier> removal = INSTANCE.toRemove.get(type);
+			removal.add(formatted);
+		}
 	}
 
 	/**

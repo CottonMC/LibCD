@@ -42,15 +42,16 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 			//don't try to load for things that use mcmetas already!
 			if (id.getPath().contains(".mcmeta") || id.getPath().contains(".png")) continue;
 			Identifier metaId = new Identifier(id.getNamespace(), id.getPath() + ".mcmeta");
-			try {
-				Resource meta = getResource(metaId);
-				String metaText = IOUtils.toString(meta.getInputStream());
-				if (!ConditionalData.shouldLoad(id, metaText)) {
-					sortedResources.remove(id);
+			if (libcd_contains(metaId)) {
+				try {
+					Resource meta = getResource(metaId);
+					String metaText = IOUtils.toString(meta.getInputStream());
+					if (!ConditionalData.shouldLoad(id, metaText)) {
+						sortedResources.remove(id);
+					}
+				} catch (IOException e) {
+					LOGGER.error("Error when accessing recipe metadata for {}: {}", id.toString(), e.getMessage());
 				}
-			} catch (IOException e) {
-				//this is so ugly but I can't really do anything else when containsResource is client-side only for *no* reason
-				if (!(e instanceof FileNotFoundException)) LOGGER.error("Error when accessing recipe metadata for {}: {}", id.toString(), e.getMessage());
 			}
 		}
 	}

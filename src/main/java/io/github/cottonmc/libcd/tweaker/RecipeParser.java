@@ -2,6 +2,7 @@ package io.github.cottonmc.libcd.tweaker;
 
 import com.google.common.collect.Sets;
 import io.github.cottonmc.libcd.LibCD;
+import io.netty.buffer.Unpooled;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -10,6 +11,7 @@ import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.DefaultedList;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.PacketByteBuf;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,11 +37,11 @@ public class RecipeParser {
 			LibCD.logger.warn("Use of deprecated potion-getting method in '" + input + "', this will be removed soon!");
 			ItemStack stack = TweakerUtils.getPotion(input.substring(1));
 			if (stack.isEmpty()) throw new TweakerSyntaxException("Failed to get potion for input: " + input);
-			return Ingredient.ofStacks(stack);
+			return hackStackIngredients(stack);
 		} else if (input.contains("->")) {
 			ItemStack stack = TweakerUtils.getSpecialStack(input);
 			if (stack.isEmpty()) throw new TweakerSyntaxException("Failed to get special stack for input: " + input);
-			return Ingredient.ofStacks(stack);
+			return hackStackIngredients(stack);
 		} else {
 			Item item = TweakerUtils.getItem(input);
 			if (item == Items.AIR) throw new TweakerSyntaxException("Failed to get item for input: " + input);
@@ -213,5 +215,22 @@ public class RecipeParser {
 		int i;
 		for (i = input.length() - 1; i >= 0 && input.charAt(i) == ' '; i--) { }
 		return i;
+	}
+
+	/**
+	 * Thanks, ProGuard! The `Ingredient.ofStacks()` method is currently only in the client environment,
+	 * so I have to write this ugly, terrible hack to make it work!
+	 * Serializes the input stacks into a PacketByteBuf,
+	 * then tricks the Ingredient class into deserializing them.
+	 * @param stacks The input stacks to support.
+	 * @return The ingredient object for the input stacks.
+	 */
+	public static Ingredient hackStackIngredients(ItemStack...stacks) {
+		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+		buf.writeInt(stacks.length);
+		for (int i = 0; i < stacks.length; i++) {
+			buf.writeItemStack(stacks[i]);
+		}
+		return Ingredient.fromPacket(buf);
 	}
 }
