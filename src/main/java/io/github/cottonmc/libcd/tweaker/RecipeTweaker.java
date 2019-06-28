@@ -73,7 +73,7 @@ public class RecipeTweaker implements Tweaker {
 					LibCD.logger.error("Failed to add recipe from tweaker - " + e.getMessage());
 				}
 			}
-			for (Identifier recipeId : toRemove.get(type)) {
+			for (Identifier recipeId : toRemove.getOrDefault(type, new ArrayList<>())) {
 				if (map.containsKey(recipeId)) {
 					map.remove(recipeId);
 					INSTANCE.removeCount++;
