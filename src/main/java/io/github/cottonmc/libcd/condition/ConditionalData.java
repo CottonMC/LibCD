@@ -61,15 +61,16 @@ public class ConditionalData {
 			}
 			return false;
 		});
-		registerCondition(new Identifier(LibCD.MODID, "any_of"), (value) -> {
-			if (value instanceof JsonObject) {
-				JsonObject json = (JsonObject)value;
-				for (String key : json.keySet()) {
-					Identifier id = new Identifier(key);
-					Object result = parseElement(json.get(key));
-					if (hasCondition(id)) {
-						if (testCondition(id, result)) return true;
-					} else return false;
+		registerCondition(new Identifier(LibCD.MODID, "or"), (value) -> {
+			if (value instanceof JsonArray) {
+				JsonArray json = (JsonArray) value;
+				for (JsonElement elem : json) {
+					if (elem instanceof JsonObject) {
+						JsonObject obj = (JsonObject) elem;
+						for (String key : obj.keySet()) {
+							if (!testCondition(new Identifier(key), obj)) return false;
+						}
+					}
 				}
 			}
 			return false;
@@ -79,7 +80,7 @@ public class ConditionalData {
 	public static boolean shouldLoad(Identifier resourceId, String meta) {
 		try {
 			JsonObject json = LibCD.jankson.load(meta);
-			JsonElement elem = json.get("conditions");
+			JsonElement elem = json.get("when");
 			if (elem instanceof JsonArray) {
 				JsonArray array = (JsonArray)elem;
 				for (JsonElement condition : array) {
