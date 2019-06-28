@@ -90,7 +90,8 @@ public class ConditionalData {
 					}
 					JsonObject obj = (JsonObject)condition;
 					for (String key : obj.keySet()) {
-						if (!testCondition(new Identifier(key), obj)) return false;
+						Identifier id = key.equals("or")? new Identifier(LibCD.MODID, "or") : new Identifier(key);
+						if (!testCondition(id, obj)) return false;
 					}
 				}
 			}
