@@ -2,10 +2,8 @@ package io.github.cottonmc.libcd.mixin;
 
 import io.github.cottonmc.libcd.condition.ConditionalData;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
-import net.minecraft.resource.ReloadableResourceManager;
-import net.minecraft.resource.ReloadableResourceManagerImpl;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceReloadListener;
+import io.github.cottonmc.libcd.impl.ResourceSearcher;
+import net.minecraft.resource.*;
 import net.minecraft.util.Identifier;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.Logger;
@@ -17,18 +15,24 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
 @Mixin(ReloadableResourceManagerImpl.class)
-public abstract class MixinResourceManagerImpl implements ReloadableResourceManager, ReloadListenersAccessor {
+public abstract class MixinResourceManagerImpl implements ReloadableResourceManager, ReloadListenersAccessor, ResourceSearcher {
 
 	@Shadow @Final private static Logger LOGGER;
 
 	@Shadow @Final private List<ResourceReloadListener> listeners;
+
+	@Shadow public abstract List<Resource> getAllResources(Identifier identifier_1) throws IOException;
+
+	@Shadow @Final private Map<String, NamespaceResourceManager> namespaceManagers;
 
 	@Inject(method = "findResources", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void checkConditioalRecipes(String parent, Predicate<String> loadFilter, CallbackInfoReturnable cir,
@@ -38,16 +42,15 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 			//don't try to load for things that use mcmetas already!
 			if (id.getPath().contains(".mcmeta") || id.getPath().contains(".png")) continue;
 			Identifier metaId = new Identifier(id.getNamespace(), id.getPath() + ".mcmeta");
-			if (containsResource(metaId)) {
-				try {
-					Resource meta = getResource(metaId);
-					String metaText = IOUtils.toString(meta.getInputStream());
-					if (!ConditionalData.shouldLoad(id, metaText)) {
-						sortedResources.remove(id);
-					}
-				} catch (IOException e) {
-					LOGGER.error("Error when accessing recipe metadata for {}: {}", id.toString(), e.getMessage());
+			try {
+				Resource meta = getResource(metaId);
+				String metaText = IOUtils.toString(meta.getInputStream());
+				if (!ConditionalData.shouldLoad(id, metaText)) {
+					sortedResources.remove(id);
 				}
+			} catch (IOException e) {
+				//this is so ugly but I can't really do anything else when containsResource is client-side only for *no* reason
+				if (!(e instanceof FileNotFoundException)) LOGGER.error("Error when accessing recipe metadata for {}: {}", id.toString(), e.getMessage());
 			}
 		}
 	}
@@ -56,4 +59,11 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 	public List<ResourceReloadListener> libcd_getListeners() {
 		return listeners;
 	}
+
+	public boolean libcd_contains(Identifier id) {
+		ResourceManager manager = this.namespaceManagers.get(id.getNamespace());
+		return manager != null && ((ResourceSearcher) manager).libcd_contains(id);
+	}
+
+
 }
