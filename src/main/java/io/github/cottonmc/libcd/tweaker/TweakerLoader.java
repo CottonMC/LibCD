@@ -1,6 +1,8 @@
 package io.github.cottonmc.libcd.tweaker;
 
 import io.github.cottonmc.libcd.LibCD;
+import io.github.cottonmc.libcd.tweaker.preparse.ConstructorParser;
+import javafx.util.Pair;
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -8,6 +10,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 import org.apache.commons.io.IOUtils;
 
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -75,8 +78,14 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 					continue;
 				}
 				try {
-					engine.eval(script);
-				} catch (ScriptException e) {
+					Pair<String, Map<String, Object>> processed = ConstructorParser.parseConstructors(script);
+					ScriptContext ctx = engine.getContext();
+					//TODO: write to file
+					for (String name : processed.getValue().keySet()) {
+						ctx.setAttribute(name, processed.getValue().get(name), ScriptContext.ENGINE_SCOPE);
+					}
+					engine.eval(processed.getKey());
+				} catch (ScriptException | TweakerSyntaxException e) {
 					LibCD.logger.error("Error executing tweaker script {}: {}", tweaker.toString(), e.getMessage());
 					continue;
 				}
@@ -108,6 +117,6 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 
 	@Override
 	public Identifier getFabricId() {
-		return new Identifier(LibCD.MODID, "tweak_loader");
+		return new Identifier(LibCD.MODID, "tweaker_loader");
 	}
 }

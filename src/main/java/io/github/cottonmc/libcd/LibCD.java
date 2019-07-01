@@ -5,6 +5,7 @@ import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import io.github.cottonmc.jankson.JanksonFactory;
 import io.github.cottonmc.libcd.condition.ConditionalData;
 import io.github.cottonmc.libcd.tweaker.RecipeTweaker;
 import io.github.cottonmc.libcd.tweaker.Tweaker;
@@ -37,7 +38,7 @@ public class LibCD implements ModInitializer {
 
 	public static final Logger logger = LogManager.getLogger();
 	public static CDConfig config;
-	public static final Jankson jankson = Jankson.builder().build();
+	public static final Jankson jankson = JanksonFactory.createJankson();
 
 	@Override
 	public void onInitialize() {

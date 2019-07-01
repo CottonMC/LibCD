@@ -2,6 +2,8 @@ package io.github.cottonmc.libcd.tweaker;
 
 import com.google.common.collect.Sets;
 import io.github.cottonmc.libcd.LibCD;
+import io.github.cottonmc.libcd.impl.MatchTypeSetter;
+import io.github.cottonmc.libcd.util.NbtMatchType;
 import io.netty.buffer.Unpooled;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,6 +18,7 @@ import net.minecraft.util.PacketByteBuf;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Helper class to make public versions private recipe methods
@@ -27,26 +30,34 @@ public class RecipeParser {
 	 * @param input The id to use, with a # at the front if it's a tag or -> between two ids for a getter
 	 * @return the Ingredient for the given id
 	 */
-	public static Ingredient processIngredient(String input) throws TweakerSyntaxException {
-		if (input.indexOf('#') == 0) {
-			String tag = input.substring(1);
-			Tag<Item> itemTag = ItemTags.getContainer().get(new Identifier(tag));
-			if (itemTag == null) throw new TweakerSyntaxException("Failed to get item tag for input: " + input);
-			return Ingredient.fromTag(itemTag);
-		} else if (input.indexOf('&') == 0) {
-			LibCD.logger.warn("Use of deprecated potion-getting method in '" + input + "', this will be removed soon!");
-			ItemStack stack = TweakerUtils.getPotion(input.substring(1));
-			if (stack.isEmpty()) throw new TweakerSyntaxException("Failed to get potion for input: " + input);
-			return hackStackIngredients(stack);
-		} else if (input.contains("->")) {
-			ItemStack stack = TweakerUtils.getSpecialStack(input);
-			if (stack.isEmpty()) throw new TweakerSyntaxException("Failed to get special stack for input: " + input);
-			return hackStackIngredients(stack);
-		} else {
-			Item item = TweakerUtils.getItem(input);
-			if (item == Items.AIR) throw new TweakerSyntaxException("Failed to get item for input: " + input);
-			return Ingredient.ofItems(item);
+	public static Ingredient processIngredient(Object input) throws TweakerSyntaxException {
+		if (input instanceof Ingredient) return (Ingredient)input;
+		else if (input instanceof String) {
+			String in = (String)input;
+			if (in.indexOf('#') == 0) {
+				String tag = in.substring(1);
+				Tag<Item> itemTag = ItemTags.getContainer().get(new Identifier(tag));
+				if (itemTag == null) throw new TweakerSyntaxException("Failed to get item tag for input: " + in);
+				return Ingredient.fromTag(itemTag);
+			} else if (in.indexOf('&') == 0) {
+				LibCD.logger.warn("Use of deprecated potion-getting method in '" + in + "', this will be removed soon!");
+				ItemStack stack = TweakerUtils.getPotion(in.substring(1));
+				if (stack.isEmpty()) throw new TweakerSyntaxException("Failed to get potion for input: " + in);
+				return hackStackIngredients(stack);
+			} else if (in.contains("->")) {
+				ItemStack stack = TweakerUtils.getSpecialStack(in);
+				if (stack.isEmpty())
+					throw new TweakerSyntaxException("Failed to get special stack for input: " + in);
+				Ingredient ret = hackStackIngredients(stack);
+				((MatchTypeSetter)(Object)ret).libcd_setMatchType(NbtMatchType.FUZZY);
+				return ret;
+			} else {
+				Item item = TweakerUtils.getItem(in);
+				if (item == Items.AIR) throw new TweakerSyntaxException("Failed to get item for input: " + in);
+				return Ingredient.ofItems(item);
+			}
 		}
+		else throw new TweakerSyntaxException("Illegal object passed to recipe parser of type " + input.getClass());
 	}
 
 	/**
@@ -67,13 +78,13 @@ public class RecipeParser {
 	 * @param inputs The array of string arrays to process inputs from
 	 * @return The inputs converted into a single string array if the grid is valid
 	 */
-	public static String[] processGrid(String[][] inputs) throws TweakerSyntaxException {
+	public static Object[] processGrid(Object[][] inputs) throws TweakerSyntaxException {
 		if (inputs.length > 3) throw new TweakerSyntaxException("Invalid pattern: too many columns, 3 is maximum");
 		if (inputs.length == 0) throw new TweakerSyntaxException("Invalid pattern: empty pattern is not allowed");
 		int width = inputs[0].length;
-		String[] output = new String[inputs.length * inputs[0].length];
+		Object[] output = new Object[inputs.length * inputs[0].length];
 		for (int i = 0; i < inputs.length; i++) {
-			String[] row = inputs[i];
+			Object[] row = inputs[i];
 			if (row.length > 3) throw new TweakerSyntaxException("Invalid pattern: too many columns, 3 is maximum");
 			if (row.length != width) throw new TweakerSyntaxException("Invalid pattern: each row must be the same width");
 			for (int j = 0; j < width; j++) {
@@ -146,9 +157,9 @@ public class RecipeParser {
 	 * @param dictionary a map of keys to values for a recipe to parse.
 	 * @return A map of string keys to ingredient values that a Recipe can read.
 	 */
-	public static Map<String, Ingredient> processDictionary(Map<String, String> dictionary) throws TweakerSyntaxException {
+	public static Map<String, Ingredient> processDictionary(Map<String, Object> dictionary) throws TweakerSyntaxException {
 		Map<String, Ingredient> map = new HashMap<>();
-		for (Map.Entry<String, String> entry : dictionary.entrySet()) {
+		for (Map.Entry<String, Object> entry : dictionary.entrySet()) {
 			if (entry.getKey().length() != 1) {
 				throw new TweakerSyntaxException("Invalid key entry: '" + entry.getKey() + "' is an invalid symbol (must be 1 character only).");
 			}
@@ -227,9 +238,9 @@ public class RecipeParser {
 	 */
 	public static Ingredient hackStackIngredients(ItemStack...stacks) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		buf.writeInt(stacks.length);
-		for (int i = 0; i < stacks.length; i++) {
-			buf.writeItemStack(stacks[i]);
+		buf.writeVarInt(stacks.length);
+		for (ItemStack stack : stacks) {
+			buf.writeItemStack(stack);
 		}
 		return Ingredient.fromPacket(buf);
 	}

@@ -30,7 +30,7 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 
 	@Shadow @Final private List<ResourceReloadListener> listeners;
 
-	@Shadow public abstract List<Resource> getAllResources(Identifier identifier_1) throws IOException;
+	@Shadow public abstract List<Resource> getAllResources(Identifier id) throws IOException;
 
 	@Shadow @Final private Map<String, NamespaceResourceManager> namespaceManagers;
 

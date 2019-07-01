@@ -4,6 +4,7 @@
   "refmap": "mixins.libcd.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "MixinIngredient",
     "MixinResourceManagerImpl",
     "MixinRecipeManager",
     "MixinNamespaceResourceManager"
