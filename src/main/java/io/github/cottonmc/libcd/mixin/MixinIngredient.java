@@ -16,9 +16,10 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public class MixinIngredient implements MatchTypeSetter {
 	private NbtMatchType type = NbtMatchType.NONE;
 	@Inject(method = "method_8093", at = @At(value = "RETURN", ordinal = 2), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-	private void checkStackNbt(ItemStack test, CallbackInfoReturnable cir, ItemStack[] stackArray, int arrayLength, int i, ItemStack testAgainst) {
-		if (!testAgainst.hasTag()) {
-			cir.setReturnValue(true);
+	private void checkStackNbt(ItemStack test, CallbackInfoReturnable<Boolean> cir, ItemStack[] stackArray, int arrayLength, int i, ItemStack testAgainst) {
+		if (!testAgainst.hasTag() || test.getTag().isEmpty()) {
+			if (type == NbtMatchType.EXACT && (test.hasTag() && !test.getTag().isEmpty())) cir.setReturnValue(false);
+			else cir.setReturnValue(true);
 			return;
 		}
 		if (type != NbtMatchType.NONE && !test.hasTag()) {
