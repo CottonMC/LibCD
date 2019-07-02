@@ -24,6 +24,7 @@ public class MixinIngredient implements MatchTypeSetter {
 		}
 		if (type != NbtMatchType.NONE && !test.hasTag()) {
 			cir.setReturnValue(false);
+			return;
 		}
 		CompoundTag testTag = test.getOrCreateTag();
 		CompoundTag againstTag = testAgainst.getOrCreateTag();
