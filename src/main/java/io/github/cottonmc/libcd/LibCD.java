@@ -72,8 +72,8 @@ public class LibCD implements ModInitializer {
 					if (i == 0 && str.contains("nbt::")) {
 						String type = str.substring(5);
 						match = NbtMatchType.forName(type);
-					} else if (str.indexOf('[') != -1) {
-						int index = str.indexOf('[');
+					} else if (str.indexOf('{') != -1) {
+						int index = str.indexOf('{');
 						String name = str.substring(0, index);
 						String nbt = str.substring(index);
 						if (name.contains("#")) {
