@@ -1,9 +1,10 @@
 package io.github.cottonmc.libcd.tweaker;
 
 import io.github.cottonmc.libcd.LibCD;
-import io.github.cottonmc.libcd.tweaker.preparse.ConstructorParser;
+import io.github.cottonmc.libcd.tweaker.preparse.LiteralParser;
 import javafx.util.Pair;
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -14,6 +15,8 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -46,9 +49,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 					try {
 						Resource res = manager.getResource(fileId);
 						String script = IOUtils.toString(res.getInputStream());
-						int localPath = fileId.getPath().indexOf('/')+1;
-						Identifier scriptId = new Identifier(fileId.getNamespace(), fileId.getPath().substring(localPath));
-						TWEAKERS.put(scriptId, script);
+						TWEAKERS.put(fileId, script);
 					} catch (IOException e) {
 						LibCD.logger.error("Error when accessing tweaker script {} in subset {}: {}", fileId.toString(), subset, e.getMessage());
 					}
@@ -78,9 +79,19 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 					continue;
 				}
 				try {
-					Pair<String, Map<String, Object>> processed = ConstructorParser.parseConstructors(script);
+					Pair<String, Map<String, Object>> processed = LiteralParser.parseLiterals(script);
 					ScriptContext ctx = engine.getContext();
-					//TODO: write to file
+					try {
+						String newFile = tweaker.toString().replace(':', '-').replace('/', '-');
+						File writeTo = FabricLoader.getInstance().getGameDirectory().toPath().resolve("libcd-export/" + newFile).toFile();
+						if (!writeTo.exists()) writeTo.createNewFile();
+						FileOutputStream out = new FileOutputStream(writeTo,false);
+						out.write(processed.getKey().getBytes());
+						out.flush();
+						out.close();
+					} catch (IOException e) {
+						LibCD.logger.error("Error exporting processed tweaker script {}: {}", tweaker.toString(), e.getMessage());
+					}
 					for (String name : processed.getValue().keySet()) {
 						ctx.setAttribute(name, processed.getValue().get(name), ScriptContext.ENGINE_SCOPE);
 					}

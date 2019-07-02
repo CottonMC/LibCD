@@ -7,23 +7,26 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import io.github.cottonmc.jankson.JanksonFactory;
 import io.github.cottonmc.libcd.condition.ConditionalData;
-import io.github.cottonmc.libcd.tweaker.RecipeTweaker;
-import io.github.cottonmc.libcd.tweaker.Tweaker;
-import io.github.cottonmc.libcd.tweaker.TweakerLoader;
-import io.github.cottonmc.libcd.tweaker.TweakerStackGetter;
+import io.github.cottonmc.libcd.impl.MatchTypeSetter;
+import io.github.cottonmc.libcd.tweaker.*;
+import io.github.cottonmc.libcd.tweaker.preparse.LiteralParser;
 import io.github.cottonmc.libcd.util.CDConfig;
+import io.github.cottonmc.libcd.util.NbtMatchType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.registry.CommandRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.tag.Tag;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
@@ -31,6 +34,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class LibCD implements ModInitializer {
@@ -57,6 +62,48 @@ public class LibCD implements ModInitializer {
 								.executes(context -> changeSubset(context, context.getArgument("subset", String.class))))
 						.then(CommandManager.literal("-reset").executes(context -> changeSubset(context, "")))
 		)));
+		LiteralParser.registerFactory(new Identifier("minecraft", "ingredient"), inputs -> {
+			List<ItemStack> stacks = new ArrayList<>();
+			NbtMatchType match = NbtMatchType.NONE;
+			for (int i = 0; i < inputs.length; i++) {
+				Object input = inputs[i];
+				if (input instanceof String) {
+					String str = (String)input;
+					if (i == 0 && str.contains("nbt::")) {
+						String type = str.substring(5);
+						match = NbtMatchType.forName(type);
+					} else if (str.indexOf('[') != -1) {
+						int index = str.indexOf('[');
+						String name = str.substring(0, index);
+						String nbt = str.substring(index);
+						if (name.contains("#")) {
+							String[] tag = TweakerUtils.getItemsInTag(str.substring(1));
+							for (String item : tag) {
+								ItemStack stack = new ItemStack(TweakerUtils.getItem(item));
+								TweakerUtils.addNbtToStack(stack, nbt);
+								stacks.add(stack);
+							}
+						} else {
+							ItemStack stack = new ItemStack(TweakerUtils.getItem(name));
+							TweakerUtils.addNbtToStack(stack, nbt);
+							stacks.add(stack);
+						}
+					} else if (str.contains("#")) {
+						String[] tag = TweakerUtils.getItemsInTag(str.substring(1));
+						for (String name : tag) {
+							Item item = TweakerUtils.getItem(name);
+							stacks.add(new ItemStack(item));
+						}
+					} else {
+						Item name = TweakerUtils.getItem((String) input);
+						stacks.add(new ItemStack(name));
+					}
+				}
+			}
+			Ingredient ret = RecipeParser.hackStackIngredients(stacks.toArray(new ItemStack[]{}));
+			((MatchTypeSetter)(Object)ret).libcd_setMatchType(match);
+			return ret;
+		});
 	}
 
 	private int changeSubset(CommandContext<ServerCommandSource> context, String setTo) {
