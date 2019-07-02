@@ -77,7 +77,7 @@ public class LibCD implements ModInitializer {
 						String name = str.substring(0, index);
 						String nbt = str.substring(index);
 						if (name.contains("#")) {
-							String[] tag = TweakerUtils.getItemsInTag(str.substring(1));
+							String[] tag = TweakerUtils.getItemsInTag(name.substring(1));
 							for (String item : tag) {
 								ItemStack stack = new ItemStack(TweakerUtils.getItem(item));
 								TweakerUtils.addNbtToStack(stack, nbt);
