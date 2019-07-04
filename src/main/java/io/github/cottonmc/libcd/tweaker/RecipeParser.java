@@ -1,7 +1,6 @@
 package io.github.cottonmc.libcd.tweaker;
 
 import com.google.common.collect.Sets;
-import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.impl.MatchTypeSetter;
 import io.github.cottonmc.libcd.util.NbtMatchType;
 import io.netty.buffer.Unpooled;
@@ -15,10 +14,7 @@ import net.minecraft.util.DefaultedList;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Predicate;
+import java.util.*;
 
 /**
  * Helper class to make public versions private recipe methods
@@ -34,28 +30,45 @@ public class RecipeParser {
 		if (input instanceof Ingredient) return (Ingredient)input;
 		else if (input instanceof String) {
 			String in = (String)input;
+			int index = in.indexOf('{');
+			String nbt = "";
+			NbtMatchType type = NbtMatchType.NONE;
+			List<ItemStack> stacks = new ArrayList<>();
+			if (index != -1) {
+				int andIndex = in.indexOf('&');
+				if (andIndex != -1) {
+					type = NbtMatchType.forName(in.substring(andIndex+1));
+					in = in.substring(0, andIndex);
+				}
+				nbt = in.substring(index);
+				in = in.substring(0, index);
+			}
 			if (in.indexOf('#') == 0) {
 				String tag = in.substring(1);
 				Tag<Item> itemTag = ItemTags.getContainer().get(new Identifier(tag));
 				if (itemTag == null) throw new TweakerSyntaxException("Failed to get item tag for input: " + in);
-				return Ingredient.fromTag(itemTag);
-			} else if (in.indexOf('&') == 0) {
-				LibCD.logger.warn("Use of deprecated potion-getting method in '" + in + "', this will be removed soon!");
-				ItemStack stack = TweakerUtils.getPotion(in.substring(1));
-				if (stack.isEmpty()) throw new TweakerSyntaxException("Failed to get potion for input: " + in);
-				return hackStackIngredients(stack);
+				for (Item item : itemTag.values()) {
+					stacks.add(new ItemStack(item));
+				}
 			} else if (in.contains("->")) {
-				ItemStack stack = TweakerUtils.getSpecialStack(in);
+				ItemStack stack = TweakerUtils.INSTANCE.getSpecialStack(in);
 				if (stack.isEmpty())
 					throw new TweakerSyntaxException("Failed to get special stack for input: " + in);
-				Ingredient ret = hackStackIngredients(stack);
-				((MatchTypeSetter)(Object)ret).libcd_setMatchType(NbtMatchType.FUZZY);
-				return ret;
+				stacks.add(stack);
+				type = NbtMatchType.EXACT;
 			} else {
-				Item item = TweakerUtils.getItem(in);
+				Item item = TweakerUtils.INSTANCE.getItem(in);
 				if (item == Items.AIR) throw new TweakerSyntaxException("Failed to get item for input: " + in);
-				return Ingredient.ofItems(item);
+				stacks.add(new ItemStack(item));
 			}
+			if (!nbt.equals("")) {
+				for (ItemStack stack : stacks) {
+					if (!stack.hasTag() || stack.getTag().isEmpty()) TweakerUtils.INSTANCE.addNbtToStack(stack, nbt);
+				}
+			}
+			Ingredient ret = hackStackIngredients(stacks.toArray(new ItemStack[]{}));
+			((MatchTypeSetter)(Object)ret).libcd_setMatchType(type);
+			return ret;
 		}
 		else throw new TweakerSyntaxException("Illegal object passed to recipe parser of type " + input.getClass());
 	}

@@ -1,21 +1,35 @@
 package io.github.cottonmc.libcd.tweaker;
 
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.profiler.Profiler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 public interface Tweaker {
 	List<Tweaker> TWEAKERS = new ArrayList<>();
+	Map<String, Object> ASSISTANTS = new HashMap<>();
 
 	/**
 	 * Add a new tweaker to store data in.
-	 * @param tweaker an instanceof Tweaker to call whenever reloading.
+	 * @param callName A unique name to call this tweaker by in scripts. Names shared with addAssistant.
+	 * @param tweaker An instanceof Tweaker to call whenever reloading.
 	 */
-	static void addTweaker(Tweaker tweaker) {
+	static void addTweaker(String callName, Tweaker tweaker) {
 		TWEAKERS.add(tweaker);
+		ASSISTANTS.put(callName, tweaker);
+	}
+
+	/**
+	 * Add a new assistant class for tweakers to access.
+	 * DO NOT PASS TWEAKER INSTANCES HERE. They are automatically added in addTweaker.
+	 * @param callName A unique name to call this object by in scripts. Names shared with addTweaker.
+	 * @param assistant An object of a class to use in scripts.
+	 */
+	static void addAssistant(String callName, Object assistant) {
+		ASSISTANTS.put(callName, assistant);
 	}
 
 	/**

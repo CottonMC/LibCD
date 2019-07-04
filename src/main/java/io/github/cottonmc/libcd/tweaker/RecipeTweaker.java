@@ -2,8 +2,10 @@ package io.github.cottonmc.libcd.tweaker;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.cottonmc.libcd.LibCD;
+import io.github.cottonmc.libcd.impl.MatchTypeSetter;
 import io.github.cottonmc.libcd.impl.RecipeMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
+import io.github.cottonmc.libcd.util.NbtMatchType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.*;
 import net.minecraft.resource.ResourceManager;
@@ -17,7 +19,7 @@ import java.util.concurrent.Executor;
 
 public class RecipeTweaker implements Tweaker {
 	public static final RecipeTweaker INSTANCE = new RecipeTweaker();
-	private RecipeManager manager;
+	private RecipeManager recipeManager;
 	private int recipeCount;
 	private int removeCount;
 	private Map<RecipeType<?>, List<Recipe<?>>> toAdd = new HashMap<>();
@@ -37,7 +39,7 @@ public class RecipeTweaker implements Tweaker {
 			List<ResourceReloadListener> listeners = ((ReloadListenersAccessor)manager).libcd_getListeners();
 			for (ResourceReloadListener listener : listeners) {
 				if (listener instanceof RecipeManager) {
-					this.manager = (RecipeManager)listener;
+					this.recipeManager = (RecipeManager)listener;
 					return;
 				}
 			}
@@ -57,7 +59,7 @@ public class RecipeTweaker implements Tweaker {
 	 */
 	@Override
 	public void applyReload(ResourceManager manager, Executor executor) {
-		Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipeMap = new HashMap<>(((RecipeMapAccessor)INSTANCE.manager).libcd_getRecipeMap());
+		Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipeMap = new HashMap<>(((RecipeMapAccessor)recipeManager).libcd_getRecipeMap());
 		Set<RecipeType<?>> types = new HashSet<>(recipeMap.keySet());
 		types.addAll(toAdd.keySet());
 		for (RecipeType<?> type : types) {
@@ -68,7 +70,7 @@ public class RecipeTweaker implements Tweaker {
 					LibCD.logger.error("Failed to add recipe from tweaker - duplicate recipe ID: " + id);
 				} else try {
 					map.put(id, recipe);
-					INSTANCE.recipeCount++;
+					recipeCount++;
 				} catch (Exception e) {
 					LibCD.logger.error("Failed to add recipe from tweaker - " + e.getMessage());
 				}
@@ -76,12 +78,12 @@ public class RecipeTweaker implements Tweaker {
 			for (Identifier recipeId : toRemove.getOrDefault(type, new ArrayList<>())) {
 				if (map.containsKey(recipeId)) {
 					map.remove(recipeId);
-					INSTANCE.removeCount++;
+					removeCount++;
 				} else LibCD.logger.error("Could not find recipe to remove: " + recipeId.toString());
 			}
 			recipeMap.put(type, ImmutableMap.copyOf(map));
 		}
-		((RecipeMapAccessor)INSTANCE.manager).libcd_setRecipeMap(ImmutableMap.copyOf(recipeMap));
+		((RecipeMapAccessor)recipeManager).libcd_setRecipeMap(ImmutableMap.copyOf(recipeMap));
 	}
 
 	@Override
@@ -94,37 +96,37 @@ public class RecipeTweaker implements Tweaker {
 	 * @param output The output stack of the recipe.
 	 * @return A unique identifier for the recipe.
 	 */
-	public static Identifier getRecipeId(ItemStack output) {
+	public Identifier getRecipeId(ItemStack output) {
 		String resultName = Registry.ITEM.getId(output.getItem()).getPath();
-		return new Identifier(LibCD.MODID, "tweaked/"+resultName+"-"+INSTANCE.recipeCount);
+		return new Identifier(LibCD.MODID, "tweaked/"+resultName+"-"+recipeCount);
 	}
 
 	/**
-	 * Remove a recipe from the recipe manager.
+	 * Remove a recipe from the recipe recipeManager.
 	 * @param id The id of the recipe to remove.
 	 */
-	public static void removeRecipe(String id) {
+	public void removeRecipe(String id) {
 		Identifier formatted = new Identifier(id);
-		Optional<? extends Recipe<?>> opt = INSTANCE.manager.get(formatted);
+		Optional<? extends Recipe<?>> opt = recipeManager.get(formatted);
 		if (opt.isPresent()) {
 			Recipe<?> recipe = opt.get();
 			RecipeType<?> type = recipe.getType();
-			if (!INSTANCE.toRemove.containsKey(type)) INSTANCE.toRemove.put(type, new ArrayList<>());
-			List<Identifier> removal = INSTANCE.toRemove.get(type);
+			if (!toRemove.containsKey(type)) toRemove.put(type, new ArrayList<>());
+			List<Identifier> removal = toRemove.get(type);
 			removal.add(formatted);
 		}
 	}
 
 	/**
-	 * Register a recipe to the recipe manager.
+	 * Register a recipe to the recipe recipeManager.
 	 * @param recipe A constructed recipe.
 	 */
-	public static void addRecipe(Recipe<?> recipe) {
+	public void addRecipe(Recipe<?> recipe) {
 		RecipeType<?> type = recipe.getType();
-		if (!INSTANCE.toAdd.containsKey(type)) {
-			INSTANCE.toAdd.put(type, new ArrayList<>());
+		if (!toAdd.containsKey(type)) {
+			toAdd.put(type, new ArrayList<>());
 		}
-		List<Recipe<?>> recipeList = INSTANCE.toAdd.get(type);
+		List<Recipe<?>> recipeList = toAdd.get(type);
 		recipeList.add(recipe);
 	}
 
@@ -133,11 +135,34 @@ public class RecipeTweaker implements Tweaker {
 	 * @param stack The item stack to make an ingredient for.
 	 * @return The wrapped ingredient of the stack.
 	 */
-	public static Ingredient ingredientForStack(ItemStack stack) {
+	public Ingredient ingredientForStack(ItemStack stack) {
 		return RecipeParser.hackStackIngredients(stack);
 	}
 
-	public static void addShaped(Object[][] inputs, ItemStack output) {
+	/**
+	 * Make an Ingredient object to pass to recipes from a string of inputs.
+	 * @param nbtMatch The NBT matching type to use: "none", "fuzzy", or "exact".
+	 * @param inputs The string forms of inputs to add to the Ingredient.
+	 * @return An Ingredient object to pass to recipes.
+	 * @throws TweakerSyntaxException If an input is malformed.
+	 */
+	public Ingredient makeIngredient(String nbtMatch, String...inputs) {
+		List<ItemStack> stacks = new ArrayList<>();
+		NbtMatchType match = NbtMatchType.forName(nbtMatch);
+		for (String input : inputs) {
+			try {
+				ItemStack[] in = RecipeParser.processIngredient(input).getStackArray();
+				stacks.addAll(Arrays.asList(in));
+			} catch (TweakerSyntaxException e) {
+				LibCD.logger.error("Could not add stack to ingredient: malformed stack string {}", input);
+			}
+		}
+		Ingredient ret = RecipeParser.hackStackIngredients(stacks.toArray(new ItemStack[]{}));
+		((MatchTypeSetter)(Object)ret).libcd_setMatchType(match);
+		return ret;
+	}
+
+	public void addShaped(Object[][] inputs, ItemStack output) {
 		addShaped(inputs, output, "");
 	}
 
@@ -147,7 +172,7 @@ public class RecipeTweaker implements Tweaker {
 	 * @param output The output of the recipe.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public static void addShaped(Object[][] inputs, ItemStack output, String group) {
+	public void addShaped(Object[][] inputs, ItemStack output, String group) {
 		try {
 			Object[] processed = RecipeParser.processGrid(inputs);
 			int width = inputs[0].length;
@@ -158,7 +183,7 @@ public class RecipeTweaker implements Tweaker {
 		}
 	}
 
-	public static void addShaped(String[] inputs, ItemStack output, int width, int height) {
+	public void addShaped(String[] inputs, ItemStack output, int width, int height) {
 		addShaped(inputs, output, width, height, "");
 	}
 
@@ -170,7 +195,7 @@ public class RecipeTweaker implements Tweaker {
 	 * @param height How many columns the recipe needs.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public static void addShaped(Object[] inputs, ItemStack output, int width, int height, String group){
+	public void addShaped(Object[] inputs, ItemStack output, int width, int height, String group){
 		Identifier recipeId = getRecipeId(output);
 		try {
 			DefaultedList<Ingredient> ingredients = DefaultedList.create();
@@ -185,7 +210,7 @@ public class RecipeTweaker implements Tweaker {
 		}
 	}
 
-	public static void addShaped(String[] pattern, Map<String, Object> dictionary, ItemStack output) {
+	public void addShaped(String[] pattern, Map<String, Object> dictionary, ItemStack output) {
 		addShaped(pattern, dictionary, output, "");
 	}
 
@@ -196,7 +221,7 @@ public class RecipeTweaker implements Tweaker {
 	 * @param output The output of the recipe.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public static void addShaped(String[] pattern, Map<String, Object> dictionary, ItemStack output, String group) {
+	public void addShaped(String[] pattern, Map<String, Object> dictionary, ItemStack output, String group) {
 		Identifier recipeId = getRecipeId(output);
 		try {
 			pattern = RecipeParser.processPattern(pattern);
@@ -210,7 +235,7 @@ public class RecipeTweaker implements Tweaker {
 		}
 	}
 
-	public static void addShapeless(Object[] inputs, ItemStack output) {
+	public void addShapeless(Object[] inputs, ItemStack output) {
 		addShapeless(inputs, output, "");
 	}
 
@@ -220,7 +245,7 @@ public class RecipeTweaker implements Tweaker {
 	 * @param output The output of the recipe.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public static void addShapeless(Object[] inputs, ItemStack output, String group) {
+	public void addShapeless(Object[] inputs, ItemStack output, String group) {
 		Identifier recipeId = getRecipeId(output);
 		try {
 			DefaultedList<Ingredient> ingredients = DefaultedList.create();
@@ -235,7 +260,7 @@ public class RecipeTweaker implements Tweaker {
 		}
 	}
 
-	public static void addSmelting(Object input, ItemStack output, int ticks, float xp) {
+	public void addSmelting(Object input, ItemStack output, int ticks, float xp) {
 		addSmelting(input, output, ticks, xp, "");
 	}
 
@@ -247,7 +272,7 @@ public class RecipeTweaker implements Tweaker {
 	 * @param xp How many experience points to drop per item, on average.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public static void addSmelting(Object input, ItemStack output, int cookTime, float xp, String group) {
+	public void addSmelting(Object input, ItemStack output, int cookTime, float xp, String group) {
 		Identifier recipeId = getRecipeId(output);
 		try {
 			Ingredient ingredient = RecipeParser.processIngredient(input);
@@ -257,7 +282,7 @@ public class RecipeTweaker implements Tweaker {
 		}
 	}
 
-	public static void addBlasting(Object input, ItemStack output, int ticks, float xp) {
+	public void addBlasting(Object input, ItemStack output, int ticks, float xp) {
 		addBlasting(input, output, ticks, xp, "");
 	}
 
@@ -269,7 +294,7 @@ public class RecipeTweaker implements Tweaker {
 	 * @param xp How many experience points to drop per item, on average.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public static void addBlasting(Object input, ItemStack output, int cookTime, float xp, String group) {
+	public void addBlasting(Object input, ItemStack output, int cookTime, float xp, String group) {
 		Identifier recipeId = getRecipeId(output);
 		try {
 			Ingredient ingredient = RecipeParser.processIngredient(input);
@@ -279,7 +304,7 @@ public class RecipeTweaker implements Tweaker {
 		}
 	}
 
-	public static void addSmoking(Object input, ItemStack output, int ticks, float xp) {
+	public void addSmoking(Object input, ItemStack output, int ticks, float xp) {
 		addSmoking(input, output, ticks, xp, "");
 	}
 
@@ -291,7 +316,7 @@ public class RecipeTweaker implements Tweaker {
 	 * @param xp How many experience points to drop per item, on average.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public static void addSmoking(Object input, ItemStack output, int cookTime, float xp, String group) {
+	public void addSmoking(Object input, ItemStack output, int cookTime, float xp, String group) {
 		Identifier recipeId = getRecipeId(output);
 		try {
 			Ingredient ingredient = RecipeParser.processIngredient(input);
@@ -301,7 +326,7 @@ public class RecipeTweaker implements Tweaker {
 		}
 	}
 
-	public static void addCampfire(Object input, ItemStack output, int ticks, float xp) {
+	public void addCampfire(Object input, ItemStack output, int ticks, float xp) {
 		addCampfire(input, output, ticks, xp, "");
 	}
 
@@ -313,7 +338,7 @@ public class RecipeTweaker implements Tweaker {
 	 * @param xp How many experience points to drop per item, on average.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public static void addCampfire(Object input, ItemStack output, int cookTime, float xp, String group) {
+	public void addCampfire(Object input, ItemStack output, int cookTime, float xp, String group) {
 		Identifier recipeId = getRecipeId(output);
 		try {
 			Ingredient ingredient = RecipeParser.processIngredient(input);
@@ -323,7 +348,7 @@ public class RecipeTweaker implements Tweaker {
 		}
 	}
 
-	public static void addStonecutting(Object input, ItemStack output) {
+	public void addStonecutting(Object input, ItemStack output) {
 		addStonecutting(input, output, "");
 	}
 
@@ -333,7 +358,7 @@ public class RecipeTweaker implements Tweaker {
 	 * @param output The output of the recipe.
 	 * @param group The recipe group to go in, or "" for none.
 	 */
-	public static void addStonecutting(Object input, ItemStack output, String group) {
+	public void addStonecutting(Object input, ItemStack output, String group) {
 		Identifier recipeId = getRecipeId(output);
 		try {
 			Ingredient ingredient = RecipeParser.processIngredient(input);

@@ -1,10 +1,7 @@
 package io.github.cottonmc.libcd.tweaker;
 
 import io.github.cottonmc.libcd.LibCD;
-import io.github.cottonmc.libcd.tweaker.preparse.LiteralParser;
-import javafx.util.Pair;
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -15,8 +12,6 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -79,24 +74,12 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 					continue;
 				}
 				try {
-					Pair<String, Map<String, Object>> processed = LiteralParser.parseLiterals(script);
 					ScriptContext ctx = engine.getContext();
-					try {
-						String newFile = tweaker.toString().replace(':', '-').replace('/', '-');
-						File writeTo = FabricLoader.getInstance().getGameDirectory().toPath().resolve("libcd-export/" + newFile).toFile();
-						if (!writeTo.exists()) writeTo.createNewFile();
-						FileOutputStream out = new FileOutputStream(writeTo,false);
-						out.write(processed.getKey().getBytes());
-						out.flush();
-						out.close();
-					} catch (IOException e) {
-						LibCD.logger.error("Error exporting processed tweaker script {}: {}", tweaker.toString(), e.getMessage());
+					for (String name : Tweaker.ASSISTANTS.keySet()) {
+						ctx.setAttribute(name, Tweaker.ASSISTANTS.get(name), ScriptContext.ENGINE_SCOPE);
 					}
-					for (String name : processed.getValue().keySet()) {
-						ctx.setAttribute(name, processed.getValue().get(name), ScriptContext.ENGINE_SCOPE);
-					}
-					engine.eval(processed.getKey());
-				} catch (ScriptException | TweakerSyntaxException e) {
+					engine.eval(script);
+				} catch (ScriptException e) {
 					LibCD.logger.error("Error executing tweaker script {}: {}", tweaker.toString(), e.getMessage());
 					continue;
 				}
@@ -130,4 +113,5 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 	public Identifier getFabricId() {
 		return new Identifier(LibCD.MODID, "tweaker_loader");
 	}
+
 }
