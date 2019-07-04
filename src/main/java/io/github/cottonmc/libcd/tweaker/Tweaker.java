@@ -13,6 +13,15 @@ public interface Tweaker {
 	Map<String, Object> ASSISTANTS = new HashMap<>();
 
 	/**
+	 * Deprecated; use {@link Tweaker#addTweaker(String, Tweaker)} instead, as it will add the object as an assistant too.
+	 * @param tweaker The tweaker to add.
+	 */
+	@Deprecated
+	static void addTweaker(Tweaker tweaker) {
+		TWEAKERS.add(tweaker);
+	}
+
+	/**
 	 * Add a new tweaker to store data in.
 	 * @param callName A unique name to call this tweaker by in scripts. Names shared with addAssistant.
 	 * @param tweaker An instanceof Tweaker to call whenever reloading.
