@@ -12,12 +12,12 @@
 LibConditionalData, or LibCD, adds hooks to conditionally load data pack elements based on a metadata file. It's focused on being simple and extensible, along with being compatible with *any* resource type added by other mods.
 
 ## Client Use
-For conditional resources, add a file `<target resource with extension>.mcmeta`. This will be parsed as JSON to check whether the resource should be loaded. Each key-value pair will specify a condition that *must* be met for the recipe to be loaded. There are four conditions pre-included, and other mods may add their own:
+For conditional resources, add a file `<target resource with extension>.mcmeta`. This will be parsed as JSON to check whether the resource should be loaded. All conditions go in an array with the key `when:`, and are each given as an object with a single key-value pair. Each pair will specify a condition that *must* be met for the recipe to be loaded. There are four conditions pre-included, and other mods may add their own:
 
-- `libcd:mod_loaded` (passed a String): Will return true if a mod with the given mod ID is loaded.
-- `libcd:item_exists` (passed a String): Will return true if an item with the given item ID is loaded.
-- `libcd:not` (passed a single-element JsonObject) Will return true if the condition listed in the given object is *not* true.
-- `libcd:any_of` (passed a JsonObject): Will return true if *any* condition listed in the given object is true.
+- `libcd:mod_loaded` (passed a String or an array): Will return true if all mods with the given IDs are loaded.
+- `libcd:item_exists` (passed a String or an array): Will return true if all items with the given item IDs are loaded.
+- `libcd:not` (passed a single-element object) Will return true if the condition listed in the given object is *not* true.
+- `libcd:or` (passed an array, aliased to "or"): Will return true if *any* condition listed in the given array is true.
 
 **WARNING**: Currently, conditions silently return false if they are passed an improper parameter. This will hopefully be changed in the future, but if you think something should be loaded and it isn't, check your conditions.
 
