@@ -19,7 +19,7 @@
   "mixins": [
     "mixins.libcd.json"
   ],
-  "requires": {
+  "depends": {
     "fabricloader": ">=0.4.0"
   }
 }
