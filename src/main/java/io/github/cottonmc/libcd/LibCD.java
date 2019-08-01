@@ -35,7 +35,10 @@ public class LibCD implements ModInitializer {
 
 	public static final Logger logger = LogManager.getLogger();
 	public static CDConfig config;
-	public static final Jankson jankson = JanksonFactory.createJankson();
+
+	public static Jankson newJankson() {
+		return JanksonFactory.createJankson();
+	}
 
 	@Override
 	public void onInitialize() {
@@ -75,6 +78,7 @@ public class LibCD implements ModInitializer {
 
 	public CDConfig loadConfig() {
 		try {
+			Jankson jankson = newJankson();
 			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("libcd.json5").toFile();
 			if (!file.exists()) saveConfig(new CDConfig());
 			JsonObject json = jankson.load(file);
@@ -95,7 +99,7 @@ public class LibCD implements ModInitializer {
 	public void saveConfig(CDConfig config) {
 		try {
 			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("libcd.json5").toFile();
-			JsonElement json = jankson.toJson(config);
+			JsonElement json = newJankson().toJson(config);
 			String result = json.toJson(true, true);
 			if (!file.exists()) file.createNewFile();
 			FileOutputStream out = new FileOutputStream(file,false);

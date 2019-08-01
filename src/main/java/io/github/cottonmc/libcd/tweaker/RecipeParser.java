@@ -195,7 +195,7 @@ public class RecipeParser {
 	 * @return A defaulted list of ingredients.
 	 */
 	public static DefaultedList<Ingredient> getIngredients(String[] pattern, Map<String, Ingredient> dictionary, int x, int y) throws TweakerSyntaxException {
-		DefaultedList<Ingredient> ingredients = DefaultedList.create(x * y, Ingredient.EMPTY);
+		DefaultedList<Ingredient> ingredients = DefaultedList.ofSize(x * y, Ingredient.EMPTY);
 		Set<String> keys = Sets.newHashSet(dictionary.keySet());
 		keys.remove(" ");
 
