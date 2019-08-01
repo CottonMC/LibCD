@@ -9,7 +9,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +78,7 @@ public class ConditionalData {
 
 	public static boolean shouldLoad(Identifier resourceId, String meta) {
 		try {
-			JsonObject json = LibCD.jankson.load(meta);
+			JsonObject json = LibCD.newJankson().load(meta);
 			JsonElement elem = json.get("when");
 			if (elem instanceof JsonArray) {
 				JsonArray array = (JsonArray)elem;
@@ -91,7 +90,7 @@ public class ConditionalData {
 					JsonObject obj = (JsonObject)condition;
 					for (String key : obj.keySet()) {
 						Identifier id = key.equals("or")? new Identifier(LibCD.MODID, "or") : new Identifier(key);
-						if (!testCondition(id, obj)) return false;
+						if (!testCondition(id, parseElement(obj.get(key)))) return false;
 					}
 				}
 			}

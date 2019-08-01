@@ -198,7 +198,7 @@ public class RecipeTweaker implements Tweaker {
 	public void addShaped(Object[] inputs, ItemStack output, int width, int height, String group){
 		Identifier recipeId = getRecipeId(output);
 		try {
-			DefaultedList<Ingredient> ingredients = DefaultedList.create();
+			DefaultedList<Ingredient> ingredients = DefaultedList.of();
 			for (int i = 0; i < Math.min(inputs.length, width * height); i++) {
 				Object id = inputs[i];
 				if (id.equals("")) continue;
@@ -248,7 +248,7 @@ public class RecipeTweaker implements Tweaker {
 	public void addShapeless(Object[] inputs, ItemStack output, String group) {
 		Identifier recipeId = getRecipeId(output);
 		try {
-			DefaultedList<Ingredient> ingredients = DefaultedList.create();
+			DefaultedList<Ingredient> ingredients = DefaultedList.of();
 			for (int i = 0; i < Math.min(inputs.length, 9); i++) {
 				Object id = inputs[i];
 				if (id.equals("")) continue;
