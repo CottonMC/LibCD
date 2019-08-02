@@ -67,7 +67,7 @@ public class ConditionalData {
 					if (elem instanceof JsonObject) {
 						JsonObject obj = (JsonObject) elem;
 						for (String key : obj.keySet()) {
-							if (!testCondition(new Identifier(key), obj)) return false;
+							if (testCondition(new Identifier(key), parseElement(obj.get(key)))) return true;
 						}
 					}
 				}
