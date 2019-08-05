@@ -9,14 +9,10 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtil;
-import net.minecraft.potion.Potions;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
@@ -99,12 +95,19 @@ public class TweakerUtils {
 
 	/**
 	 * Create an item stack from an item id.
-	 * @param id The id of the item to get.
+	 * @param id The id of the item to get, along with any NBT.
 	 * @param amount The amount of the item in the stack.
 	 * @return An item stack of the specified item and amount.
 	 */
 	public ItemStack createItemStack(String id, int amount) {
-		return new ItemStack(getItem(id), amount);
+		int index = id.indexOf('{');
+		if (index == -1) {
+			return new ItemStack(getItem(id), amount);
+		} else {
+			Item item = getItem(id.substring(0, index));
+			ItemStack stack = new ItemStack(item, amount);
+			return addNbtToStack(stack, id.substring(index));
+		}
 	}
 
 	/**
