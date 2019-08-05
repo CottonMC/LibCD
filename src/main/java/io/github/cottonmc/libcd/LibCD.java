@@ -5,8 +5,11 @@ import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+
 import io.github.cottonmc.jankson.JanksonFactory;
 import io.github.cottonmc.libcd.condition.ConditionalData;
+import io.github.cottonmc.libcd.impl.HeldItemCommand;
 import io.github.cottonmc.libcd.tweaker.*;
 import io.github.cottonmc.libcd.util.CDConfig;
 import net.fabricmc.api.ModInitializer;
@@ -52,12 +55,30 @@ public class LibCD implements ModInitializer {
 			if (potion == Potions.EMPTY) return ItemStack.EMPTY;
 			return PotionUtil.setPotion(new ItemStack(Items.POTION), potion);
 		});
-		CommandRegistry.INSTANCE.register(false, dispatcher -> dispatcher.register((
+		CommandRegistry.INSTANCE.register(false, dispatcher -> {
+			dispatcher.register(
 				CommandManager.literal("cd_subset").requires(source -> source.hasPermissionLevel(3))
 						.then(CommandManager.argument("subset", StringArgumentType.string())
 								.executes(context -> changeSubset(context, context.getArgument("subset", String.class))))
 						.then(CommandManager.literal("-reset").executes(context -> changeSubset(context, "")))
-		)));
+			);
+			
+			
+			//New nodes
+			LiteralCommandNode<ServerCommandSource> libcdNode = CommandManager
+					.literal("libcd")
+					.build();
+			
+			LiteralCommandNode<ServerCommandSource> heldNode = CommandManager
+					.literal("held")
+					.executes(new HeldItemCommand())
+					.build();
+			
+			//Stitch nodes together
+			libcdNode.addChild(heldNode);
+			dispatcher.getRoot().addChild(libcdNode);
+			
+		});
 	}
 
 	private int changeSubset(CommandContext<ServerCommandSource> context, String setTo) {
