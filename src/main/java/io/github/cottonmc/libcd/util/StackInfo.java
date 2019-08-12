@@ -1,5 +1,7 @@
-package io.github.cottonmc.libcd.tweaker;
+package io.github.cottonmc.libcd.util;
 
+import io.github.cottonmc.libcd.util.nbt.NbtUtils;
+import io.github.cottonmc.libcd.util.nbt.WrappedCompoundTag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
@@ -10,32 +12,54 @@ import net.minecraft.util.registry.Registry;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * A class with read-only info about a stack, accessible outside of obf. The stack and its NBT cannot be modified from a StackInfo.
+ */
 public class StackInfo {
 	private ItemStack stack;
 	public StackInfo(ItemStack stack) {
 		this.stack = stack.copy();
 	}
 
+	/**
+	 * @return Whether the stack is empty.
+	 */
 	boolean isEmpty() {
 		return stack.isEmpty();
 	}
 
+	/**
+	 * @return The ID of the stack's item.
+	 */
 	String getItem() {
 		return Registry.ITEM.getId(stack.getItem()).toString();
 	}
 
+	/**
+	 * @return The count of items in the stack.
+	 */
 	int getCount() {
 		return stack.getCount();
 	}
 
+	/**
+	 * @return The stack's name.
+	 */
 	String getName() {
 		return stack.getName().asString();
 	}
 
+	/**
+	 * @return How much damage the item has taken.
+	 */
 	int getDamage() {
 		return stack.getDamage();
 	}
 
+	/**
+	 * @param enchantId The enchantment to check for.
+	 * @return The level of that enchantment, or 0 if it's not there.
+	 */
 	int getEnchantmentLevel(String enchantId) {
 		if (!stack.hasEnchantments()) return 0;
 		Optional<Enchantment> opt = Registry.ENCHANTMENT.getOrEmpty(new Identifier(enchantId));
@@ -44,10 +68,20 @@ public class StackInfo {
 		return enchants.getOrDefault(opt.get(), 0);
 	}
 
-	String getTagValue(String key) {
+	/**
+	 * @param key The key to check the value of.
+	 * @return The object at that key.
+	 */
+	Object getTagValue(String key) {
 		CompoundTag tag = stack.getOrCreateTag();
-		if (!tag.containsKey(key)) return "";
-		else return tag.getTag(key).asString();
+		return NbtUtils.getObjectFor(tag.getTag(key));
+	}
+
+	/**
+	 * @return a non-modifiable view of the object's NBT, wrapped for usability.
+	 */
+	WrappedCompoundTag getTag() {
+		return new WrappedCompoundTag(stack.getOrCreateTag());
 	}
 
 }

@@ -94,6 +94,7 @@ public class NbtUtils {
 	 * @return The tagified form of the object.
 	 */
 	public static Tag getTagFor(Object value) {
+		if (value == null) return null;
 		if (value instanceof Byte) {
 			return new ByteTag((byte)value);
 		} else if (value instanceof Boolean) {
@@ -128,11 +129,10 @@ public class NbtUtils {
 	 * @return The object form of the tag.
 	 */
 	public static Object getObjectFor(Tag tag) {
-		if (tag instanceof ByteTag) {
-			return ((ByteTag)tag).getByte();
-		} else if (tag instanceof ShortTag) {
-			return ((ShortTag)tag).getShort();
-		} else if (tag instanceof IntTag) {
+		if (tag == null) return null;
+		if (tag instanceof ByteTag) return ((ByteTag)tag).getByte();
+		else if (tag instanceof ShortTag) return ((ShortTag)tag).getShort();
+		else if (tag instanceof IntTag) {
 			return ((IntTag)tag).getInt();
 		} else if (tag instanceof LongTag) {
 			return ((LongTag)tag).getLong();
