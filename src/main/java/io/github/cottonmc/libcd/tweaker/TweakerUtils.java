@@ -3,6 +3,7 @@ package io.github.cottonmc.libcd.tweaker;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.cottonmc.libcd.LibCD;
+import io.github.cottonmc.libcd.tweaker.nbt.WrappedCompoundTag;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
@@ -234,5 +235,13 @@ public class TweakerUtils {
 
 	public StackInfo getStackInfo(ItemStack stack) {
 		return new StackInfo(stack);
+	}
+
+	public WrappedCompoundTag getStackTag(ItemStack stack) {
+		return new WrappedCompoundTag(stack.getOrCreateTag());
+	}
+
+	public void setStackTag(ItemStack stack, WrappedCompoundTag tag) {
+		stack.setTag(tag.getUnderlying());
 	}
 }
