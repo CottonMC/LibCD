@@ -1,4 +1,4 @@
-package io.github.cottonmc.libcd.tweaker.nbt;
+package io.github.cottonmc.libcd.util.nbt;
 
 import net.minecraft.nbt.*;
 

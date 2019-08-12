@@ -1,4 +1,4 @@
-package io.github.cottonmc.libcd.tweaker.nbt;
+package io.github.cottonmc.libcd.util.nbt;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -6,7 +6,6 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.nbt.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class NbtUtils {
