@@ -5,6 +5,9 @@ import net.minecraft.nbt.*;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * A wrapper for the ListTag class, since that's obfuscated.
+ */
 public class WrappedListTag {
 	private ListTag underlying;
 
@@ -12,10 +15,17 @@ public class WrappedListTag {
 		this.underlying = underlying;
 	}
 
+	/**
+	 * @return A new, empty list tag.
+	 */
 	public static WrappedListTag create() {
 		return new WrappedListTag(new ListTag());
 	}
 
+	/**
+	 * @param orig The list to add into the tag.
+	 * @return a new list tag containing tagified forms of the passed list.
+	 */
 	public static WrappedListTag create(List orig) {
 		ListTag ret = new ListTag();
 		for (Object o : orig) {
@@ -24,6 +34,10 @@ public class WrappedListTag {
 		return new WrappedListTag(ret);
 	}
 
+	/**
+	 * @param orig The array to add into the tag.
+	 * @return a new list tag containing tagified forms of the passed array.
+	 */
 	public static WrappedListTag create(Object[] orig) {
 		ListTag ret = new ListTag();
 		for (Object o : orig) {
@@ -32,22 +46,43 @@ public class WrappedListTag {
 		return new WrappedListTag(ret);
 	}
 
+	/**
+	 * @return The underlying list tag. Only call from java.
+	 */
 	public ListTag getUnderlying() {
 		return underlying;
 	}
 
+	/**
+	 * List tags can only accept one type of object tag.
+	 * @return The type of tag the list will accept.
+	 */
 	public String getListType() {
 		return NbtUtils.getTypeName(underlying.getListType());
 	}
 
+	/**
+	 * @return How many elements are in the list.
+	 */
 	public int getSize() {
 		return underlying.size();
 	}
 
+	/**
+	 * Get an object from the list.
+	 * @param index The index of the item to get.
+	 * @return The object form of the tag at that point.
+	 */
 	public Object get(int index) {
 		return NbtUtils.getObjectFor(underlying.get(index));
 	}
 
+	/**
+	 * Set an object in the list. Will override.
+	 * @param index The index of the item to set.
+	 * @param value The object form to add in
+	 * @return Whether the object could be successfully added.
+	 */
 	public boolean set(int index, Object value) {
 		switch(underlying.getListType()) {
 			case 0:
@@ -93,10 +128,21 @@ public class WrappedListTag {
 		return false;
 	}
 
+	/**
+	 * Add an element to the end of the list.
+	 * @param value The object to add.
+	 * @return Whether the tagified object could be added.
+	 */
 	public boolean add(Object value) {
 		return add(getSize(), value);
 	}
 
+	/**
+	 * Add an element to the list, at a certain index. Will not override.
+	 * @param index The index to add at.
+	 * @param value The object to add.
+	 * @return Whether the tagified object could be added.
+	 */
 	public boolean add(int index, Object value) {
 		switch(underlying.getListType()) {
 			case 0:
@@ -142,18 +188,41 @@ public class WrappedListTag {
 		return false;
 	}
 
-	public String remove(int index) {
-		return underlying.method_10536(index).toString();
+	/**
+	 * Remove an element from the list. If this is the last element, the list's type will be reset.
+	 * @param index The index of the element to remove.
+	 * @return The object form of the tag removed.
+	 */
+	public Object remove(int index) {
+		return NbtUtils.getObjectFor(underlying.method_10536(index));
 	}
 
+	/**
+	 * Empty all entries from the list, and reset its type.
+	 */
+	public void clear() {
+		for (int i = 0; i < getSize(); i++) {
+			underlying.method_10536(i);
+		}
+	}
+
+	/**
+	 * @return Whether there are no elements in the list.
+	 */
 	public boolean isEmpty() {
 		return underlying.isEmpty();
 	}
 
+	/**
+	 * @return The string form of the underlying list tag.
+	 */
 	public String toString() {
 		return underlying.asString();
 	}
 
+	/**
+	 * @return The hash code of the underlying list tag.
+	 */
 	public int hashCode() {
 		return underlying.hashCode();
 	}

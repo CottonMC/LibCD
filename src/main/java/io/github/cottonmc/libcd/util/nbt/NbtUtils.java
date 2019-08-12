@@ -9,6 +9,10 @@ import net.minecraft.nbt.*;
 import java.util.Arrays;
 
 public class NbtUtils {
+	/**
+	 * @param type The int type of the tag you want to get the name of.
+	 * @return The string name of the tag type, in all lower case.
+	 */
 	public static String getTypeName(int type) {
 		switch (type) {
 			case 0:
@@ -44,7 +48,11 @@ public class NbtUtils {
 		}
 	}
 
-	public static int getTypeValue(String type) {
+	/**
+	 * @param type The string form of the tag type you want to get the magic number of. Not case sensitive.
+	 * @return The int number of the tag type.
+	 */
+	public static int getTypeNumber(String type) {
 		String lower = type.toLowerCase();
 		switch(lower) {
 			case "end":
@@ -74,12 +82,17 @@ public class NbtUtils {
 			case "long array":
 				return 12;
 			case "any number":
+			case "number":
 				return 99;
 			default:
 				return -1;
 		}
 	}
 
+	/**
+	 * @param value The object to get a tagified form of.
+	 * @return The tagified form of the object.
+	 */
 	public static Tag getTagFor(Object value) {
 		if (value instanceof Byte) {
 			return new ByteTag((byte)value);
@@ -110,6 +123,10 @@ public class NbtUtils {
 		} else return new StringTag(value.toString());
 	}
 
+	/**
+	 * @param tag The tag to get the object form of.
+	 * @return The object form of the tag.
+	 */
 	public static Object getObjectFor(Tag tag) {
 		if (tag instanceof ByteTag) {
 			return ((ByteTag)tag).getByte();

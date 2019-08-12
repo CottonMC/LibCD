@@ -3,7 +3,7 @@ package io.github.cottonmc.libcd.tweaker;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.cottonmc.libcd.LibCD;
-import io.github.cottonmc.libcd.tweaker.nbt.WrappedCompoundTag;
+import io.github.cottonmc.libcd.util.nbt.WrappedCompoundTag;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
