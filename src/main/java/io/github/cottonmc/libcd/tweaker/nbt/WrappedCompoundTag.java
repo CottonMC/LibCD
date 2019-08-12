@@ -1,6 +1,8 @@
 package io.github.cottonmc.libcd.tweaker.nbt;
 
+import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 
 import java.util.UUID;
 
@@ -40,36 +42,7 @@ public class WrappedCompoundTag {
 	 * @return The type of the key.
 	 */
 	public String getType(String key) {
-		//TODO: inverse
-		int val = underlying.getType(key);
-		switch (val) {
-			case 1:
-				return "byte";
-			case 2:
-				return "short";
-			case 3:
-				return "int";
-			case 4:
-				return "long";
-			case 5:
-				return "float";
-			case 6:
-				return "double";
-			case 7:
-				return "byte array";
-			case 8:
-				return "string";
-			case 9:
-				return "list";
-			case 10:
-				return "compound";
-			case 11:
-				return "int array";
-			case 12:
-				return "long array";
-			default:
-				return "unknown";
-		}
+		return NbtUtils.getTypeName(underlying.getType(key));
 	}
 
 	/**
@@ -102,8 +75,8 @@ public class WrappedCompoundTag {
 	 * @param key The tag to get.
 	 * @return The string form of this tag.
 	 */
-	public String getTag(String key) {
-		return underlying.getTag(key).toString();
+	public Object getTag(String key) {
+		return NbtUtils.getObjectFor(underlying.getTag(key));
 	}
 
 	public byte getByte(String key) {
@@ -146,6 +119,10 @@ public class WrappedCompoundTag {
 		underlying.putLong(key, value);
 	}
 
+	public boolean hasUuid(String key) {
+		return underlying.hasUuid(key);
+	}
+
 	public String getUuid(String key) {
 		return underlying.getUuid(key).toString();
 	}
@@ -186,7 +163,17 @@ public class WrappedCompoundTag {
 		underlying.putString(key, value);
 	}
 
-	//TODO: list
+	public boolean hasList(String key, String type) {
+		return underlying.containsKey(key, NbtType.LIST) && ((ListTag)underlying.getTag(key)).getListType() == NbtUtils.getTypeValue(type);
+	}
+
+	public WrappedListTag getList(String key, String type) {
+		return new WrappedListTag(underlying.getList(key, NbtUtils.getTypeValue(type)));
+	}
+
+	public void putList(String key, WrappedListTag value) {
+		underlying.put(key, value.getUnderlying());
+	}
 
 	public WrappedCompoundTag getCompound(String key) {
 		return new WrappedCompoundTag(underlying.getCompound(key));
@@ -216,11 +203,15 @@ public class WrappedCompoundTag {
 		underlying.remove(key);
 	}
 
-	public String toString() {
-		return underlying.toString();
-	}
-
 	public boolean isEmpty() {
 		return underlying.isEmpty();
+	}
+
+	public String toString() {
+		return underlying.asString();
+	}
+
+	public int hashCode() {
+		return underlying.hashCode();
 	}
 }
