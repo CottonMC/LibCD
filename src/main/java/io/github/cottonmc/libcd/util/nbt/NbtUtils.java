@@ -1,12 +1,18 @@
 package io.github.cottonmc.libcd.util.nbt;
 
+import blue.endless.jankson.JsonArray;
+import blue.endless.jankson.JsonElement;
+import blue.endless.jankson.JsonObject;
+import blue.endless.jankson.JsonPrimitive;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.nbt.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class NbtUtils {
 	/**
@@ -163,5 +169,65 @@ public class NbtUtils {
 			}
 			return ret.toArray(new long[0]);
 		} else return tag.asString();
+	}
+
+	public static CompoundTag fromJson(JsonObject json) {
+		CompoundTag ret = new CompoundTag();
+		for (String key : json.keySet()) {
+			JsonElement elem = json.get(key);
+			if (elem instanceof JsonObject) {
+				ret.put(key, fromJson((JsonObject)elem));
+			} else if (elem instanceof JsonPrimitive) {
+				JsonPrimitive prim = (JsonPrimitive) elem;
+				ret.put(key, getTagFor(prim.getValue()));
+			} else if (elem instanceof JsonArray) {
+				ret.put(key, parseJsonList((JsonArray)elem).getUnderlying());
+			}
+		}
+		return ret;
+	}
+
+	public static WrappedListTag parseJsonList(JsonArray array) {
+		List<Object> ret = new ArrayList<>();
+		for (JsonElement entry : array) {
+			if (entry instanceof JsonObject) {
+				ret.add(new WrappedCompoundTag(fromJson((JsonObject)entry)));
+			} else if (entry instanceof JsonPrimitive) {
+				JsonPrimitive prim = (JsonPrimitive)entry;
+				ret.add(getTagFor(prim.getValue()));
+			} else if (entry instanceof JsonArray) {
+				ret.add(parseJsonList(array));
+			}
+		}
+		return WrappedListTag.create(ret);
+	}
+
+	public static JsonObject toJson(CompoundTag tag) {
+		JsonObject ret = new JsonObject();
+		for (String key : tag.getKeys()) {
+			Tag elem = tag.getTag(key);
+			if (elem instanceof CompoundTag) {
+				ret.put(key, toJson((CompoundTag)elem));
+			} else if (elem instanceof ListTag) {
+				ret.put(key, parseTagList((ListTag)elem));
+			} else {
+				ret.put(key, new JsonPrimitive(getObjectFor(elem)));
+			}
+		}
+		return ret;
+	}
+
+	public static JsonArray parseTagList(ListTag list) {
+		JsonArray ret = new JsonArray();
+		for (Tag tag : list) {
+			if (tag instanceof CompoundTag) {
+				ret.add(toJson((CompoundTag)tag));
+			} else if (tag instanceof ListTag) {
+				ret.add(parseTagList((ListTag)tag));
+			} else {
+				ret.add(new JsonPrimitive(getObjectFor(tag)));
+			}
+		}
+		return ret;
 	}
 }
