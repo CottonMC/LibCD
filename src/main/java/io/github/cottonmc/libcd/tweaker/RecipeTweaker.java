@@ -20,6 +20,7 @@ import java.util.concurrent.Executor;
 public class RecipeTweaker implements Tweaker {
 	public static final RecipeTweaker INSTANCE = new RecipeTweaker();
 	private RecipeManager recipeManager;
+	private int triedRecipeCount;
 	private int recipeCount;
 	private int removeCount;
 	private Map<RecipeType<?>, List<Recipe<?>>> toAdd = new HashMap<>();
@@ -31,6 +32,7 @@ public class RecipeTweaker implements Tweaker {
 	 */
 	@Override
 	public void prepareReload(ResourceManager manager) {
+		triedRecipeCount = -1;
 		recipeCount = 0;
 		removeCount = 0;
 		toAdd.clear();
@@ -98,7 +100,8 @@ public class RecipeTweaker implements Tweaker {
 	 */
 	public Identifier getRecipeId(ItemStack output) {
 		String resultName = Registry.ITEM.getId(output.getItem()).getPath();
-		return new Identifier(LibCD.MODID, "tweaked/"+resultName+"-"+recipeCount);
+		triedRecipeCount++;
+		return new Identifier(LibCD.MODID, "tweaked/"+resultName+"-"+triedRecipeCount);
 	}
 
 	/**

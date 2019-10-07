@@ -74,6 +74,10 @@ public class ConditionalData {
 			}
 			return false;
 		});
+		registerCondition(new Identifier(LibCD.MODID, "dev_mode"), value -> {
+			if (value instanceof Boolean) return (Boolean)value == (FabricLoader.getInstance().isDevelopmentEnvironment() || LibCD.config.dev_mode);
+			return false;
+		});
 	}
 
 	public static boolean shouldLoad(Identifier resourceId, String meta) {

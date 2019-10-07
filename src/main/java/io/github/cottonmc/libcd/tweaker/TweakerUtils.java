@@ -187,14 +187,13 @@ public class TweakerUtils {
 	 */
 	public ItemStack addLore(ItemStack stack, String[] lore) {
 		CompoundTag display = stack.getOrCreateSubTag("display");
-		if (!display.containsKey("Lore")) display.put("Lore", new ListTag());
-		if (display.containsKey("Lore", 9)) {
-			ListTag list = display.getList("Lore", 8);
-			for (int i = 0; i < lore.length; i++) {
-				String line = lore[i];
-				list.addTag(i, new StringTag(line));
-			}
+		ListTag list = display.getList("Lore", 8);
+		for (int i = 0; i < lore.length; i++) {
+			String line = lore[i];
+			list.addTag(i, new StringTag("{\"text\":\"" + line + "\"}"));
 		}
+		display.put("Lore", list);
+		stack.putSubTag("display", display);
 		return stack;
 	}
 
