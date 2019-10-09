@@ -186,7 +186,7 @@ public class RecipeTweaker implements Tweaker {
 		}
 	}
 
-	public void addShaped(String[] inputs, ItemStack output, int width, int height) {
+	public void addShaped(Object[] inputs, ItemStack output, int width, int height) {
 		addShaped(inputs, output, width, height, "");
 	}
 
