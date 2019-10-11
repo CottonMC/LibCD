@@ -95,16 +95,16 @@ public class RecipeParser {
 		if (inputs.length > 3) throw new TweakerSyntaxException("Invalid pattern: too many columns, 3 is maximum");
 		if (inputs.length == 0) throw new TweakerSyntaxException("Invalid pattern: empty pattern is not allowed");
 		int width = inputs[0].length;
-		Object[] output = new Object[inputs.length * inputs[0].length];
+		List<Object> output = new ArrayList<>();
 		for (int i = 0; i < inputs.length; i++) {
 			Object[] row = inputs[i];
 			if (row.length > 3) throw new TweakerSyntaxException("Invalid pattern: too many columns, 3 is maximum");
 			if (row.length != width) throw new TweakerSyntaxException("Invalid pattern: each row must be the same width");
 			for (int j = 0; j < width; j++) {
-				output[j + inputs.length * i] = inputs[i][j];
+				output.add(inputs[i][j]);
 			}
 		}
-		return output;
+		return output.toArray();
 	}
 
 	/**
