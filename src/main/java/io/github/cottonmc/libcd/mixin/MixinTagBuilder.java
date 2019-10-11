@@ -2,9 +2,9 @@ package io.github.cottonmc.libcd.mixin;
 
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.JsonOps;
 import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.impl.TagExtensions;
+import io.github.cottonmc.libcd.util.GsonOps;
 import io.github.cottonmc.libcd.util.JanksonOps;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
@@ -35,7 +35,7 @@ public class MixinTagBuilder<T> {
                 TagExtensions.ExtensionResult<T> result = TagExtensions.load(
                         getter,
                         (blue.endless.jankson.JsonObject) Dynamic.convert(
-                                JsonOps.INSTANCE, JanksonOps.INSTANCE, JsonHelper.getObject(json, "libcd")
+                                GsonOps.INSTANCE, JanksonOps.INSTANCE, JsonHelper.getObject(json, "libcd")
                         )
                 );
 
