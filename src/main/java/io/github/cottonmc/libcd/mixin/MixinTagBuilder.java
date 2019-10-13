@@ -12,10 +12,13 @@ import net.minecraft.util.JsonHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -25,6 +28,9 @@ public class MixinTagBuilder<T> {
     @Shadow
     @Final
     private Set<Tag.Entry<T>> entries;
+
+    @Unique
+    private final List<Object> libcdWarnings = new ArrayList<>();
 
     /* Run before Set.addAll so that vanilla's replacing doesn't clear our entries
        and our replacing doesn't clear theirs */
@@ -43,9 +49,26 @@ public class MixinTagBuilder<T> {
                     entries.clear();
                 }
                 entries.addAll(result.getEntries());
+                libcdWarnings.addAll(result.getWarnings());
             }
         } catch (Exception e) {
-            LibCD.logger.warn("Failed to load LibCD tag extensions in {}", json, e);
+            libcdWarnings.add(e);
+        }
+    }
+
+    /** Logs the warnings found during tag extension loading. */
+    @Inject(method = "build", at = @At("RETURN"))
+    private void onBuild_logWarnings(Identifier id, CallbackInfoReturnable<Tag<T>> info) {
+        if (!libcdWarnings.isEmpty()) {
+            LibCD.logger.warn("Found problems in tag extensions of tag " + id + ':');
+            for (Object warning : libcdWarnings) {
+                if (warning instanceof Throwable) {
+                    Throwable t = (Throwable) warning;
+                    LibCD.logger.error("\t- {}", t.getMessage(), t);
+                } else {
+                    LibCD.logger.warn("\t- {}", warning);
+                }
+            }
         }
     }
 }
