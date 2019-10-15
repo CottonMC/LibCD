@@ -1,3 +1,7 @@
+//warning for production environments
+print("WARNING! LibCD Tweaker sample script is running!");
+print("If you are not in a dev environment, please report this!");
+
 //A shorthand to get a stick input.
 var stick = "minecraft:stick";
 //A shorthand to get a crafting table output

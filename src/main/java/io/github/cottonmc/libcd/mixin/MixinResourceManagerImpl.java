@@ -43,14 +43,16 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 			if (id.getPath().contains(".mcmeta") || id.getPath().contains(".png")) continue;
 			Identifier metaId = new Identifier(id.getNamespace(), id.getPath() + ".mcmeta");
 			if (libcd_contains(metaId)) {
+				System.out.println(id.toString() + " has mcmeta file " + metaId.toString());
 				try {
 					Resource meta = getResource(metaId);
 					String metaText = IOUtils.toString(meta.getInputStream());
 					if (!ConditionalData.shouldLoad(id, metaText)) {
+						System.out.println(metaId.toString() + " cancels loading of " + id.toString());
 						sortedResources.remove(id);
 					}
 				} catch (IOException e) {
-					LOGGER.error("Error when accessing recipe metadata for {}: {}", id.toString(), e.getMessage());
+					LOGGER.error("Error when accessing resource metadata for {}: {}", id.toString(), e.getMessage());
 				}
 			}
 		}
