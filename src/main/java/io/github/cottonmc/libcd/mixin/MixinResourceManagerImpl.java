@@ -1,12 +1,12 @@
 package io.github.cottonmc.libcd.mixin;
 
+import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.condition.ConditionalData;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
 import io.github.cottonmc.libcd.impl.ResourceSearcher;
 import net.minecraft.resource.*;
 import net.minecraft.util.Identifier;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +24,6 @@ import java.util.function.Predicate;
 
 @Mixin(ReloadableResourceManagerImpl.class)
 public abstract class MixinResourceManagerImpl implements ReloadableResourceManager, ReloadListenersAccessor, ResourceSearcher {
-
-	@Shadow @Final private static Logger LOGGER;
 
 	@Shadow @Final private List<ResourceReloadListener> listeners;
 
@@ -43,16 +40,14 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 			if (id.getPath().contains(".mcmeta") || id.getPath().contains(".png")) continue;
 			Identifier metaId = new Identifier(id.getNamespace(), id.getPath() + ".mcmeta");
 			if (libcd_contains(metaId)) {
-				System.out.println(id.toString() + " has mcmeta file " + metaId.toString());
 				try {
 					Resource meta = getResource(metaId);
 					String metaText = IOUtils.toString(meta.getInputStream());
 					if (!ConditionalData.shouldLoad(id, metaText)) {
-						System.out.println(metaId.toString() + " cancels loading of " + id.toString());
 						sortedResources.remove(id);
 					}
 				} catch (IOException e) {
-					LOGGER.error("Error when accessing resource metadata for {}: {}", id.toString(), e.getMessage());
+					LibCD.logger.error("Error when accessing resource metadata for %s: %s", id.toString(), e.getMessage());
 				}
 			}
 		}

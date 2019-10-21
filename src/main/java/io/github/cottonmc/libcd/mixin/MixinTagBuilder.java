@@ -64,9 +64,9 @@ public class MixinTagBuilder<T> {
             for (Object warning : libcdWarnings) {
                 if (warning instanceof Throwable) {
                     Throwable t = (Throwable) warning;
-                    LibCD.logger.error("\t- {}", t.getMessage(), t);
+                    LibCD.logger.error("\t- %s", t.getMessage(), t);
                 } else {
-                    LibCD.logger.warn("\t- {}", warning);
+                    LibCD.logger.warn("\t- %s", warning);
                 }
             }
         }

@@ -70,7 +70,41 @@ public class RecipeParser {
 			((IngredientAccessUtils)(Object)ret).libcd_setMatchType(type);
 			return ret;
 		}
-		else throw new TweakerSyntaxException("Illegal object passed to recipe parser of type " + input.getClass());
+		else throw new TweakerSyntaxException("Illegal object passed to recipe parser of type " + input.getClass().getName());
+	}
+
+	public static ItemStack processItemStack(Object input) throws TweakerSyntaxException {
+		if (input instanceof ItemStack) return (ItemStack)input;
+		else if (input instanceof String) {
+			String in = (String)input;
+			int atIndex = in.lastIndexOf('@');
+			int count = 1;
+			if (atIndex != -1 && atIndex > in.lastIndexOf('}')) {
+				count = Integer.parseInt(in.substring(atIndex + 1));
+				in = in.substring(0, atIndex);
+			}
+			if (in.contains("->")) {
+				ItemStack stack = TweakerUtils.INSTANCE.getSpecialStack(in);
+				if (stack.isEmpty())
+					throw new TweakerSyntaxException("Failed to get special stack for input: " + in);
+				if (stack.isStackable()) {
+					stack.setCount(count);
+				}
+				return stack;
+			} else {
+				int nbtIndex = in.indexOf('{');
+				if (nbtIndex != -1) {
+					String nbt = in.substring(nbtIndex);
+					in = in.substring(0, nbtIndex);
+					ItemStack stack = new ItemStack(TweakerUtils.INSTANCE.getItem(in), count);
+					TweakerUtils.INSTANCE.addNbtToStack(stack, nbt);
+					return stack;
+				} else {
+					return new ItemStack(TweakerUtils.INSTANCE.getItem(in), count);
+				}
+			}
+		}
+		else throw new TweakerSyntaxException("Illegal object passed to recipe parser of type " + input.getClass().getName());
 	}
 
 	/**
@@ -91,8 +125,9 @@ public class RecipeParser {
 	 * @param inputs The array of string arrays to process inputs from
 	 * @return The inputs converted into a single string array if the grid is valid
 	 */
+	//TODO: support having rows with uneven widths?
 	public static Object[] processGrid(Object[][] inputs) throws TweakerSyntaxException {
-		if (inputs.length > 3) throw new TweakerSyntaxException("Invalid pattern: too many columns, 3 is maximum");
+		if (inputs.length > 3) throw new TweakerSyntaxException("Invalid pattern: too many rows, 3 is maximum");
 		if (inputs.length == 0) throw new TweakerSyntaxException("Invalid pattern: empty pattern is not allowed");
 		int width = inputs[0].length;
 		List<Object> output = new ArrayList<>();

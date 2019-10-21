@@ -75,7 +75,7 @@ public class ConditionalData {
 			return false;
 		});
 		registerCondition(new Identifier(LibCD.MODID, "dev_mode"), value -> {
-			if (value instanceof Boolean) return (Boolean)value == (FabricLoader.getInstance().isDevelopmentEnvironment() || LibCD.config.dev_mode);
+			if (value instanceof Boolean) return (Boolean)value == LibCD.isDevMode();
 			return false;
 		});
 	}
@@ -88,7 +88,7 @@ public class ConditionalData {
 				JsonArray array = (JsonArray)elem;
 				for (JsonElement condition : array) {
 					if (!(condition instanceof JsonObject)) {
-						LibCD.logger.error("Error parsing meta for {}: item {} in condition list not a JsonObject", resourceId, condition.toString());
+						LibCD.logger.error("Error parsing meta for %s: item %s in condition list not a JsonObject", resourceId, condition.toString());
 						return false;
 					}
 					JsonObject obj = (JsonObject)condition;
@@ -98,15 +98,15 @@ public class ConditionalData {
 					}
 				}
 			} else if (elem == null) {
-				LibCD.logger.error("Error parsing meta for {}: primary \"when\" key does not exist", resourceId);
+				LibCD.logger.error("Error parsing meta for %s: primary \"when\" key does not exist", resourceId);
 				return false;
 			} else {
-				LibCD.logger.error("Error parsing meta for {}: primary \"when\" key is not a JsonArray", resourceId);
+				LibCD.logger.error("Error parsing meta for %s: primary \"when\" key is not a JsonArray", resourceId);
 				return false;
 			}
 			return true;
 		} catch (SyntaxError e) {
-			LibCD.logger.error("Error parsing meta for {}: {}", resourceId, e.getLineMessage());
+			LibCD.logger.error("Error parsing meta for %s: %s", resourceId, e.getLineMessage());
 		}
 		return false;
 	}
