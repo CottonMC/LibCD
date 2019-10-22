@@ -121,19 +121,29 @@ public class RecipeParser {
 	}
 
 	/**
-	 * Process a grid of inputs CraftTweaker-style.
+	 * Process a grid of inputs CraftTweaker-style. Max of 3 width and height.
 	 * @param inputs The array of string arrays to process inputs from
 	 * @return The inputs converted into a single string array if the grid is valid
 	 */
-	//TODO: support having rows with uneven widths?
 	public static Object[] processGrid(Object[][] inputs) throws TweakerSyntaxException {
-		if (inputs.length > 3) throw new TweakerSyntaxException("Invalid pattern: too many rows, 3 is maximum");
+		return processGrid(inputs, 3, 3);
+	}
+
+	/**
+	 * Process a grid of inputs CraftTweaker-style.
+	 * @param inputs The array of string arrays to process inputs from
+	 * @param maxWidth The maximum number of columns allowed
+	 * @param maxHeight The maximum number of rows allowed
+	 * @return The inputs converted into a single string array if the grid is valid
+	 */
+	public static Object[] processGrid(Object[][] inputs, int maxWidth, int maxHeight) throws TweakerSyntaxException {
+		if (inputs.length > maxHeight) throw new TweakerSyntaxException("Invalid pattern: too many rows, " + maxHeight + " is maximum");
 		if (inputs.length == 0) throw new TweakerSyntaxException("Invalid pattern: empty pattern is not allowed");
 		int width = inputs[0].length;
 		List<Object> output = new ArrayList<>();
 		for (int i = 0; i < inputs.length; i++) {
 			Object[] row = inputs[i];
-			if (row.length > 3) throw new TweakerSyntaxException("Invalid pattern: too many columns, 3 is maximum");
+			if (row.length > maxWidth) throw new TweakerSyntaxException("Invalid pattern: too many columns, " + maxWidth + " is maximum");
 			if (row.length != width) throw new TweakerSyntaxException("Invalid pattern: each row must be the same width");
 			for (int j = 0; j < width; j++) {
 				output.add(inputs[i][j]);
@@ -143,20 +153,31 @@ public class RecipeParser {
 	}
 
 	/**
-	 * validate and parse a recipe pattern.
+	 * validate and parse a recipe pattern. Max of 3 width and height.
 	 * @param pattern up to three strings of up to three characters each for the pattern
 	 * @return processed pattern
 	 */
 	public static String[] processPattern(String... pattern) throws TweakerSyntaxException {
+		return processPattern(3, 3, pattern);
+	}
+
+	/**
+	 * Validate and parse a recipe pattern.
+	 * @param maxWidth The maximum number of columns allowed
+	 * @param maxHeight The maximum number of rows allowed
+	 * @param pattern Up to <height> strings of up to <width> characters each for the pattern
+	 * @return processed pattern
+	 */
+	public static String[] processPattern(int maxWidth, int maxHeight, String... pattern) throws TweakerSyntaxException {
 		if (pattern.length > 3) {
-			throw new TweakerSyntaxException("Invalid pattern: too many rows, 3 is maximum");
+			throw new TweakerSyntaxException("Invalid pattern: too many rows, " + maxHeight + " is maximum");
 		} else if (pattern.length == 0) {
 			throw new TweakerSyntaxException("Invalid pattern: empty pattern not allowed");
 		} else {
 			for (int i = 0; i < pattern.length; i++) {
 				String row = pattern[i];
 				if (row.length() > 3) {
-					throw new TweakerSyntaxException("Invalid pattern: too many columns, 3 is maximum");
+					throw new TweakerSyntaxException("Invalid pattern: too many columns, " + maxWidth + " is maximum");
 				}
 
 				if (i > 0 && pattern[0].length() != row.length()) {
