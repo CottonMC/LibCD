@@ -1,4 +1,4 @@
-package io.github.cottonmc.libcd.impl;
+package io.github.cottonmc.libcd.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;

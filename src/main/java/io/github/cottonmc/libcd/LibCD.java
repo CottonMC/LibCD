@@ -9,7 +9,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import io.github.cottonmc.jankson.JanksonFactory;
 import io.github.cottonmc.libcd.condition.ConditionalData;
-import io.github.cottonmc.libcd.impl.HeldItemCommand;
+import io.github.cottonmc.libcd.command.HeldItemCommand;
 import io.github.cottonmc.libcd.tweaker.*;
 import io.github.cottonmc.libcd.util.CDConfig;
 import io.github.cottonmc.libcd.util.TweakerLogger;
@@ -27,12 +27,9 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.function.Predicate;
 
 public class LibCD implements ModInitializer {
 	public static final String MODID = "libcd";

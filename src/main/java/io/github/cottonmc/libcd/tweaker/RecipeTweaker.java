@@ -147,8 +147,13 @@ public class RecipeTweaker implements Tweaker {
 		recipeList.add(recipe);
 	}
 
-	public RecipeBuilder builder(String id) {
-		return new RecipeBuilder(Registry.RECIPE_SERIALIZER.get(new Identifier(id)));
+	/**
+	 * Begin building a recipe from JSON if the recipe doesn't have intrinsic LibCD support.
+	 * @param type the ID of the recipe serializer to use.
+	 * @return A builder to start the recipe.
+	 */
+	public RecipeBuilder builder(String type) {
+		return new RecipeBuilder(Registry.RECIPE_SERIALIZER.get(new Identifier(type)));
 	}
 
 	/**

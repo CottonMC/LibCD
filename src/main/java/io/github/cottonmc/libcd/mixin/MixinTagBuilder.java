@@ -3,7 +3,7 @@ package io.github.cottonmc.libcd.mixin;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.Dynamic;
 import io.github.cottonmc.libcd.LibCD;
-import io.github.cottonmc.libcd.impl.TagExtensions;
+import io.github.cottonmc.libcd.tag.TagExtensions;
 import io.github.cottonmc.libcd.util.GsonOps;
 import io.github.cottonmc.libcd.util.JanksonOps;
 import net.minecraft.tag.Tag;

@@ -14,16 +14,27 @@ import net.minecraft.util.registry.Registry;
 
 import java.util.Map;
 
+/**
+ * A builder for recipes without inherent LibCD support. Assembles a JSON object and constructs a recipe for it.
+ */
 public class RecipeBuilder {
 	private JsonObject json = new JsonObject();
 	private RecipeSerializer serializer;
 	private ItemStack idStack = ItemStack.EMPTY;
 	private RecipeTweaker tweaker = RecipeTweaker.INSTANCE;
 
+	/**
+	 * @param serializer The serializer to use for this recipe.
+	 */
 	public RecipeBuilder(RecipeSerializer serializer) {
 		this.serializer = serializer;
 	}
 
+	/**
+	 * @param key The key to place this ingredient at. Typically "ingredient".
+	 * @param ingredient An object to be parsed as an ingredient.
+	 * @return This builder with the ingredient added.
+	 */
 	public RecipeBuilder ingredient(String key, Object ingredient) {
 		try {
 			Ingredient ing = RecipeParser.processIngredient(ingredient);
@@ -34,6 +45,11 @@ public class RecipeBuilder {
 		return this;
 	}
 
+	/**
+	 * @param key The key to place this ingredient at. Typically "ingredient".
+	 * @param ingredients An array of objects to be parsed as ingredients.
+	 * @return This builder with the ingredient array added.
+	 */
 	public RecipeBuilder ingredientArray(String key, Object[] ingredients) {
 		try {
 			JsonArray array = new JsonArray();
@@ -47,6 +63,12 @@ public class RecipeBuilder {
 		return this;
 	}
 
+	/**
+	 * Assemble an ingredient map for a shaped recipe.
+	 * @param key The key to place this map at. Typically "key".
+	 * @param map The map of single characters to objects to be parsed as ingredients.
+	 * @return This builder with the ingredient key added.
+	 */
 	public RecipeBuilder ingredientMao(String key, Map<String, Object> map) {
 		JsonObject obj = new JsonObject();
 		try {
@@ -61,6 +83,11 @@ public class RecipeBuilder {
 		return this;
 	}
 
+	/**
+	 * @param key The key to place this item stack at. Typically "result".
+	 * @param stack An object to be parsed as an item stack.
+	 * @return This builder with the item stack added.
+	 */
 	public RecipeBuilder itemStack(String key, Object stack) {
 		try {
 			ItemStack s = RecipeParser.processItemStack(stack);
@@ -72,6 +99,11 @@ public class RecipeBuilder {
 		return this;
 	}
 
+	/**
+	 * @param key The key to place this item stack array at.
+	 * @param stacks An array of objects to be parsed as item stacks.
+	 * @return This builder with the item stack array added.
+	 */
 	public RecipeBuilder itemStackArray(String key, Object[] stacks) {
 		try {
 			JsonArray array = new JsonArray();
@@ -85,6 +117,12 @@ public class RecipeBuilder {
 		return this;
 	}
 
+	/**
+	 * For adding any primitive properies (numbers, booleans, or strings) needed for the recipe.
+	 * @param key The key to place this property at.
+	 * @param prop The number, boolean, or string to add.
+	 * @return This builder with the property added.
+	 */
 	public RecipeBuilder property(String key, Object prop) {
 		if (prop instanceof Number) {
 			json.addProperty(key, (Number)prop);
@@ -96,6 +134,11 @@ public class RecipeBuilder {
 		return this;
 	}
 
+	/**
+	 * @param key The key to place this property array at.
+	 * @param props An array of numbers, booleans, and/or strings to add.
+	 * @return This builder with the property added.
+	 */
 	public RecipeBuilder propertyArray(String key, Object[] props) {
 		JsonArray array = new JsonArray();
 		for (Object obj : props) {
@@ -111,11 +154,24 @@ public class RecipeBuilder {
 		return this;
 	}
 
-	public RecipeBuilder idStack(ItemStack keyStack) {
-		this.idStack = keyStack;
+	/**
+	 * Set the stack which will be used for the ID of this recipe.
+	 * @param keyStack An object to be parsed as an item stack.
+	 * @return This builder with the id stack set.
+	 */
+	public RecipeBuilder idStack(Object keyStack) {
+		try {
+			ItemStack stack = RecipeParser.processItemStack(keyStack);
+			this.idStack = stack;
+		} catch (Exception e) {
+			tweaker.getLogger().error("Error processing recipe builder id stack - " + e.getMessage());
+		}
 		return this;
 	}
 
+	/**
+	 * @return All the passed properties built into a recipe using the given recipe serializer. Pass this directly to {@link RecipeTweaker#addRecipe(Recipe)}.
+	 */
 	public Recipe build() {
 		System.out.println(json.toString());
 		return serializer.read(RecipeTweaker.INSTANCE.getRecipeId(idStack), json);

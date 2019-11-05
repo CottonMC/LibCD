@@ -1,4 +1,4 @@
-package io.github.cottonmc.libcd.impl;
+package io.github.cottonmc.libcd.tag;
 
 import blue.endless.jankson.JsonArray;
 import blue.endless.jankson.JsonElement;
