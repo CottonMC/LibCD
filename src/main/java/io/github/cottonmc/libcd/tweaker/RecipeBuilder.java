@@ -12,10 +12,13 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.util.registry.Registry;
 
+import java.util.Map;
+
 public class RecipeBuilder {
 	private JsonObject json = new JsonObject();
 	private RecipeSerializer serializer;
 	private ItemStack idStack = ItemStack.EMPTY;
+	private RecipeTweaker tweaker = RecipeTweaker.INSTANCE;
 
 	public RecipeBuilder(RecipeSerializer serializer) {
 		this.serializer = serializer;
@@ -26,7 +29,7 @@ public class RecipeBuilder {
 			Ingredient ing = RecipeParser.processIngredient(ingredient);
 			json.add(key, ing.toJson());
 		} catch (Exception e) {
-			//TODO
+			tweaker.getLogger().error("Error processing recipe builder ingredient - " + e.getMessage());
 		}
 		return this;
 	}
@@ -39,8 +42,22 @@ public class RecipeBuilder {
 			}
 			json.add(key, array);
 		} catch (Exception e) {
-			//TODO
+			tweaker.getLogger().error("Error processing recipe builder ingredient array - " + e.getMessage());
 		}
+		return this;
+	}
+
+	public RecipeBuilder ingredientMao(String key, Map<String, Object> map) {
+		JsonObject obj = new JsonObject();
+		try {
+			for (String ch : map.keySet()) {
+				Ingredient ing = RecipeParser.processIngredient(map.get(ch));
+				obj.add(ch, ing.toJson());
+			}
+		} catch (Exception e) {
+			tweaker.getLogger().error("Error processing recipe builder ingredient map - " + e.getMessage());
+		}
+		json.add(key, obj);
 		return this;
 	}
 
@@ -50,7 +67,7 @@ public class RecipeBuilder {
 			if (idStack.isEmpty()) idStack = s;
 			json.add(key, serializeStack(s));
 		} catch (Exception e) {
-			//TODO
+			tweaker.getLogger().error("Error processing recipe builder item stack - " + e.getMessage());
 		}
 		return this;
 	}
@@ -63,7 +80,7 @@ public class RecipeBuilder {
 			}
 			json.add(key, array);
 		} catch (Exception e) {
-			//TODO
+			tweaker.getLogger().error("Error processing recipe builder item stack array - " + e.getMessage());
 		}
 		return this;
 	}
@@ -94,8 +111,9 @@ public class RecipeBuilder {
 		return this;
 	}
 
-	public void idStack(ItemStack keyStack) {
+	public RecipeBuilder idStack(ItemStack keyStack) {
 		this.idStack = keyStack;
+		return this;
 	}
 
 	public Recipe build() {
