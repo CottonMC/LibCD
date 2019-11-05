@@ -80,3 +80,9 @@ var builder = RecipeTweaker.builder("minecraft:smelting")
     .property("experience", 0.35);
 
 RecipeTweaker.addRecipe(builder.build());
+
+builder = RecipeTweaker.builder("minecraft:stonecutting")
+    .ingredient("ingredient", "minecraft:diamond_block")
+    .itemStack("result", "minecraft:diamond@9");
+
+RecipeTweaker.addRecipe(builder.build());
