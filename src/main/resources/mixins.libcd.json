@@ -8,6 +8,8 @@
     "MixinResourceManagerImpl",
     "MixinRecipeManager",
     "MixinNamespaceResourceManager",
-    "MixinTagBuilder"
+    "MixinTagBuilder",
+    "MixinCookingRecipeSerializer",
+    "MixinCookingRecipeFactory"
   ]
 }

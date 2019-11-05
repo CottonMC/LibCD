@@ -147,6 +147,10 @@ public class RecipeTweaker implements Tweaker {
 		recipeList.add(recipe);
 	}
 
+	public RecipeBuilder builder(String id) {
+		return new RecipeBuilder(Registry.RECIPE_SERIALIZER.get(new Identifier(id)));
+	}
+
 	/**
 	 * Get a recipe ingredient from an item stack. Call this from java tweaker classes.
 	 * @param stack The item stack to make an ingredient for.

@@ -72,3 +72,11 @@ var logs = TweakerUtils.getItemsInTag("minecraft:logs");
 for (var i = 0; i < logs.length; i++) {
     RecipeTweaker.addStonecutting("#minecraft:logs", logs[i]);
 }
+
+var builder = RecipeTweaker.builder("minecraft:smelting")
+    .ingredient("ingredient", "minecraft:diamond")
+    .itemStack("result", "minecraft:obsidian@8")
+    .property("cookingtime", 200)
+    .property("experience", 0.35);
+
+RecipeTweaker.addRecipe(builder.build());
