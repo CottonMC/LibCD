@@ -9,6 +9,7 @@ import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import io.github.cottonmc.jankson.JanksonFactory;
+import io.github.cottonmc.libcd.command.DebugExportCommand;
 import io.github.cottonmc.libcd.condition.ConditionalData;
 import io.github.cottonmc.libcd.command.HeldItemCommand;
 import io.github.cottonmc.libcd.tweaker.*;
@@ -85,12 +86,24 @@ public class LibCD implements ModInitializer {
 					.literal("held")
 					.executes(new HeldItemCommand())
 					.build();
-			
+
+			LiteralCommandNode<ServerCommandSource> debugNode = CommandManager
+					.literal("debug")
+					.requires(source -> source.hasPermissionLevel(3))
+					.build();
+
+			LiteralCommandNode<ServerCommandSource> debugExportNode = CommandManager
+					.literal("export")
+					.executes(new DebugExportCommand())
+					.build();
+
 			//Stitch nodes together
 			subsetNode.addChild(setSubsetNode);
 			subsetNode.addChild(resetSubsetNode);
 			libcdNode.addChild(subsetNode);
 			libcdNode.addChild(heldNode);
+			debugNode.addChild(debugExportNode);
+			libcdNode.addChild(debugNode);
 			dispatcher.getRoot().addChild(libcdNode);
 			
 		});

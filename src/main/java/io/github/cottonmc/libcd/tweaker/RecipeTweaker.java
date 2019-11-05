@@ -1,5 +1,8 @@
 package io.github.cottonmc.libcd.tweaker;
 
+import blue.endless.jankson.JsonArray;
+import blue.endless.jankson.JsonObject;
+import blue.endless.jankson.JsonPrimitive;
 import com.google.common.collect.ImmutableMap;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.impl.RecipeMapAccessor;
@@ -28,6 +31,7 @@ public class RecipeTweaker implements Tweaker {
 	private String currentNamespace = "libcd";
 	private boolean canAddRecipes = false;
 	private TweakerLogger logger;
+	private JsonObject recipeDebug;
 
 	/**
 	 * Used during data pack loading to set up recipe adding.
@@ -35,6 +39,7 @@ public class RecipeTweaker implements Tweaker {
 	 */
 	@Override
 	public void prepareReload(ResourceManager manager) {
+		recipeDebug = new JsonObject();
 		triedRecipeCount = -1;
 		recipeCount = 0;
 		removeCount = 0;
@@ -68,7 +73,10 @@ public class RecipeTweaker implements Tweaker {
 		Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipeMap = new HashMap<>(((RecipeMapAccessor)recipeManager).libcd_getRecipeMap());
 		Set<RecipeType<?>> types = new HashSet<>(recipeMap.keySet());
 		types.addAll(toAdd.keySet());
+		JsonArray added = new JsonArray();
+		JsonArray removed = new JsonArray();
 		for (RecipeType<?> type : types) {
+			String typeId = Registry.RECIPE_TYPE.getId(type).toString();
 			Map<Identifier, Recipe<?>> map = new HashMap<>(recipeMap.getOrDefault(type, new HashMap<>()));
 			for (Recipe<?> recipe : toAdd.getOrDefault(type, new ArrayList<>())) {
 				Identifier id = recipe.getId();
@@ -77,6 +85,7 @@ public class RecipeTweaker implements Tweaker {
 				} else try {
 					map.put(id, recipe);
 					recipeCount++;
+					added.add(new JsonPrimitive(typeId + " - " + id.toString()));
 				} catch (Exception e) {
 					logger.error("Failed to add recipe from tweaker - " + e.getMessage());
 				}
@@ -85,12 +94,15 @@ public class RecipeTweaker implements Tweaker {
 				if (map.containsKey(recipeId)) {
 					map.remove(recipeId);
 					removeCount++;
+					removed.add(new JsonPrimitive(typeId + " - " + recipeId.toString()));
 				} else logger.error("Could not find recipe to remove: " + recipeId.toString());
 			}
 			recipeMap.put(type, ImmutableMap.copyOf(map));
 		}
 		((RecipeMapAccessor)recipeManager).libcd_setRecipeMap(ImmutableMap.copyOf(recipeMap));
 		currentNamespace = "libcd";
+		recipeDebug.put("added", added);
+		recipeDebug.put("removed", removed);
 		canAddRecipes = false;
 	}
 
@@ -404,5 +416,9 @@ public class RecipeTweaker implements Tweaker {
 
 	public TweakerLogger getLogger() {
 		return logger;
+	}
+
+	public JsonObject getRecipeDebug() {
+		return recipeDebug;
 	}
 }
