@@ -26,11 +26,11 @@ public class MixinCookingRecipeSerializer {
 	private CookingRecipeFactoryInvoker invoker;
 
 	@Inject(method = "<init>", at = @At("RETURN"))
-	public void saveInvoker(@Coerce Object invoker, int cookingTime, CallbackInfo info) {
+	private void saveInvoker(@Coerce Object invoker, int cookingTime, CallbackInfo info) {
 		this.invoker = (CookingRecipeFactoryInvoker) invoker;
 	}
 
-	@Inject(method = "method_17736", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;", ordinal = 1),
+	@Inject(method = "method_17736", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;)Ljava/lang/String;", ordinal = 0),
 			cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void read(Identifier id, JsonObject json, CallbackInfoReturnable info,
 					  String group, JsonElement ingElem, Ingredient ingredient) {

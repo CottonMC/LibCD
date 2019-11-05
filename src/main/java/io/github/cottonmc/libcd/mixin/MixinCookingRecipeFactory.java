@@ -9,10 +9,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(targets = "net.minecraft.recipe.CookingRecipeSerializer$RecipeFactory")
-public abstract class MixinCookingRecipeFactory<T extends AbstractCookingRecipe> implements CookingRecipeFactoryInvoker {
-	@Shadow public abstract T create(Identifier identifier, String s, Ingredient ingredient, ItemStack itemStack, float v, int i);
+public interface MixinCookingRecipeFactory<T extends AbstractCookingRecipe> extends CookingRecipeFactoryInvoker {
+	@Shadow T create(Identifier identifier, String s, Ingredient ingredient, ItemStack itemStack, float v, int i);
 
-	public T libcd_create(Identifier id, String group, Ingredient input, ItemStack output, float experience, int cookingTime) {
+	default T libcd_create(Identifier id, String group, Ingredient input, ItemStack output, float experience, int cookingTime) {
 		return create(id, group, input, output, experience, cookingTime);
 	}
 }
