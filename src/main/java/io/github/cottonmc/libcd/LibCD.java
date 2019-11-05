@@ -5,6 +5,7 @@ import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import io.github.cottonmc.jankson.JanksonFactory;
@@ -59,17 +60,25 @@ public class LibCD implements ModInitializer {
 			return PotionUtil.setPotion(new ItemStack(Items.POTION), potion);
 		});
 		CommandRegistry.INSTANCE.register(false, dispatcher -> {
-			dispatcher.register(
-				CommandManager.literal("cd_subset").requires(source -> source.hasPermissionLevel(3))
-						.then(CommandManager.argument("subset", StringArgumentType.string())
-								.executes(context -> changeSubset(context, context.getArgument("subset", String.class))))
-						.then(CommandManager.literal("-reset").executes(context -> changeSubset(context, "")))
-			);
-			
 			
 			//New nodes
 			LiteralCommandNode<ServerCommandSource> libcdNode = CommandManager
 					.literal("libcd")
+					.build();
+
+			LiteralCommandNode<ServerCommandSource> subsetNode = CommandManager
+					.literal("subset")
+					.requires(source -> source.hasPermissionLevel(3))
+					.build();
+
+			ArgumentCommandNode<ServerCommandSource, String> setSubsetNode = CommandManager
+					.argument("subset", StringArgumentType.string())
+					.executes(context -> changeSubset(context, context.getArgument("subset", String.class)))
+					.build();
+
+			LiteralCommandNode<ServerCommandSource> resetSubsetNode = CommandManager
+					.literal("-reset")
+					.executes(context -> changeSubset(context, ""))
 					.build();
 			
 			LiteralCommandNode<ServerCommandSource> heldNode = CommandManager
@@ -78,6 +87,9 @@ public class LibCD implements ModInitializer {
 					.build();
 			
 			//Stitch nodes together
+			subsetNode.addChild(setSubsetNode);
+			subsetNode.addChild(resetSubsetNode);
+			libcdNode.addChild(subsetNode);
 			libcdNode.addChild(heldNode);
 			dispatcher.getRoot().addChild(libcdNode);
 			

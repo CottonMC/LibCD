@@ -173,7 +173,6 @@ public class RecipeBuilder {
 	 * @return All the passed properties built into a recipe using the given recipe serializer. Pass this directly to {@link RecipeTweaker#addRecipe(Recipe)}.
 	 */
 	public Recipe build() {
-		System.out.println(json.toString());
 		return serializer.read(RecipeTweaker.INSTANCE.getRecipeId(idStack), json);
 	}
 
