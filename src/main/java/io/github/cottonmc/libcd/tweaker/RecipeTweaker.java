@@ -30,7 +30,7 @@ public class RecipeTweaker implements Tweaker {
 	private int removeCount;
 	private Map<RecipeType<?>, List<Recipe<?>>> toAdd = new HashMap<>();
 	private Map<RecipeType<?>, List<Identifier>> toRemove = new HashMap<>();
-	private List<Item> removeFor = new ArrayList<>();
+	private Map<RecipeType<?>, List<Item>> removeFor = new HashMap<>();
 	private String currentNamespace = "libcd";
 	private boolean canAddRecipes = false;
 	private TweakerLogger logger;
@@ -92,7 +92,7 @@ public class RecipeTweaker implements Tweaker {
 			}
 			for (Identifier id : new HashSet<>(map.keySet())) {
 				Recipe recipe = map.get(id);
-				if (removeFor.contains(recipe.getOutput().getItem())) {
+				if (removeFor.get(type).contains(recipe.getOutput().getItem())) {
 					map.remove(id);
 					removeCount++;
 					removed.add(new JsonPrimitive(typeId + " - " + id.toString()));
@@ -167,7 +167,25 @@ public class RecipeTweaker implements Tweaker {
 		Identifier formatted = new Identifier(id);
 		Item item = Registry.ITEM.get(formatted);
 		if (item != Items.AIR) {
-			removeFor.add(item);
+			for (Identifier typeId : Registry.RECIPE_TYPE.getIds()) {
+				RecipeType type = Registry.RECIPE_TYPE.get(typeId);
+				if (!removeFor.containsKey(type)) removeFor.put(type, new ArrayList<>());
+				removeFor.get(type).add(item);
+			}
+		} else {
+			logger.error("Couldn't find item to remove recipes for: " + id);
+		}
+	}
+
+	public void removeRecipesFor(String id, String type) {
+		if (!canAddRecipes) throw new RuntimeException("Someone tried to remove recipes via LibCD outside of reload time!");
+		Identifier formatted = new Identifier(id);
+		Identifier typeId = new Identifier(type);
+		Item item = Registry.ITEM.get(formatted);
+		if (item != Items.AIR) {
+			RecipeType rType = Registry.RECIPE_TYPE.get(typeId);
+			if (!removeFor.containsKey(rType)) removeFor.put(rType, new ArrayList<>());
+			removeFor.get(rType).add(item);
 		} else {
 			logger.error("Couldn't find item to remove recipes for: " + id);
 		}
