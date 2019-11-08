@@ -9,7 +9,9 @@ import io.github.cottonmc.libcd.impl.RecipeMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
 import io.github.cottonmc.libcd.util.NbtMatchType;
 import io.github.cottonmc.libcd.util.TweakerLogger;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.recipe.*;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReloadListener;
@@ -28,6 +30,7 @@ public class RecipeTweaker implements Tweaker {
 	private int removeCount;
 	private Map<RecipeType<?>, List<Recipe<?>>> toAdd = new HashMap<>();
 	private Map<RecipeType<?>, List<Identifier>> toRemove = new HashMap<>();
+	private List<Item> removeFor = new ArrayList<>();
 	private String currentNamespace = "libcd";
 	private boolean canAddRecipes = false;
 	private TweakerLogger logger;
@@ -45,6 +48,7 @@ public class RecipeTweaker implements Tweaker {
 		removeCount = 0;
 		toAdd.clear();
 		toRemove.clear();
+		removeFor.clear();
 		if (manager instanceof ReloadListenersAccessor) {
 			List<ResourceReloadListener> listeners = ((ReloadListenersAccessor)manager).libcd_getListeners();
 			for (ResourceReloadListener listener : listeners) {
@@ -78,6 +82,22 @@ public class RecipeTweaker implements Tweaker {
 		for (RecipeType<?> type : types) {
 			String typeId = Registry.RECIPE_TYPE.getId(type).toString();
 			Map<Identifier, Recipe<?>> map = new HashMap<>(recipeMap.getOrDefault(type, new HashMap<>()));
+			//remove before we add, so that we don't accidentally remove our own recipes!
+			for (Identifier recipeId : toRemove.getOrDefault(type, new ArrayList<>())) {
+				if (map.containsKey(recipeId)) {
+					map.remove(recipeId);
+					removeCount++;
+					removed.add(new JsonPrimitive(typeId + " - " + recipeId.toString()));
+				} else logger.error("Could not find recipe to remove: " + recipeId.toString());
+			}
+			for (Identifier id : new HashSet<>(map.keySet())) {
+				Recipe recipe = map.get(id);
+				if (removeFor.contains(recipe.getOutput().getItem())) {
+					map.remove(id);
+					removeCount++;
+					removed.add(new JsonPrimitive(typeId + " - " + id.toString()));
+				}
+			}
 			for (Recipe<?> recipe : toAdd.getOrDefault(type, new ArrayList<>())) {
 				Identifier id = recipe.getId();
 				if (map.containsKey(id)) {
@@ -89,13 +109,6 @@ public class RecipeTweaker implements Tweaker {
 				} catch (Exception e) {
 					logger.error("Failed to add recipe from tweaker - " + e.getMessage());
 				}
-			}
-			for (Identifier recipeId : toRemove.getOrDefault(type, new ArrayList<>())) {
-				if (map.containsKey(recipeId)) {
-					map.remove(recipeId);
-					removeCount++;
-					removed.add(new JsonPrimitive(typeId + " - " + recipeId.toString()));
-				} else logger.error("Could not find recipe to remove: " + recipeId.toString());
 			}
 			recipeMap.put(type, ImmutableMap.copyOf(map));
 		}
@@ -133,6 +146,7 @@ public class RecipeTweaker implements Tweaker {
 	 * @param id The id of the recipe to remove.
 	 */
 	public void removeRecipe(String id) {
+		if (!canAddRecipes) throw new RuntimeException("Someone tried to remove recipes via LibCD outside of reload time!");
 		Identifier formatted = new Identifier(id);
 		Optional<? extends Recipe<?>> opt = recipeManager.get(formatted);
 		if (opt.isPresent()) {
@@ -141,6 +155,21 @@ public class RecipeTweaker implements Tweaker {
 			if (!toRemove.containsKey(type)) toRemove.put(type, new ArrayList<>());
 			List<Identifier> removal = toRemove.get(type);
 			removal.add(formatted);
+		}
+	}
+
+	/**
+	 * Remove all recipes outputting a certain item from the recipe manager.
+	 * @param id The id of the output item to remove recipes for.
+	 */
+	public void removeRecipesFor(String id) {
+		if (!canAddRecipes) throw new RuntimeException("Someone tried to remove recipes via LibCD outside of reload time!");
+		Identifier formatted = new Identifier(id);
+		Item item = Registry.ITEM.get(formatted);
+		if (item != Items.AIR) {
+			removeFor.add(item);
+		} else {
+			logger.error("Couldn't find item to remove recipes for: " + id);
 		}
 	}
 
@@ -246,6 +275,7 @@ public class RecipeTweaker implements Tweaker {
 			addRecipe(new ShapedRecipe(recipeId, group, width, height, ingredients, stack));
 		} catch (Exception e) {
 			logger.error("Error parsing 1D array shaped recipe - " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 

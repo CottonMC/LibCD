@@ -10,6 +10,9 @@ var table = TweakerUtils.createItemStack("minecraft:crafting_table");
 //remove the vanilla crafting table recipe, so we can use ours instead
 RecipeTweaker.removeRecipe("minecraft:crafting_table");
 
+//remove all recipes for gold nuggets - make them entirely uncraftable
+RecipeTweaker.removeRecipesFor("minecraft:gold_nugget");
+
 //create a recipe for a piece of tall grass and a piece of bonemeal -> a two-high piece of tall grass
 RecipeTweaker.addShapeless(["minecraft:grass", "minecraft:bone_meal"], TweakerUtils.createItemStack("minecraft:tall_grass"));
 
