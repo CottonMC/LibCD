@@ -5,9 +5,7 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.util.Identifier;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.Map;
@@ -15,15 +13,15 @@ import java.util.Map;
 @Mixin(RecipeManager.class)
 public abstract class MixinRecipeManager implements RecipeMapAccessor {
 	@Shadow
-	private Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipeMap;
+	private Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipes;
 
 	@Override
 	public Map<RecipeType<?>, Map<Identifier, Recipe<?>>> libcd_getRecipeMap() {
-		return recipeMap;
+		return recipes;
 	}
 
 	@Override
 	public void libcd_setRecipeMap(Map<RecipeType<?>, Map<Identifier, Recipe<?>>> map) {
-		recipeMap = map;
+		recipes = map;
 	}
 }

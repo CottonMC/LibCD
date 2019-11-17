@@ -16,9 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(Ingredient.class)
 public abstract class MixinIngredient implements IngredientAccessUtils {
 
-	@Shadow private ItemStack[] stackArray;
+	@Shadow private ItemStack[] matchingStacks;
 
-	@Shadow protected abstract void createStackArray();
+	@Shadow protected abstract void cacheMatchingStacks();
 
 	private NbtMatchType type = NbtMatchType.NONE;
 	@Inject(method = "method_8093", at = @At(value = "RETURN", ordinal = 2), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
@@ -37,9 +37,9 @@ public abstract class MixinIngredient implements IngredientAccessUtils {
 		switch(type) {
 			case FUZZY:
 				for (String key : againstTag.getKeys()) {
-					if (!testTag.containsKey(key)) cir.setReturnValue(false);
-					Tag trial = testTag.getTag(key);
-					Tag against = againstTag.getTag(key);
+					if (!testTag.contains(key)) cir.setReturnValue(false);
+					Tag trial = testTag.get(key);
+					Tag against = againstTag.get(key);
 					if (trial.getType() == against.getType()) {
 						if (!trial.asString().equals(against.asString())) {
 							cir.setReturnValue(false);
@@ -65,7 +65,7 @@ public abstract class MixinIngredient implements IngredientAccessUtils {
 
 	@Override
 	public ItemStack[] libcd_getStackArray() {
-		createStackArray();
-		return stackArray;
+		cacheMatchingStacks();
+		return matchingStacks;
 	}
 }

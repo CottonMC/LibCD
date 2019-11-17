@@ -1,7 +1,7 @@
 package io.github.cottonmc.libcd.condition;
 
 import blue.endless.jankson.*;
-import blue.endless.jankson.impl.SyntaxError;
+import blue.endless.jankson.api.SyntaxError;
 import io.github.cottonmc.libcd.LibCD;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Items;

@@ -74,7 +74,7 @@ public class StackInfo {
 	 */
 	Object getTagValue(String key) {
 		CompoundTag tag = stack.getOrCreateTag();
-		return NbtUtils.getObjectFor(tag.getTag(key));
+		return NbtUtils.getObjectFor(tag.get(key));
 	}
 
 	/**

@@ -52,7 +52,7 @@ public class WrappedCompoundTag {
 	 * @return Whether the tag has this key.
 	 */
 	public boolean hasTag(String key) {
-		return underlying.containsKey(key);
+		return underlying.contains(key);
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class WrappedCompoundTag {
 	 * @return Whether the tag has this key, and the key has this type.
 	 */
 	public boolean hasTag(String key, String type) {
-		return underlying.containsKey(key) && getType(key).equals(type);
+		return underlying.contains(key) && getType(key).equals(type);
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class WrappedCompoundTag {
 	 * @return Whether the tag has this key, and the key has this type.
 	 */
 	public boolean hasTag(String key, int type) {
-		return underlying.containsKey(key, type);
+		return underlying.contains(key, type);
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class WrappedCompoundTag {
 	 * @return The string form of this tag.
 	 */
 	public Object getTag(String key) {
-		return NbtUtils.getObjectFor(underlying.getTag(key));
+		return NbtUtils.getObjectFor(underlying.get(key));
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class WrappedCompoundTag {
 	 * @return Whether the tag has a UUID with this key.
 	 */
 	public boolean hasUuid(String key) {
-		return underlying.hasUuid(key);
+		return underlying.containsUuid(key);
 	}
 
 	/**
@@ -277,7 +277,7 @@ public class WrappedCompoundTag {
 	 * @return Whether a list at that tag and of that type exists.
 	 */
 	public boolean hasList(String key, String type) {
-		return underlying.containsKey(key, NbtType.LIST) && ((ListTag)underlying.getTag(key)).getListType() == NbtUtils.getTypeNumber(type);
+		return underlying.contains(key, NbtType.LIST) && ((ListTag)underlying.get(key)).getElementType() == NbtUtils.getTypeNumber(type);
 	}
 
 	/**
@@ -285,9 +285,9 @@ public class WrappedCompoundTag {
 	 * @return The type of the list at the given key, or "" if it's not a list.
 	 */
 	public String getListType(String key) {
-		Tag tag = underlying.getTag(key);
+		Tag tag = underlying.get(key);
 		if (tag instanceof ListTag) {
-			return NbtUtils.getTypeName(((ListTag)tag).getListType());
+			return NbtUtils.getTypeName(((ListTag)tag).getElementType());
 		} else return "";
 	}
 

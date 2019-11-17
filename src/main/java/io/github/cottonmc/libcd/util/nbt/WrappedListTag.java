@@ -58,7 +58,7 @@ public class WrappedListTag {
 	 * @return The type of tag the list will accept.
 	 */
 	public String getListType() {
-		return NbtUtils.getTypeName(underlying.getListType());
+		return NbtUtils.getTypeName(underlying.getElementType());
 	}
 
 	/**
@@ -84,33 +84,33 @@ public class WrappedListTag {
 	 * @return Whether the object could be successfully added.
 	 */
 	public boolean set(int index, Object value) {
-		switch(underlying.getListType()) {
+		switch(underlying.getElementType()) {
 			case 0:
 				return underlying.setTag(index, NbtUtils.getTagFor(value));
 			case 1:
 				if (value instanceof Byte) {
-					return underlying.setTag(index, new ByteTag((Byte)value));
+					return underlying.setTag(index, ByteTag.of((Byte)value));
 				} else return false;
 			case 2:
-				if (value instanceof Short) return underlying.setTag(index, new ShortTag((Short)value));
+				if (value instanceof Short) return underlying.setTag(index, ShortTag.of((Short)value));
 				 else return false;
 			case 3:
-				if (value instanceof Integer) return underlying.setTag(index, new IntTag((Integer)value));
+				if (value instanceof Integer) return underlying.setTag(index, IntTag.of((Integer)value));
 				else return false;
 			case 4:
-				if (value instanceof Long) return underlying.setTag(index, new LongTag((Long)value));
+				if (value instanceof Long) return underlying.setTag(index, LongTag.of((Long)value));
 				else return false;
 			case 5:
-				if (value instanceof Float) return underlying.setTag(index, new LongTag((Long)value));
+				if (value instanceof Float) return underlying.setTag(index, FloatTag.of((Float)value));
 				else return false;
 			case 6:
-				if (value instanceof Double) return underlying.setTag(index, new DoubleTag((Long)value));
+				if (value instanceof Double) return underlying.setTag(index, DoubleTag.of((Double)value));
 				else return false;
 			case 7:
 				if (value instanceof Byte[]) return underlying.setTag(index, new ByteArrayTag(Arrays.asList((Byte[])value)));
 				else return false;
 			case 8:
-				if (value instanceof String) return underlying.setTag(index, new StringTag((String)value));
+				if (value instanceof String) return underlying.setTag(index, StringTag.of((String)value));
 				else return false;
 			case 9:
 				if (value instanceof WrappedListTag) return underlying.setTag(index, ((WrappedListTag)value).getUnderlying());
@@ -144,33 +144,33 @@ public class WrappedListTag {
 	 * @return Whether the tagified object could be added.
 	 */
 	public boolean add(int index, Object value) {
-		switch(underlying.getListType()) {
+		switch(underlying.getElementType()) {
 			case 0:
 				return underlying.addTag(index, NbtUtils.getTagFor(value));
 			case 1:
 				if (value instanceof Byte) {
-					return underlying.addTag(index, new ByteTag((Byte)value));
+					return underlying.addTag(index, ByteTag.of((Byte)value));
 				} else return false;
 			case 2:
-				if (value instanceof Short) return underlying.addTag(index, new ShortTag((Short)value));
+				if (value instanceof Short) return underlying.addTag(index, ShortTag.of((Short)value));
 				else return false;
 			case 3:
-				if (value instanceof Integer) return underlying.addTag(index, new IntTag((Integer)value));
+				if (value instanceof Integer) return underlying.addTag(index, IntTag.of((Integer)value));
 				else return false;
 			case 4:
-				if (value instanceof Long) return underlying.addTag(index, new LongTag((Long)value));
+				if (value instanceof Long) return underlying.addTag(index, LongTag.of((Long)value));
 				else return false;
 			case 5:
-				if (value instanceof Float) return underlying.addTag(index, new LongTag((Long)value));
+				if (value instanceof Float) return underlying.addTag(index, FloatTag.of((Float)value));
 				else return false;
 			case 6:
-				if (value instanceof Double) return underlying.addTag(index, new DoubleTag((Long)value));
+				if (value instanceof Double) return underlying.addTag(index, DoubleTag.of((Double)value));
 				else return false;
 			case 7:
 				if (value instanceof Byte[]) return underlying.addTag(index, new ByteArrayTag(Arrays.asList((Byte[])value)));
 				else return false;
 			case 8:
-				if (value instanceof String) return underlying.addTag(index, new StringTag((String)value));
+				if (value instanceof String) return underlying.addTag(index, StringTag.of((String)value));
 				else return false;
 			case 9:
 				if (value instanceof WrappedListTag) return underlying.addTag(index, ((WrappedListTag)value).getUnderlying());

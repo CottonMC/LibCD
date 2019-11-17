@@ -102,23 +102,23 @@ public class NbtUtils {
 	public static Tag getTagFor(Object value) {
 		if (value == null) return null;
 		if (value instanceof Byte) {
-			return new ByteTag((byte)value);
+			return ByteTag.of((byte) value);
 		} else if (value instanceof Boolean) {
-			return new ByteTag((byte)((boolean)value ? 1 : 0));
+			return ByteTag.of((byte)((boolean)value ? 1 : 0));
 		} else if (value instanceof Short) {
-			return new ShortTag((short)value);
+			return ShortTag.of((short)value);
 		} else if (value instanceof Integer) {
-			return new IntTag((int)value);
+			return IntTag.of((int)value);
 		} else if (value instanceof Long) {
-			return new LongTag((long)value);
+			return LongTag.of((long)value);
 		} else if (value instanceof Float) {
-			return new FloatTag((float)value);
+			return FloatTag.of((float)value);
 		} else if (value instanceof Double) {
-			return new DoubleTag((double) value);
+			return DoubleTag.of((double) value);
 		} else if (value instanceof Byte[]) {
 			return new ByteArrayTag(Arrays.asList((Byte[])value));
 		} else if (value instanceof String) {
-			return new StringTag((String)value);
+			return StringTag.of((String)value);
 		} else if (value instanceof WrappedListTag) {
 			return ((WrappedListTag)value).getUnderlying();
 		} else if (value instanceof WrappedCompoundTag) {
@@ -127,7 +127,7 @@ public class NbtUtils {
 			return new IntArrayTag(Arrays.asList((Integer[])value));
 		} else if (value instanceof Long[]) {
 			return new LongArrayTag(Arrays.asList((Long[])value));
-		} else return new StringTag(value.toString());
+		} else return StringTag.of(value.toString());
 	}
 
 	/**
@@ -205,7 +205,7 @@ public class NbtUtils {
 	public static JsonObject toJson(CompoundTag tag) {
 		JsonObject ret = new JsonObject();
 		for (String key : tag.getKeys()) {
-			Tag elem = tag.getTag(key);
+			Tag elem = tag.get(key);
 			if (elem instanceof CompoundTag) {
 				ret.put(key, toJson((CompoundTag)elem));
 			} else if (elem instanceof ListTag) {

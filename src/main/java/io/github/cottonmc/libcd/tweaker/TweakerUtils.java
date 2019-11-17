@@ -208,7 +208,7 @@ public class TweakerUtils {
 		ListTag list = display.getList("Lore", 8);
 		for (int i = 0; i < lore.length; i++) {
 			String line = lore[i];
-			list.addTag(i, new StringTag("{\"text\":\"" + line + "\"}"));
+			list.addTag(i, StringTag.of("{\"text\":\"" + line + "\"}"));
 		}
 		display.put("Lore", list);
 		stack.putSubTag("display", display);
