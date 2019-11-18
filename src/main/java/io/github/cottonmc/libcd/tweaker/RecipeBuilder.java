@@ -69,7 +69,7 @@ public class RecipeBuilder {
 	 * @param map The map of single characters to objects to be parsed as ingredients.
 	 * @return This builder with the ingredient key added.
 	 */
-	public RecipeBuilder ingredientMao(String key, Map<String, Object> map) {
+	public RecipeBuilder ingredientMap(String key, Map<String, Object> map) {
 		JsonObject obj = new JsonObject();
 		try {
 			for (String ch : map.keySet()) {
