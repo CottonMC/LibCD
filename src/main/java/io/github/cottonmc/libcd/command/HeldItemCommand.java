@@ -36,8 +36,8 @@ public class HeldItemCommand implements Command<ServerCommandSource> {
 		}
 		
 		Style clickableStyle = new Style()
-			.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to put this text in the chat bar")))
-			.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, description.toString()));
+			.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to copy to clipboard")))
+			.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, description.toString()));
 		
 		feedback.setStyle(clickableStyle);
 		player.sendMessage(feedback);
