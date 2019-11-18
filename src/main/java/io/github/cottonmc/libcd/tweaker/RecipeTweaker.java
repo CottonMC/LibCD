@@ -92,7 +92,7 @@ public class RecipeTweaker implements Tweaker {
 			}
 			for (Identifier id : new HashSet<>(map.keySet())) {
 				Recipe recipe = map.get(id);
-				if (removeFor.get(type).contains(recipe.getOutput().getItem())) {
+				if (removeFor.getOrDefault(type, Collections.emptyList()).contains(recipe.getOutput().getItem())) {
 					map.remove(id);
 					removeCount++;
 					removed.add(new JsonPrimitive(typeId + " - " + id.toString()));
