@@ -80,7 +80,8 @@ public class RecipeTweaker implements Tweaker {
 		JsonArray added = new JsonArray();
 		JsonArray removed = new JsonArray();
 		for (RecipeType<?> type : types) {
-			String typeId = Registry.RECIPE_TYPE.getId(type).toString();
+			Identifier preTypeId = Registry.RECIPE_TYPE.getId(type);
+			String typeId = preTypeId == null? "unknown" : preTypeId.toString();
 			Map<Identifier, Recipe<?>> map = new HashMap<>(recipeMap.getOrDefault(type, new HashMap<>()));
 			//remove before we add, so that we don't accidentally remove our own recipes!
 			for (Identifier recipeId : toRemove.getOrDefault(type, new ArrayList<>())) {
