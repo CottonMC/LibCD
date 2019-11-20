@@ -30,7 +30,7 @@ if(rootProject.file('private.gradle').exists()) { //Publishing details
 
 archivesBaseName = "libcd"
 group = "io.github.cottonmc"
-version = "1.6.0+1.15"
+version = "1.6.1+1.15"
 
 minecraft {
 	refmapName = 'mixins.libcd.refmap.json'
