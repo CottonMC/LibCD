@@ -1,9 +1,15 @@
 package io.github.cottonmc.libcd.tweaker;
 
 import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.mojang.datafixers.Dynamic;
+import com.mojang.datafixers.types.JsonOps;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.util.NbtMatchType;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.datafixers.NbtOps;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -13,6 +19,7 @@ import net.minecraft.tag.Tag;
 import net.minecraft.util.DefaultedList;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
+import net.minecraft.util.registry.Registry;
 
 import java.util.*;
 
@@ -300,17 +307,36 @@ public class RecipeParser {
 	/**
 	 * Thanks, ProGuard! The `Ingredient.ofStacks()` method is currently only in the client environment,
 	 * so I have to write this ugly, terrible hack to make it work!
-	 * Serializes the input stacks into a PacketByteBuf,
+	 * Serializes the input stacks into a PacketByteBuf (or JSON if NBT Crafting is here to deal with NBT),
 	 * then tricks the Ingredient class into deserializing them.
 	 * @param stacks The input stacks to support.
 	 * @return The ingredient object for the input stacks.
 	 */
 	public static Ingredient hackStackIngredients(ItemStack...stacks) {
-		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		buf.writeVarInt(stacks.length);
-		for (ItemStack stack : stacks) {
-			buf.writeItemStack(stack);
+		if (FabricLoader.getInstance().isModLoaded("nbtcrafting")) {
+			JsonArray array = new JsonArray();
+			for (ItemStack stack : stacks) {
+				array.add(serializeStack(stack));
+			}
+			return Ingredient.fromJson(array);
+		} else {
+			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+			buf.writeVarInt(stacks.length);
+			for (ItemStack stack : stacks) {
+				buf.writeItemStack(stack);
+			}
+			return Ingredient.fromPacket(buf);
 		}
-		return Ingredient.fromPacket(buf);
+	}
+
+	private static JsonObject serializeStack(ItemStack stack) {
+		JsonObject ret = new JsonObject();
+		ret.addProperty("item", Registry.ITEM.getId(stack.getItem()).toString());
+		ret.addProperty("count", stack.getCount());
+		if (stack.hasTag()) {
+			JsonObject data = Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, stack.getTag()).getAsJsonObject();
+			ret.add("data", data);
+		}
+		return ret;
 	}
 }
