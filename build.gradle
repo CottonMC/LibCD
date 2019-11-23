@@ -39,6 +39,7 @@ minecraft {
 repositories {
 	mavenCentral()
 	maven { url "http://server.bbkr.space:8081/artifactory/libs-release" }
+	maven { url "https://www.jitpack.io" }
 }
 
 dependencies {
@@ -50,6 +51,8 @@ dependencies {
 	
 	modApi "io.github.cottonmc:Jankson-Fabric:2.0.0+j1.2.0"
 	include "io.github.cottonmc:Jankson-Fabric:2.0.0+j1.2.0"
+
+	modImplementation ("com.github.Siphalor:nbt-crafting:1.2.5") {transitive = false}
 }
 
 processResources {
