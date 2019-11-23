@@ -4,7 +4,6 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.JsonOps;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.util.GsonOps;
 import io.github.cottonmc.libcd.util.NbtMatchType;
@@ -315,11 +314,15 @@ public class RecipeParser {
 	 */
 	public static Ingredient hackStackIngredients(ItemStack...stacks) {
 		if (FabricLoader.getInstance().isModLoaded("nbtcrafting")) {
-			JsonArray array = new JsonArray();
-			for (ItemStack stack : stacks) {
-				array.add(serializeStack(stack));
+			if (stacks.length > 1) {
+				JsonArray array = new JsonArray();
+				for (ItemStack stack : stacks) {
+					array.add(serializeStack(stack));
+				}
+				return Ingredient.fromJson(array);
+			} else {
+				return Ingredient.fromJson(serializeStack(stacks[0]));
 			}
-			return Ingredient.fromJson(array);
 		} else {
 			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 			buf.writeVarInt(stacks.length);
