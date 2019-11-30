@@ -59,12 +59,12 @@ public abstract class MixinIngredient implements IngredientAccessUtils {
 
 
 	@Override
-	public void libcd_setMatchType(NbtMatchType type) {
+	public void libcd$setMatchType(NbtMatchType type) {
 		this.type = type;
 	}
 
 	@Override
-	public ItemStack[] libcd_getStackArray() {
+	public ItemStack[] libcd$getStackArray() {
 		cacheMatchingStacks();
 		return matchingStacks;
 	}

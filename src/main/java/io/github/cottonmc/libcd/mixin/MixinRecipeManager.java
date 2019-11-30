@@ -16,12 +16,12 @@ public abstract class MixinRecipeManager implements RecipeMapAccessor {
 	private Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipes;
 
 	@Override
-	public Map<RecipeType<?>, Map<Identifier, Recipe<?>>> libcd_getRecipeMap() {
+	public Map<RecipeType<?>, Map<Identifier, Recipe<?>>> libcd$getRecipeMap() {
 		return recipes;
 	}
 
 	@Override
-	public void libcd_setRecipeMap(Map<RecipeType<?>, Map<Identifier, Recipe<?>>> map) {
+	public void libcd$setRecipeMap(Map<RecipeType<?>, Map<Identifier, Recipe<?>>> map) {
 		recipes = map;
 	}
 }

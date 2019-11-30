@@ -6,5 +6,5 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.util.Identifier;
 
 public interface CookingRecipeFactoryInvoker<T extends AbstractCookingRecipe> {
-	T libcd_create(Identifier id, String group, Ingredient ingredient, ItemStack output, float experience, int cookingTime);
+	T libcd$create(Identifier id, String group, Ingredient ingredient, ItemStack output, float experience, int cookingTime);
 }

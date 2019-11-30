@@ -32,7 +32,7 @@ public class MixinCuttingRecipeSerializer {
 		JsonElement elem = json.get("result");
 		if (elem instanceof JsonObject) {
 			ItemStack stack = ShapedRecipe.getItemStack((JsonObject)elem);
-			info.setReturnValue(invoker.libcd_create(id, group, ingredient, stack));
+			info.setReturnValue(invoker.libcd$create(id, group, ingredient, stack));
 		}
 	}
 }

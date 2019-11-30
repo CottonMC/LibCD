@@ -6,5 +6,5 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.util.Identifier;
 
 public interface CuttingRecipeFactoryInvoker<T extends CuttingRecipe> {
-	T libcd_create(Identifier id, String group, Ingredient input, ItemStack output);
+	T libcd$create(Identifier id, String group, Ingredient input, ItemStack output);
 }

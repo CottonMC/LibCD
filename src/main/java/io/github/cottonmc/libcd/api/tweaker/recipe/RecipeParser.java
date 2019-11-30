@@ -76,7 +76,7 @@ public class RecipeParser {
 				}
 			}
 			Ingredient ret = hackStackIngredients(stacks.toArray(new ItemStack[]{}));
-			((IngredientAccessUtils)(Object)ret).libcd_setMatchType(type);
+			((IngredientAccessUtils)(Object)ret).libcd$setMatchType(type);
 			return ret;
 		}
 		else throw new CDSyntaxError("Illegal object passed to recipe parser of type " + input.getClass().getName());

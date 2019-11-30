@@ -5,5 +5,5 @@ import net.minecraft.resource.ResourceReloadListener;
 import java.util.List;
 
 public interface ReloadListenersAccessor {
-	List<ResourceReloadListener> libcd_getListeners();
+	List<ResourceReloadListener> libcd$getListeners();
 }

@@ -4,6 +4,6 @@ import io.github.cottonmc.libcd.api.util.NbtMatchType;
 import net.minecraft.item.ItemStack;
 
 public interface IngredientAccessUtils {
-	void libcd_setMatchType(NbtMatchType type);
-	ItemStack[] libcd_getStackArray();
+	void libcd$setMatchType(NbtMatchType type);
+	ItemStack[] libcd$getStackArray();
 }

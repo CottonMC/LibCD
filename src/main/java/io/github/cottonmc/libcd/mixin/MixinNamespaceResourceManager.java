@@ -20,7 +20,7 @@ public abstract class MixinNamespaceResourceManager implements ResourceManager, 
 
 	@Shadow protected abstract boolean isPathAbsolute(Identifier id);
 
-	public boolean libcd_contains(Identifier id) {
+	public boolean libcd$contains(Identifier id) {
 		if (!this.isPathAbsolute(id)) {
 			return false;
 		} else {

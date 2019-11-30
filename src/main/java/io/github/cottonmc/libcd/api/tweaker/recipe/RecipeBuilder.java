@@ -1,7 +1,6 @@
 package io.github.cottonmc.libcd.api.tweaker.recipe;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.types.JsonOps;
 import net.fabricmc.loader.api.FabricLoader;
@@ -151,6 +150,18 @@ public class RecipeBuilder {
 			}
 		}
 		json.add(key, array);
+		return this;
+	}
+
+	/**
+	 * Add raw JSON to the recipe.
+	 * @param key The key to place this JSON at.
+	 * @param value The JSON to add.
+	 * @return This builder with the JSON added.
+	 */
+	public RecipeBuilder value(String key, String value) {
+		JsonParser parser = new JsonParser();
+		json.add(key, parser.parse(value));
 		return this;
 	}
 

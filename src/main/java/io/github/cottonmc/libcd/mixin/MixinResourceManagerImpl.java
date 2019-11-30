@@ -39,7 +39,7 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 			//don't try to load for things that use mcmetas already!
 			if (id.getPath().contains(".mcmeta") || id.getPath().contains(".png")) continue;
 			Identifier metaId = new Identifier(id.getNamespace(), id.getPath() + ".mcmeta");
-			if (libcd_contains(metaId)) {
+			if (libcd$contains(metaId)) {
 				try {
 					Resource meta = getResource(metaId);
 					String metaText = IOUtils.toString(meta.getInputStream());
@@ -54,13 +54,13 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 	}
 
 	@Override
-	public List<ResourceReloadListener> libcd_getListeners() {
+	public List<ResourceReloadListener> libcd$getListeners() {
 		return listeners;
 	}
 
-	public boolean libcd_contains(Identifier id) {
+	public boolean libcd$contains(Identifier id) {
 		ResourceManager manager = this.namespaceManagers.get(id.getNamespace());
-		return manager != null && ((ResourceSearcher) manager).libcd_contains(id);
+		return manager != null && ((ResourceSearcher) manager).libcd$contains(id);
 	}
 
 

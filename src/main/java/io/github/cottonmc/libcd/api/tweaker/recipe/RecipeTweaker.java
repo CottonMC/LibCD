@@ -53,7 +53,7 @@ public class RecipeTweaker implements Tweaker {
 		toRemove.clear();
 		removeFor.clear();
 		if (manager instanceof ReloadListenersAccessor) {
-			List<ResourceReloadListener> listeners = ((ReloadListenersAccessor)manager).libcd_getListeners();
+			List<ResourceReloadListener> listeners = ((ReloadListenersAccessor)manager).libcd$getListeners();
 			for (ResourceReloadListener listener : listeners) {
 				if (listener instanceof RecipeManager) {
 					this.recipeManager = (RecipeManager)listener;
@@ -77,7 +77,7 @@ public class RecipeTweaker implements Tweaker {
 	 */
 	@Override
 	public void applyReload(ResourceManager manager, Executor executor) {
-		Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipeMap = new HashMap<>(((RecipeMapAccessor)recipeManager).libcd_getRecipeMap());
+		Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipeMap = new HashMap<>(((RecipeMapAccessor)recipeManager).libcd$getRecipeMap());
 		Set<RecipeType<?>> types = new HashSet<>(recipeMap.keySet());
 		types.addAll(toAdd.keySet());
 		JsonArray added = new JsonArray();
@@ -125,7 +125,7 @@ public class RecipeTweaker implements Tweaker {
 			}
 			recipeMap.put(type, ImmutableMap.copyOf(map));
 		}
-		((RecipeMapAccessor)recipeManager).libcd_setRecipeMap(ImmutableMap.copyOf(recipeMap));
+		((RecipeMapAccessor)recipeManager).libcd$setRecipeMap(ImmutableMap.copyOf(recipeMap));
 		currentNamespace = "libcd";
 		recipeDebug.put("added", added);
 		recipeDebug.put("removed", removed);
@@ -249,14 +249,14 @@ public class RecipeTweaker implements Tweaker {
 		NbtMatchType match = NbtMatchType.forName(nbtMatch);
 		for (String input : inputs) {
 			try {
-				ItemStack[] in = ((IngredientAccessUtils)(Object)RecipeParser.processIngredient(input)).libcd_getStackArray();
+				ItemStack[] in = ((IngredientAccessUtils)(Object)RecipeParser.processIngredient(input)).libcd$getStackArray();
 				stacks.addAll(Arrays.asList(in));
 			} catch (CDSyntaxError e) {
 				logger.error("Could not add stack to ingredient: malformed stack string %s", input);
 			}
 		}
 		Ingredient ret = RecipeParser.hackStackIngredients(stacks.toArray(new ItemStack[]{}));
-		((IngredientAccessUtils)(Object)ret).libcd_setMatchType(match);
+		((IngredientAccessUtils)(Object)ret).libcd$setMatchType(match);
 		return ret;
 	}
 

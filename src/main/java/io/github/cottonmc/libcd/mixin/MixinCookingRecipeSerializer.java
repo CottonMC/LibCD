@@ -39,7 +39,7 @@ public class MixinCookingRecipeSerializer {
 			ItemStack stack = ShapedRecipe.getItemStack((JsonObject)elem);
 			float experience = JsonHelper.getFloat(json, "experience", 0.0F);
 			int cookingtime = JsonHelper.getInt(json, "cookingtime", this.cookingTime);
-			info.setReturnValue(invoker.libcd_create(id, group, ingredient, stack, experience, cookingtime));
+			info.setReturnValue(invoker.libcd$create(id, group, ingredient, stack, experience, cookingtime));
 		}
 	}
 }
