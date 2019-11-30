@@ -1,4 +1,4 @@
-package io.github.cottonmc.libcd.util.nbt;
+package io.github.cottonmc.libcd.api.util.nbt;
 
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.CompoundTag;

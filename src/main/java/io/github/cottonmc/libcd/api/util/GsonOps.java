@@ -1,4 +1,4 @@
-package io.github.cottonmc.libcd.util;
+package io.github.cottonmc.libcd.api.util;
 
 import com.google.gson.JsonElement;
 import com.mojang.datafixers.types.JsonOps;

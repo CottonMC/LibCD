@@ -7,28 +7,22 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-
 import io.github.cottonmc.jankson.JanksonFactory;
+import io.github.cottonmc.libcd.api.CDLogger;
+import io.github.cottonmc.libcd.api.LibCDInitializer;
+import io.github.cottonmc.libcd.api.condition.ConditionManager;
+import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
 import io.github.cottonmc.libcd.command.DebugExportCommand;
-import io.github.cottonmc.libcd.condition.ConditionalData;
 import io.github.cottonmc.libcd.command.HeldItemCommand;
-import io.github.cottonmc.libcd.tweaker.*;
-import io.github.cottonmc.libcd.util.CDConfig;
-import io.github.cottonmc.libcd.util.TweakerLogger;
+import io.github.cottonmc.libcd.loader.TweakerLoader;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.registry.CommandRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtil;
-import net.minecraft.potion.Potions;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,7 +30,7 @@ import java.io.FileOutputStream;
 public class LibCD implements ModInitializer {
 	public static final String MODID = "libcd";
 
-	public static final TweakerLogger logger = new TweakerLogger();
+	public static final CDLogger logger = new CDLogger();
 	public static CDConfig config;
 
 	public static Jankson newJankson() {
@@ -50,16 +44,11 @@ public class LibCD implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		config = loadConfig();
-		ConditionalData.init();
-		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new TweakerLoader());
-		Tweaker.addTweaker("RecipeTweaker", RecipeTweaker.INSTANCE);
-		Tweaker.addAssistant("TweakerUtils", TweakerUtils.INSTANCE);
-		Tweaker.addAssistantFactory("log", (id) -> new TweakerLogger(id.getNamespace()));
-		TweakerStackGetter.registerGetter(new Identifier("minecraft", "potion"), (id) -> {
-			Potion potion = Potion.byId(id.toString());
-			if (potion == Potions.EMPTY) return ItemStack.EMPTY;
-			return PotionUtil.setPotion(new ItemStack(Items.POTION), potion);
+		FabricLoader.getInstance().getEntrypoints("libcd", LibCDInitializer.class).forEach(init -> {
+			init.initTweakers(TweakerManager.INSTANCE);
+			init.initConditions(ConditionManager.INSTANCE);
 		});
+		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new TweakerLoader());
 		CommandRegistry.INSTANCE.register(false, dispatcher -> {
 			
 			//New nodes

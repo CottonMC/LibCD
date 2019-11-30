@@ -1,4 +1,4 @@
-package io.github.cottonmc.libcd.util;
+package io.github.cottonmc.libcd;
 
 import blue.endless.jankson.Comment;
 

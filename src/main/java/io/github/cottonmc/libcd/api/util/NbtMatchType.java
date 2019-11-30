@@ -1,4 +1,4 @@
-package io.github.cottonmc.libcd.util;
+package io.github.cottonmc.libcd.api.util;
 
 import net.minecraft.util.StringIdentifiable;
 

@@ -1,21 +1,19 @@
 package io.github.cottonmc.libcd.tweaker;
 
+import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
+import io.github.cottonmc.libcd.api.tweaker.TweakerStackFactory;
+import io.github.cottonmc.libcd.legacy.LegacyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
-import java.util.HashMap;
-import java.util.Map;
-
+@Deprecated
 /**
- * Some ItemStacks, like vanilla potions, have entirely different functions and names based on NBT.
- * Because of that, it's hard to use those stacks in recipes.
- * CottonTweaker uses a "[getter id]->[entry id]" syntax to get those recipes
+ * use {@link TweakerStackFactory} instead
  */
 public interface TweakerStackGetter {
-	public static Map<Identifier, TweakerStackGetter> GETTERS = new HashMap<>();
 
 	static void registerGetter(Identifier id, TweakerStackGetter getter) {
-		GETTERS.put(id, getter);
+		TweakerManager.INSTANCE.addStackFactory(id, new LegacyGetter(getter));
 	}
 
 	/**

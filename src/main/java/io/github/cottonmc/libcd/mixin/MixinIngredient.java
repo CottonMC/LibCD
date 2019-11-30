@@ -1,7 +1,7 @@
 package io.github.cottonmc.libcd.mixin;
 
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
-import io.github.cottonmc.libcd.util.NbtMatchType;
+import io.github.cottonmc.libcd.api.util.NbtMatchType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;

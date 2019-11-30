@@ -1,4 +1,4 @@
-package io.github.cottonmc.libcd.util.nbt;
+package io.github.cottonmc.libcd.api.util.nbt;
 
 import blue.endless.jankson.JsonArray;
 import blue.endless.jankson.JsonElement;

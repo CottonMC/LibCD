@@ -1,6 +1,8 @@
-package io.github.cottonmc.libcd.tweaker;
+package io.github.cottonmc.libcd.loader;
 
+import io.github.cottonmc.libcd.api.tweaker.Tweaker;
 import io.github.cottonmc.libcd.LibCD;
+import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -58,7 +60,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 	@Override
 	public CompletableFuture<Void> apply(Object o, ResourceManager manager, Profiler profiler, Executor executor) {
 		return CompletableFuture.runAsync(() -> {
-			for (Tweaker tweaker : Tweaker.TWEAKERS) {
+			for (Tweaker tweaker : TweakerManager.INSTANCE.getTweakers()) {
 				tweaker.prepareReload(manager);
 			}
 			int loaded = 0;
@@ -76,8 +78,8 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 				}
 				try {
 					ScriptContext ctx = engine.getContext();
-					for (String name : Tweaker.ASSISTANTS.keySet()) {
-						ctx.setAttribute(name, Tweaker.ASSISTANTS.get(name).apply(tweaker), ScriptContext.ENGINE_SCOPE);
+					for (String name : TweakerManager.INSTANCE.getAssistants().keySet()) {
+						ctx.setAttribute(name, TweakerManager.INSTANCE.getAssistants().get(name).apply(tweaker), ScriptContext.ENGINE_SCOPE);
 					}
 					engine.eval(script);
 				} catch (ScriptException e) {
@@ -87,7 +89,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 				loaded++;
 			}
 			List<String> applied = new ArrayList<>();
-			for (Tweaker tweaker : Tweaker.TWEAKERS) {
+			for (Tweaker tweaker : TweakerManager.INSTANCE.getTweakers()) {
 				tweaker.applyReload(manager, executor);
 				applied.add(tweaker.getApplyMessage());
 			}

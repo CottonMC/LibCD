@@ -1,7 +1,7 @@
-package io.github.cottonmc.libcd.util;
+package io.github.cottonmc.libcd.api.util;
 
-import io.github.cottonmc.libcd.util.nbt.NbtUtils;
-import io.github.cottonmc.libcd.util.nbt.WrappedCompoundTag;
+import io.github.cottonmc.libcd.api.util.nbt.NbtUtils;
+import io.github.cottonmc.libcd.api.util.nbt.WrappedCompoundTag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
