@@ -260,8 +260,8 @@ public class TweakerUtils {
 	public ItemStack getSpecialStack(String getter, String entry) {
 		Identifier getterId = new Identifier(getter);
 		Identifier itemId = new Identifier(entry);
-		if (!TweakerManager.INSTANCE.getStackGetters().containsKey(getterId)) return ItemStack.EMPTY;
-		TweakerStackFactory get = TweakerManager.INSTANCE.getStackGetters().get(getterId);
+		if (!TweakerManager.INSTANCE.getStackFactories().containsKey(getterId)) return ItemStack.EMPTY;
+		TweakerStackFactory get = TweakerManager.INSTANCE.getStackFactories().get(getterId);
 		return get.getSpecialStack(itemId);
 	}
 

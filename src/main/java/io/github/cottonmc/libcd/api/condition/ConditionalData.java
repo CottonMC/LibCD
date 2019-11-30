@@ -30,7 +30,7 @@ public class ConditionalData {
 						try {
 							if (!testCondition(id, parseElement(obj.get(key)))) return false;
 						} catch (CDSyntaxError e) {
-
+							LibCD.logger.error("Error parsing meta for %s: %s", resourceId, e.getMessage());
 						}
 					}
 				}
