@@ -2,8 +2,8 @@ package io.github.cottonmc.libcd.api.condition;
 
 import blue.endless.jankson.*;
 import blue.endless.jankson.api.SyntaxError;
-import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
+import io.github.cottonmc.libcd.api.CDCommons;
 import net.minecraft.util.Identifier;
 
 import javax.annotation.Nullable;
@@ -14,36 +14,40 @@ public class ConditionalData {
 	static final Map<Identifier, Condition> conditions = new HashMap<>();
 
 	public static boolean shouldLoad(Identifier resourceId, String meta) {
+		if (conditions.isEmpty()) {
+			CDCommons.logger.warn("List of conditions is empty, loading %s anyway", resourceId);
+			return true;
+		}
 		try {
-			JsonObject json = LibCD.newJankson().load(meta);
+			JsonObject json = CDCommons.newJankson().load(meta);
 			JsonElement elem = json.get("when");
 			if (elem instanceof JsonArray) {
 				JsonArray array = (JsonArray)elem;
 				for (JsonElement condition : array) {
 					if (!(condition instanceof JsonObject)) {
-						LibCD.logger.error("Error parsing meta for %s: item %s in condition list not a JsonObject", resourceId, condition.toString());
+						CDCommons.logger.error("Error parsing meta for %s: item %s in condition list not a JsonObject", resourceId, condition.toString());
 						return false;
 					}
 					JsonObject obj = (JsonObject)condition;
 					for (String key : obj.keySet()) {
-						Identifier id = key.equals("or")? new Identifier(LibCD.MODID, "or") : new Identifier(key);
+						Identifier id = key.equals("or")? new Identifier(CDCommons.MODID, "or") : new Identifier(key);
 						try {
 							if (!testCondition(id, parseElement(obj.get(key)))) return false;
 						} catch (CDSyntaxError e) {
-							LibCD.logger.error("Error parsing meta for %s: %s", resourceId, e.getMessage());
+							CDCommons.logger.error("Error parsing meta for %s: %s", resourceId, e.getMessage());
 						}
 					}
 				}
 			} else if (elem == null) {
-				LibCD.logger.error("Error parsing meta for %s: primary \"when\" key does not exist", resourceId);
+				CDCommons.logger.error("Error parsing meta for %s: primary \"when\" key does not exist", resourceId);
 				return false;
 			} else {
-				LibCD.logger.error("Error parsing meta for %s: primary \"when\" key is not a JsonArray", resourceId);
+				CDCommons.logger.error("Error parsing meta for %s: primary \"when\" key is not a JsonArray", resourceId);
 				return false;
 			}
 			return true;
 		} catch (SyntaxError e) {
-			LibCD.logger.error("Error parsing meta for %s: %s", resourceId, e.getLineMessage());
+			CDCommons.logger.error("Error parsing meta for %s: %s", resourceId, e.getLineMessage());
 		}
 		return false;
 	}

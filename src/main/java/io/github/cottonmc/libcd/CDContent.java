@@ -4,6 +4,7 @@ import blue.endless.jankson.JsonArray;
 import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import blue.endless.jankson.JsonPrimitive;
+import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.CDLogger;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
 import io.github.cottonmc.libcd.api.LibCDInitializer;
@@ -38,7 +39,7 @@ public class CDContent implements LibCDInitializer {
 
 	@Override
 	public void initConditions(ConditionManager manager) {
-		manager.registerCondition(new Identifier(LibCD.MODID, "mod_loaded"), (value) -> {
+		manager.registerCondition(new Identifier(CDCommons.MODID, "mod_loaded"), (value) -> {
 			if (value instanceof String) return FabricLoader.getInstance().isModLoaded((String) value);
 			if (value instanceof List) {
 				for (JsonElement el : (List<JsonElement>)value) {
@@ -52,7 +53,7 @@ public class CDContent implements LibCDInitializer {
 			}
 			throw new CDSyntaxError("mod_loaded must accept either a String or an Array!");
 		});
-		manager.registerCondition(new Identifier(LibCD.MODID, "item_exists"), (value) -> {
+		manager.registerCondition(new Identifier(CDCommons.MODID, "item_exists"), (value) -> {
 			if (value instanceof String) return Registry.ITEM.get(new Identifier((String)value)) != Items.AIR;
 			if (value instanceof List) {
 				for (JsonElement el : (List<JsonElement>)value) {
@@ -66,7 +67,7 @@ public class CDContent implements LibCDInitializer {
 			}
 			throw new CDSyntaxError("item_exists must accept either a String or an Array!");
 		});
-		manager.registerCondition(new Identifier(LibCD.MODID, "not"), (value) -> {
+		manager.registerCondition(new Identifier(CDCommons.MODID, "not"), (value) -> {
 			if (value instanceof JsonObject) {
 				JsonObject json = (JsonObject)value;
 				for (String key : json.keySet()) {
@@ -79,7 +80,7 @@ public class CDContent implements LibCDInitializer {
 			}
 			throw new CDSyntaxError("not must accept an Object!");
 		});
-		manager.registerCondition(new Identifier(LibCD.MODID, "or"), (value) -> {
+		manager.registerCondition(new Identifier(CDCommons.MODID, "or"), (value) -> {
 			if (value instanceof JsonArray) {
 				JsonArray json = (JsonArray) value;
 				for (JsonElement elem : json) {
@@ -93,7 +94,7 @@ public class CDContent implements LibCDInitializer {
 			}
 			throw new CDSyntaxError("or must accept an Array!");
 		});
-		manager.registerCondition(new Identifier(LibCD.MODID, "dev_mode"), value -> {
+		manager.registerCondition(new Identifier(CDCommons.MODID, "dev_mode"), value -> {
 			if (value instanceof Boolean) return (Boolean)value == LibCD.isDevMode();
 			throw new CDSyntaxError("dev_mode must accept a Boolean!");
 		});

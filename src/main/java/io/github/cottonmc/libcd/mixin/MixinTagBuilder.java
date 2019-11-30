@@ -3,6 +3,7 @@ package io.github.cottonmc.libcd.mixin;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.Dynamic;
 import io.github.cottonmc.libcd.LibCD;
+import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.loader.TagExtensions;
 import io.github.cottonmc.libcd.api.util.GsonOps;
 import io.github.cottonmc.libcd.api.util.JanksonOps;
@@ -60,13 +61,13 @@ public class MixinTagBuilder<T> {
     @Inject(method = "build", at = @At("RETURN"))
     private void onBuild_logWarnings(Identifier id, CallbackInfoReturnable<Tag<T>> info) {
         if (!libcdWarnings.isEmpty()) {
-            LibCD.logger.warn("Found problems in tag extensions of tag " + id + ':');
+            CDCommons.logger.warn("Found problems in tag extensions of tag " + id + ':');
             for (Object warning : libcdWarnings) {
                 if (warning instanceof Throwable) {
                     Throwable t = (Throwable) warning;
-                    LibCD.logger.error("\t- %s", t.getMessage(), t);
+                    CDCommons.logger.error("\t- %s", t.getMessage(), t);
                 } else {
-                    LibCD.logger.warn("\t- %s", warning);
+                    CDCommons.logger.warn("\t- %s", warning);
                 }
             }
         }

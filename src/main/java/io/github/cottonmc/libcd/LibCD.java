@@ -8,6 +8,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.cottonmc.jankson.JanksonFactory;
+import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.CDLogger;
 import io.github.cottonmc.libcd.api.LibCDInitializer;
 import io.github.cottonmc.libcd.api.condition.ConditionManager;
@@ -28,14 +29,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 public class LibCD implements ModInitializer {
-	public static final String MODID = "libcd";
 
-	public static final CDLogger logger = new CDLogger();
 	public static CDConfig config;
-
-	public static Jankson newJankson() {
-		return JanksonFactory.createJankson();
-	}
 
 	public static boolean isDevMode() {
 		return FabricLoader.getInstance().isDevelopmentEnvironment() || config.dev_mode;
@@ -108,7 +103,7 @@ public class LibCD implements ModInitializer {
 
 	public CDConfig loadConfig() {
 		try {
-			Jankson jankson = newJankson();
+			Jankson jankson = CDCommons.newJankson();
 			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("libcd.json5").toFile();
 			if (!file.exists()) saveConfig(new CDConfig());
 			JsonObject json = jankson.load(file);
@@ -121,7 +116,7 @@ public class LibCD implements ModInitializer {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("Error loading config: {}", e.getMessage());
+			CDCommons.logger.error("Error loading config: {}", e.getMessage());
 		}
 		return new CDConfig();
 	}
@@ -129,7 +124,7 @@ public class LibCD implements ModInitializer {
 	public void saveConfig(CDConfig config) {
 		try {
 			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("libcd.json5").toFile();
-			JsonElement json = newJankson().toJson(config);
+			JsonElement json = CDCommons.newJankson().toJson(config);
 			String result = json.toJson(true, true);
 			if (!file.exists()) file.createNewFile();
 			FileOutputStream out = new FileOutputStream(file,false);
@@ -137,7 +132,7 @@ public class LibCD implements ModInitializer {
 			out.flush();
 			out.close();
 		} catch (Exception e) {
-			logger.error("Error saving config: {}", e.getMessage());
+			CDCommons.logger.error("Error saving config: {}", e.getMessage());
 		}
 	}
 }

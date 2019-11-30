@@ -21,7 +21,7 @@ public abstract class MixinIngredient implements IngredientAccessUtils {
 	@Shadow protected abstract void cacheMatchingStacks();
 
 	private NbtMatchType type = NbtMatchType.NONE;
-	@Inject(method = "method_8093", at = @At(value = "RETURN", ordinal = 2), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+	@Inject(method = "test", at = @At(value = "RETURN", ordinal = 2), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void checkStackNbt(ItemStack test, CallbackInfoReturnable<Boolean> cir, ItemStack[] stackArray, int arrayLength, int i, ItemStack testAgainst) {
 		if (!testAgainst.hasTag() || test.getTag().isEmpty()) {
 			if (type == NbtMatchType.EXACT && (test.hasTag() && !test.getTag().isEmpty())) cir.setReturnValue(false);

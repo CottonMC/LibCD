@@ -1,5 +1,6 @@
 package io.github.cottonmc.libcd.loader;
 
+import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.tweaker.Tweaker;
 import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
@@ -37,7 +38,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 					Identifier scriptId = new Identifier(fileId.getNamespace(), fileId.getPath().substring(localPath));
 					TWEAKERS.put(scriptId, script);
 				} catch (IOException e) {
-					LibCD.logger.error("Error when accessing tweaker script %s: %s", fileId.toString(), e.getMessage());
+					CDCommons.logger.error("Error when accessing tweaker script %s: %s", fileId.toString(), e.getMessage());
 				}
 			}
 			String subset = LibCD.config.tweaker_subset;
@@ -49,7 +50,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 						String script = IOUtils.toString(res.getInputStream(), StandardCharsets.UTF_8);
 						TWEAKERS.put(fileId, script);
 					} catch (IOException e) {
-						LibCD.logger.error("Error when accessing tweaker script %s in subset %s: %s", fileId.toString(), subset, e.getMessage());
+						CDCommons.logger.error("Error when accessing tweaker script %s in subset %s: %s", fileId.toString(), subset, e.getMessage());
 					}
 				}
 			}
@@ -68,12 +69,12 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 				String extension = tweaker.getPath().substring(tweaker.getPath().lastIndexOf('.') + 1);
 				String script = TWEAKERS.get(tweaker);
 				if (script == null) {
-					LibCD.logger.error("Tweaker script not found: " + tweaker.toString());
+					CDCommons.logger.error("Tweaker script not found: " + tweaker.toString());
 					continue;
 				}
 				ScriptEngine engine = SCRIPT_MANAGER.getEngineByExtension(extension);
 				if (engine == null) {
-					LibCD.logger.error("Engine for tweaker script not found: " + tweaker.toString());
+					CDCommons.logger.error("Engine for tweaker script not found: " + tweaker.toString());
 					continue;
 				}
 				try {
@@ -83,7 +84,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 					}
 					engine.eval(script);
 				} catch (ScriptException e) {
-					LibCD.logger.error("Error executing tweaker script %s: %s", tweaker.toString(), e.getMessage());
+					CDCommons.logger.error("Error executing tweaker script %s: %s", tweaker.toString(), e.getMessage());
 					continue;
 				}
 				loaded++;
@@ -94,7 +95,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 				applied.add(tweaker.getApplyMessage());
 			}
 			String confirm = formatApplied(applied);
-			if (loaded > 0) LibCD.logger.info("Applied %s tweaker %s, including %s", loaded, (loaded == 1? "script" : "scripts"), confirm);
+			if (loaded > 0) CDCommons.logger.info("Applied %s tweaker %s, including %s", loaded, (loaded == 1? "script" : "scripts"), confirm);
 		});
 	}
 
@@ -114,7 +115,7 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 
 	@Override
 	public Identifier getFabricId() {
-		return new Identifier(LibCD.MODID, "tweaker_loader");
+		return new Identifier(CDCommons.MODID, "tweaker_loader");
 	}
 
 }

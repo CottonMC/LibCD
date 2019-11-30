@@ -2,7 +2,7 @@ package io.github.cottonmc.libcd.api.tweaker.util;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.github.cottonmc.libcd.LibCD;
+import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
 import io.github.cottonmc.libcd.api.tweaker.TweakerStackFactory;
 import io.github.cottonmc.libcd.api.tweaker.recipe.RecipeParser;
@@ -155,7 +155,7 @@ public class TweakerUtils {
 			CompoundTag tag = reader.parseCompoundTag();
 			stack.setTag(tag);
 		} catch (CommandSyntaxException e) {
-			LibCD.logger.error("Error adding NBT to stack: " + e.getMessage());
+			CDCommons.logger.error("Error adding NBT to stack: " + e.getMessage());
 		}
 		return stack;
 	}

@@ -4,6 +4,7 @@ import blue.endless.jankson.JsonArray;
 import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import io.github.cottonmc.libcd.LibCD;
+import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
 import io.github.cottonmc.libcd.api.condition.ConditionalData;
 import net.minecraft.tag.Tag;
@@ -95,7 +96,7 @@ public final class TagExtensions {
 
         JsonObject obj = (JsonObject) condition;
         for (String key : obj.keySet()) {
-            Identifier id = key.equals("or") ? new Identifier(LibCD.MODID, "or") : Identifier.tryParse(key);
+            Identifier id = key.equals("or") ? new Identifier(CDCommons.MODID, "or") : Identifier.tryParse(key);
             if (id == null || !ConditionalData.hasCondition(id)) {
                 warnings.add("Found unknown condition: " + key);
             }

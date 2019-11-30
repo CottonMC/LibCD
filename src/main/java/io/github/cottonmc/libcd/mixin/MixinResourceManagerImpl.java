@@ -1,6 +1,7 @@
 package io.github.cottonmc.libcd.mixin;
 
 import io.github.cottonmc.libcd.LibCD;
+import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.condition.ConditionalData;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
 import io.github.cottonmc.libcd.impl.ResourceSearcher;
@@ -47,7 +48,7 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 						sortedResources.remove(id);
 					}
 				} catch (IOException e) {
-					LibCD.logger.error("Error when accessing resource metadata for %s: %s", id.toString(), e.getMessage());
+					CDCommons.logger.error("Error when accessing resource metadata for %s: %s", id.toString(), e.getMessage());
 				}
 			}
 		}
