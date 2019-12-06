@@ -34,7 +34,7 @@ public interface Tweaker {
 	 * @param assistant An object of a class to use in scripts.
 	 */
 	static void addAssistant(String callName, Object assistant) {
-		TweakerManager.INSTANCE.addAssistant(callName, assistant);
+		TweakerManager.INSTANCE.addLegacyAssistant(callName, assistant);
 	}
 
 	/**
@@ -43,7 +43,7 @@ public interface Tweaker {
 	 * @param assistant A function that takes an identifier and returns an object of a class to use in scripts.
 	 */
 	static void addAssistantFactory(String callName, Function<Identifier, Object> assistant) {
-		TweakerManager.INSTANCE.addAssistantFactory(callName, assistant);
+		TweakerManager.INSTANCE.addLegacyAssistantFactory(callName, assistant);
 	}
 
 	/**

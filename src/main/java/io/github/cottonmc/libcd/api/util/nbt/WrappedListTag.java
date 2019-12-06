@@ -194,16 +194,14 @@ public class WrappedListTag {
 	 * @return The object form of the tag removed.
 	 */
 	public Object remove(int index) {
-		return NbtUtils.getObjectFor(underlying.method_10536(index));
+		return NbtUtils.getObjectFor(underlying.remove(index));
 	}
 
 	/**
 	 * Empty all entries from the list, and reset its type.
 	 */
 	public void clear() {
-		for (int i = 0; i < getSize(); i++) {
-			underlying.method_10536(i);
-		}
+		underlying.clear();
 	}
 
 	/**

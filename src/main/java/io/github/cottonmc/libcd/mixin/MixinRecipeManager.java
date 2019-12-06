@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.Map;
 
 @Mixin(RecipeManager.class)
-public abstract class MixinRecipeManager implements RecipeMapAccessor {
+public class MixinRecipeManager implements RecipeMapAccessor {
 	@Shadow
 	private Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipes;
 

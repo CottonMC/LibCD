@@ -14,6 +14,9 @@
   "entrypoints": {
     "main": [
       "io.github.cottonmc.libcd.LibCD"
+    ],
+    "libcd": [
+      "io.github.cottonmc.libcd.CDContent"
     ]
   },
   "mixins": [

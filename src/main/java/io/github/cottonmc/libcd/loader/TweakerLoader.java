@@ -1,6 +1,8 @@
 package io.github.cottonmc.libcd.loader;
 
 import io.github.cottonmc.libcd.api.CDCommons;
+import io.github.cottonmc.libcd.api.CDLogger;
+import io.github.cottonmc.libcd.api.tweaker.ScriptBridge;
 import io.github.cottonmc.libcd.api.tweaker.Tweaker;
 import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
@@ -79,9 +81,11 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 				}
 				try {
 					ScriptContext ctx = engine.getContext();
-					for (String name : TweakerManager.INSTANCE.getAssistants().keySet()) {
-						ctx.setAttribute(name, TweakerManager.INSTANCE.getAssistants().get(name).apply(tweaker), ScriptContext.ENGINE_SCOPE);
+					for (String name : TweakerManager.INSTANCE.getLegacyAssistants().keySet()) {
+						ctx.setAttribute(name, TweakerManager.INSTANCE.getLegacyAssistants().get(name).apply(tweaker), ScriptContext.ENGINE_SCOPE);
 					}
+					ctx.setAttribute("libcd", new ScriptBridge(engine, script, tweaker), ScriptContext.ENGINE_SCOPE);
+					ctx.setAttribute("log", new CDLogger(tweaker.getNamespace()), ScriptContext.ENGINE_SCOPE);
 					engine.eval(script);
 				} catch (ScriptException e) {
 					CDCommons.logger.error("Error executing tweaker script %s: %s", tweaker.toString(), e.getMessage());

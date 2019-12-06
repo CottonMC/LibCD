@@ -2,6 +2,10 @@
 log.info("WARNING! LibCD Tweaker sample script is running!");
 log.info("If you are not in a dev environment, please report this!");
 
+//imports - use `libcd.require`
+var RecipeTweaker = libcd.require("libcd.recipe.RecipeTweaker");
+var TweakerUtils = libcd.require("libcd.util.TweakerUtils");
+
 //A shorthand to get a stick input
 var stick = "minecraft:stick";
 //A shorthand to get a crafting table output
@@ -92,3 +96,14 @@ builder = RecipeTweaker.builder("minecraft:stonecutting")
     .itemStack("result", "minecraft:diamond@9");
 
 RecipeTweaker.addRecipe(builder.build());
+
+//import the stuff we need for loot tables
+var LootTweaker = libcd.require("libcd.loot.LootTweaker");
+var Conditions = libcd.require("libcd.loot.Conditions");
+var Functions = libcd.require("libcd.loot.Functions");
+
+//start messing with loot tables!
+var sheepTable = LootTweaker.getTable("minecraft:entities/sheep");
+var mainPool = sheepTable.getPool(0);
+mainPool.removeEntry("minecraft:item", "minecraft:mutton");
+mainPool.addItemEntry("minecraft:prismarine_shard", 1, 1, [Functions.countExact(5)], [Conditions.killedByPlayer()]);

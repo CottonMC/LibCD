@@ -1,5 +1,6 @@
 package io.github.cottonmc.libcd.legacy;
 
+import blue.endless.jankson.JsonObject;
 import io.github.cottonmc.libcd.api.tweaker.Tweaker;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -31,5 +32,10 @@ public class LegacyTweaker implements Tweaker {
 	@Override
 	public void prepareFor(Identifier scriptId) {
 		tweaker.prepareFor(scriptId);
+	}
+
+	@Override
+	public JsonObject getDebugInfo() {
+		return new JsonObject();
 	}
 }

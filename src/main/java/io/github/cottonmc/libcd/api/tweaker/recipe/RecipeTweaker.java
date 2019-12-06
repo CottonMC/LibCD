@@ -134,7 +134,7 @@ public class RecipeTweaker implements Tweaker {
 
 	@Override
 	public String getApplyMessage() {
-		return recipeCount + " " + (recipeCount == 1? "recipe" : "recipes" + (removeCount == 0? "" : " (" + removeCount + " removed)"));
+		return recipeCount + " " + (recipeCount == 1? "recipe" : "recipes") + (removeCount == 0? "" : " (" + removeCount + " removed)");
 	}
 
 	@Override
@@ -480,6 +480,11 @@ public class RecipeTweaker implements Tweaker {
 	}
 
 	public JsonObject getRecipeDebug() {
+		return recipeDebug;
+	}
+
+	@Override
+	public JsonObject getDebugInfo() {
 		return recipeDebug;
 	}
 }

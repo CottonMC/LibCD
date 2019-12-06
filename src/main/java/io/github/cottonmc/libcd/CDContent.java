@@ -5,14 +5,16 @@ import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import blue.endless.jankson.JsonPrimitive;
 import io.github.cottonmc.libcd.api.CDCommons;
-import io.github.cottonmc.libcd.api.CDLogger;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
 import io.github.cottonmc.libcd.api.LibCDInitializer;
 import io.github.cottonmc.libcd.api.condition.ConditionManager;
 import io.github.cottonmc.libcd.api.condition.ConditionalData;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
+import io.github.cottonmc.libcd.api.tweaker.loot.Conditions;
+import io.github.cottonmc.libcd.api.tweaker.loot.Functions;
+import io.github.cottonmc.libcd.api.tweaker.loot.LootTweaker;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
-import io.github.cottonmc.libcd.tweaker.RecipeTweaker;
+import io.github.cottonmc.libcd.api.tweaker.recipe.RecipeTweaker;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -27,9 +29,11 @@ import java.util.List;
 public class CDContent implements LibCDInitializer {
 	@Override
 	public void initTweakers(TweakerManager manager) {
-		manager.addTweaker("RecipeTweaker", RecipeTweaker.INSTANCE);
-		manager.addAssistant("TweakerUtils", TweakerUtils.INSTANCE);
-		manager.addAssistantFactory("log", id -> new CDLogger(id.getNamespace()));
+		manager.addTweaker("libcd.recipe.RecipeTweaker", RecipeTweaker.INSTANCE);
+		manager.addTweaker("libcd.loot.LootTweaker", LootTweaker.INSTANCE);
+		manager.addAssistant("libcd.util.TweakerUtils", TweakerUtils.INSTANCE);
+		manager.addAssistant("libcd.loot.Conditions", Conditions.INSTANCE);
+		manager.addAssistant("libcd.loot.Functions", Functions.INSTANCE);
 		manager.addStackFactory(new Identifier("minecraft", "potion"), (id) -> {
 			Potion potion = Potion.byId(id.toString());
 			if (potion == Potions.EMPTY) return ItemStack.EMPTY;

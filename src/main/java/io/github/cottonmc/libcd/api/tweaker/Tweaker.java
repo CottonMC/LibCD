@@ -1,5 +1,6 @@
 package io.github.cottonmc.libcd.api.tweaker;
 
+import blue.endless.jankson.JsonObject;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
@@ -32,4 +33,9 @@ public interface Tweaker {
 	 * @param scriptId The ID of the script about to be run.
 	 */
 	default void prepareFor(Identifier scriptId) {}
+
+	/**
+	 * @return A JsonObject containing information useful for debugging. Called when `/libcd debug export` is run.
+	 */
+	JsonObject getDebugInfo();
 }
