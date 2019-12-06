@@ -101,9 +101,13 @@ RecipeTweaker.addRecipe(builder.build());
 var LootTweaker = libcd.require("libcd.loot.LootTweaker");
 var Conditions = libcd.require("libcd.loot.Conditions");
 var Functions = libcd.require("libcd.loot.Functions");
+var Entries = libcd.require("libcd.loot.Entries");
 
 //start messing with loot tables!
 var sheepTable = LootTweaker.getTable("minecraft:entities/sheep");
 var mainPool = sheepTable.getPool(0);
 mainPool.removeEntry("minecraft:item", "minecraft:mutton");
-mainPool.addItemEntry("minecraft:prismarine_shard", 1, 1, [Functions.countExact(5)], [Conditions.killedByPlayer()]);
+var prismarineEntry = Entries.item("minecraft:prismarine_shard")
+    .addFunctions(Functions.countExact(5))
+    .addConditions(Conditions.killedByPlayer());
+mainPool.addEntries(prismarineEntry);

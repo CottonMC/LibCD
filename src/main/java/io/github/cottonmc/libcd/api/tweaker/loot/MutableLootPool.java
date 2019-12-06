@@ -87,8 +87,38 @@ public class MutableLootPool {
      * @param quality The quality of this entry in the pool. Used for luck/unluck status effects, along with Luck of the Sea enchantment.
      * @param functions A list of functions to apply to this entry, each constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
      * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
+     */
+    //TODO: remove?
+    public void addLeafEntry(String type, String name, int weight, int quality, LootFunction[] functions, LootCondition[] conditions) {
+        addLeafEntry(type, name, weight, quality, functions, conditions, new JsonObject());
+    }
+
+    /**
+     * Add a new leaf entry to the loot pool.
+     * @param type The type of entry to add.
+     * @param name The ID used to decide the drop.
+     * @param weight The weight of this entry in the pool.
+     * @param quality The quality of this entry in the pool. Used for luck/unluck status effects, along with Luck of the Sea enchantment.
+     * @param functions A list of functions to apply to this entry, each constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
+     * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
+     * @param extra Any extra JSON needed for this type of entry to function, as stringified JSON.
+     */
+    //TODO: remove?
+    public void addLeafEntry(String type, String name, int weight, int quality, LootFunction[] functions, LootCondition[] conditions, String extra) {
+        addLeafEntry(type, name, weight, quality, functions, conditions, (JsonObject) Gsons.PARSER.parse(extra));
+    }
+
+    /**
+     * Add a new leaf entry to the loot pool.
+     * @param type The type of entry to add.
+     * @param name The ID used to decide the drop.
+     * @param weight The weight of this entry in the pool.
+     * @param quality The quality of this entry in the pool. Used for luck/unluck status effects, along with Luck of the Sea enchantment.
+     * @param functions A list of functions to apply to this entry, each constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
+     * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
      * @param extra Any extra JSON needed for this type of entry to function, as a JSON object.
      */
+    //TODO: remove?
     public MutableLootPool addLeafEntry(String type, String name, int weight, int quality, LootFunction[] functions, LootCondition[] conditions, JsonObject extra) {
         JsonObject entry = new JsonObject();
         entry.addProperty("type", type);

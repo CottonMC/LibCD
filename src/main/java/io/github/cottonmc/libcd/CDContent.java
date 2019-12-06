@@ -11,6 +11,7 @@ import io.github.cottonmc.libcd.api.condition.ConditionManager;
 import io.github.cottonmc.libcd.api.condition.ConditionalData;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
 import io.github.cottonmc.libcd.api.tweaker.loot.Conditions;
+import io.github.cottonmc.libcd.api.tweaker.loot.Entries;
 import io.github.cottonmc.libcd.api.tweaker.loot.Functions;
 import io.github.cottonmc.libcd.api.tweaker.loot.LootTweaker;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
@@ -34,6 +35,7 @@ public class CDContent implements LibCDInitializer {
 		manager.addAssistant("libcd.util.TweakerUtils", TweakerUtils.INSTANCE);
 		manager.addAssistant("libcd.loot.Conditions", Conditions.INSTANCE);
 		manager.addAssistant("libcd.loot.Functions", Functions.INSTANCE);
+		manager.addAssistant("libcd.loot.Entries", Entries.INSTANCE);
 		manager.addStackFactory(new Identifier("minecraft", "potion"), (id) -> {
 			Potion potion = Potion.byId(id.toString());
 			if (potion == Potions.EMPTY) return ItemStack.EMPTY;
