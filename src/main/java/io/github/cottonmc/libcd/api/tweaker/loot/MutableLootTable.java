@@ -1,13 +1,15 @@
 package io.github.cottonmc.libcd.api.tweaker.loot;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.github.cottonmc.libcd.api.util.Gsons;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.util.JsonHelper;
 
+/**
+ * A representation of a loot table that's modifiable from JSR-223 code.
+ */
 public class MutableLootTable {
 	private JsonObject tableJson;
 
@@ -19,10 +21,20 @@ public class MutableLootTable {
 		this.tableJson = json;
 	}
 
+	/**
+	 * Get a pool from the table's array.
+	 * @param index The index of the pool to get.
+	 * @return A modifiable form of that pool.
+	 */
 	public MutableLootPool getPool(int index) {
 		return new MutableLootPool((JsonObject)getPools().get(index));
 	}
 
+	/**
+	 * Add a new pool to the table.
+	 * @param rolls How many rolls this pool should have.
+	 * @return A modifiable form of this pool.
+	 */
 	public MutableLootPool addPool(int rolls) {
 		JsonObject json = new JsonObject();
 		json.addProperty("rolls", rolls);
@@ -30,6 +42,12 @@ public class MutableLootTable {
 		return new MutableLootPool(json);
 	}
 
+	/**
+	 * Add a new pool to the table.
+	 * @param minRolls How many rolls this pool should have at minimum.
+	 * @param maxRolls How many rolls this pool should have at maximum.
+	 * @return A modifiable form of this pool.
+	 */
 	public MutableLootPool addPool(int minRolls, int maxRolls) {
 		JsonObject json = new JsonObject();
 		JsonObject rolls = new JsonObject();
@@ -40,6 +58,14 @@ public class MutableLootTable {
 		return new MutableLootPool(json);
 	}
 
+	/**
+	 * Add a new pool to the table.
+	 * @param minRolls How many rolls this pool should have at minimum.
+	 * @param maxRolls How many rolls this pool should have at maximum.
+	 * @param minBonusRolls How many bonus rolls this pool should have at minimum.
+	 * @param maxBonusRolls How many bonus rolls this pool should have at maximum.
+	 * @return A modifiable form of this pool.
+	 */
 	public MutableLootPool addPool(int minRolls, int maxRolls, int minBonusRolls, int maxBonusRolls) {
 		JsonObject json = new JsonObject();
 		JsonObject rolls = new JsonObject();
@@ -54,14 +80,26 @@ public class MutableLootTable {
 		return new MutableLootPool(json);
 	}
 
+	/**
+	 * Remove a pool from the table array.
+	 * @param index The index of the pool to remove. Will shift all other pools over.
+	 */
 	public void removePool(int index) {
 		getPools().remove(index);
 	}
 
+	/**
+	 * Add a function to all drops from the table.
+	 * @param function The function to add, constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
+	 */
 	public void addFunction(LootFunction function) {
 		getFunctions().add(Gsons.PARSER.parse(Gsons.LOOT_TABLE.toJson(function)));
 	}
 
+	/**
+	 * Remove a function from all drops from the table.
+	 * @param index The index of the function to remove.
+	 */
 	public void removeFunction(int index) {
 		getFunctions().remove(index);
 	}

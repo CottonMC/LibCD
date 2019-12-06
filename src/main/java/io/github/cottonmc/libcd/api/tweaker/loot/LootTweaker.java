@@ -21,8 +21,6 @@ public class LootTweaker implements Tweaker {
 	private LootManager lootManager;
 	private int tableCount;
 	private Map<Identifier, MutableLootTable> tables = new HashMap<>();
-	private String currentNamespace = "libcd";
-	private boolean canAddRecipes = false;
 	private CDLogger logger;
 	private JsonObject tableDebug;
 
@@ -36,7 +34,6 @@ public class LootTweaker implements Tweaker {
 			for (ResourceReloadListener listener : listeners) {
 				if (listener instanceof LootManager) {
 					this.lootManager = (LootManager)listener;
-					canAddRecipes = true;
 					return;
 				}
 			}
@@ -76,21 +73,29 @@ public class LootTweaker implements Tweaker {
 
 	@Override
 	public String getApplyMessage() {
-		return tableCount + " modified loot" + (tableCount == 1? "table" : "tables");
+		return tableCount + " modified loot " + (tableCount == 1? "table" : "tables");
 	}
 
 	@Override
 	public void prepareFor(Identifier scriptId) {
-		this.currentNamespace = scriptId.getNamespace();
 		this.logger = new CDLogger(scriptId.getNamespace());
 	}
 
+	/**
+	 * Get a new loot table, or create one if it doesn't yet exist.
+	 * @param id The ID of the table to get or create.
+	 * @return A modifiable form of that table.
+	 */
 	public MutableLootTable getTable(String id) {
 		Identifier tableId = new Identifier(id);
-		LootTable table = lootManager.getSupplier(tableId);
-		MutableLootTable mutable = new MutableLootTable(table);
-		tables.put(tableId, mutable);
-		return mutable;
+		if (!tables.containsKey(tableId)) {
+			return tables.get(tableId);
+		} else {
+			LootTable table = lootManager.getSupplier(tableId);
+			MutableLootTable mutable = new MutableLootTable(table);
+			tables.put(tableId, mutable);
+			return mutable;
+		}
 	}
 
 	@Override
