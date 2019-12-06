@@ -2,6 +2,7 @@ package io.github.cottonmc.libcd.api.tweaker.loot;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.cottonmc.libcd.api.util.Gsons;
 import net.minecraft.loot.condition.*;
@@ -23,7 +24,12 @@ public class Conditions {
 	 * @return The parsed condition, ready to add to a pool or entry.
 	 */
 	public LootCondition parse(String json) {
-		return Gsons.LOOT_TABLE.fromJson(json, LootCondition.class);
+		try {
+			return Gsons.LOOT_TABLE.fromJson(json, LootCondition.class);
+		} catch (JsonSyntaxException e) {
+			LootTweaker.INSTANCE.getLogger().error("Could not parse loot condition, returning null: " + e.getMessage());
+			return null;
+		}
 	}
 
 	/**
@@ -36,6 +42,10 @@ public class Conditions {
 		json.addProperty("condition", "minecraft:alternative");
 		JsonArray children = new JsonArray();
 		for (LootCondition condition : conditions) {
+			if (condition == null) {
+				LootTweaker.INSTANCE.getLogger().error("Loot table `or` condition cannot take null condition, skipping");
+				continue;
+			}
 			String cond = Gsons.LOOT_TABLE.toJson(condition);
 			children.add(Gsons.PARSER.parse(cond));
 		}
@@ -49,6 +59,10 @@ public class Conditions {
 	 * @return An assembled condition, ready to add to a pool or entry.
 	 */
 	public LootCondition not(LootCondition condition) {
+		if (condition == null) {
+			LootTweaker.INSTANCE.getLogger().error("Loot table `not` condition cannot take null condition, returning null");
+			return null;
+		}
 		String json = Gsons.LOOT_TABLE.toJson(condition);
 		JsonObject cond = new JsonObject();
 		cond.addProperty("condition", "minecraft:inverted");

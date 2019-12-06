@@ -2,6 +2,7 @@ package io.github.cottonmc.libcd.api.tweaker.loot;
 
 import blue.endless.jankson.JsonObject;
 import io.github.cottonmc.libcd.api.CDLogger;
+import io.github.cottonmc.libcd.api.tweaker.ScriptBridge;
 import io.github.cottonmc.libcd.api.tweaker.Tweaker;
 import io.github.cottonmc.libcd.impl.LootTableMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
@@ -77,8 +78,8 @@ public class LootTweaker implements Tweaker {
 	}
 
 	@Override
-	public void prepareFor(Identifier scriptId) {
-		this.logger = new CDLogger(scriptId.getNamespace());
+	public void prepareFor(ScriptBridge bridge) {
+		this.logger = new CDLogger(bridge.getId().getNamespace());
 	}
 
 	/**
@@ -101,5 +102,9 @@ public class LootTweaker implements Tweaker {
 	@Override
 	public JsonObject getDebugInfo() {
 		return tableDebug;
+	}
+
+	public CDLogger getLogger() {
+		return logger;
 	}
 }

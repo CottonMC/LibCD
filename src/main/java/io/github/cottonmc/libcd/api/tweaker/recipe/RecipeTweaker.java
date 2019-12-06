@@ -6,6 +6,7 @@ import blue.endless.jankson.JsonPrimitive;
 import com.google.common.collect.ImmutableMap;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
 import io.github.cottonmc.libcd.api.CustomOutputRecipe;
+import io.github.cottonmc.libcd.api.tweaker.ScriptBridge;
 import io.github.cottonmc.libcd.api.tweaker.Tweaker;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.impl.RecipeMapAccessor;
@@ -138,7 +139,8 @@ public class RecipeTweaker implements Tweaker {
 	}
 
 	@Override
-	public void prepareFor(Identifier scriptId) {
+	public void prepareFor(ScriptBridge bridge) {
+		Identifier scriptId = bridge.getId();
 		this.currentNamespace = scriptId.getNamespace();
 		this.logger = new CDLogger(scriptId.getNamespace());
 	}

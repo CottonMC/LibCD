@@ -1,6 +1,7 @@
 package io.github.cottonmc.libcd.api.tweaker.loot;
 
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import io.github.cottonmc.libcd.api.util.Gsons;
 import net.minecraft.loot.BinomialLootTableRange;
 import net.minecraft.loot.ConstantLootTableRange;
@@ -10,6 +11,9 @@ import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.function.FillPlayerHeadLootFunction;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.loot.function.SetCountLootFunction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A utility class to assemble loot functions from JSR-223 code.
@@ -24,7 +28,12 @@ public class Functions {
 	 * @return The parsed function, ready to add to a table or entry.
 	 */
 	public LootFunction parse(String json) {
-		return Gsons.LOOT_TABLE.fromJson(parser.parse(json), LootFunction.class);
+		try {
+			return Gsons.LOOT_TABLE.fromJson(parser.parse(json), LootFunction.class);
+		} catch (JsonSyntaxException e) {
+			LootTweaker.INSTANCE.getLogger().error("Could not parse loot function, returning null: " + e.getMessage());
+			return null;
+		}
 	}
 
 	/**
@@ -63,7 +72,15 @@ public class Functions {
 	 * @return An assembled function, ready to add to a table or entry.
 	 */
 	public LootFunction fillPlayerHead(String from, LootCondition... conditions) {
+		List<LootCondition> safeConditions = new ArrayList<>();
+		for (LootCondition condition : conditions) {
+			if (condition == null) {
+				LootTweaker.INSTANCE.getLogger().error("Loot table `fillPlayerHead` function cannot take null condition, ignoring");
+				continue;
+			}
+			safeConditions.add(condition);
+		}
 		LootContext.EntityTarget target = LootContext.EntityTarget.fromString(from);
-		return new FillPlayerHeadLootFunction(conditions, target);
+		return new FillPlayerHeadLootFunction(safeConditions.toArray(new LootCondition[]{}), target);
 	}
 }

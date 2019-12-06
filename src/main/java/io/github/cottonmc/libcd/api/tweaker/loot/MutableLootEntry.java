@@ -66,6 +66,9 @@ public class MutableLootEntry {
 	 */
 	public MutableLootEntry addConditions(LootCondition... conditions) {
 		for (LootCondition condition : conditions) {
+			if (condition == null) {
+				LootTweaker.INSTANCE.getLogger().error("Loot entry cannot take null condition, skipping");
+			}
 			getConditions().add(Gsons.PARSER.parse(Gsons.LOOT_TABLE.toJson(condition)));
 		}
 		return this;
@@ -78,6 +81,10 @@ public class MutableLootEntry {
 	 */
 	public MutableLootEntry addFunctions(LootFunction... functions) {
 		for (LootFunction function : functions) {
+			if (function == null) {
+				LootTweaker.INSTANCE.getLogger().error("Loot entry cannot take null function, skipping");
+				continue;
+			}
 			getFunctions().add(Gsons.PARSER.parse(Gsons.LOOT_TABLE.toJson(function)));
 		}
 		return this;

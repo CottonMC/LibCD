@@ -13,10 +13,11 @@ public class TweakerManager {
 
 	private List<Tweaker> tweakers = new ArrayList<>();
 	private Map<Tweaker, String> tweakerNames = new HashMap<>();
-	private Map<String, Function<Identifier, Object>> assistants = new HashMap<>();
+	private Map<String, Function<ScriptBridge, Object>> assistants = new HashMap<>();
 	private Map<Identifier, TweakerStackFactory> factories = new HashMap<>();
 
-	private Map<String, Function<Identifier, Object>> legacyAssistants = new HashMap<>();
+	@Deprecated
+	private Map<String, Function<ScriptBridge, Object>> legacyAssistants = new HashMap<>();
 
 	/**
 	 * Add a new tweaker to store data in.
@@ -32,8 +33,8 @@ public class TweakerManager {
 			return tweaker;
 		});
 		String[] split = name.split("\\.");
-		legacyAssistants.put(split[split.length - 1], id -> {
-			tweaker.prepareFor(id);
+		legacyAssistants.put(split[split.length - 1], bridge -> {
+			tweaker.prepareFor(bridge);
 			return tweaker;
 		});
 	}
@@ -47,7 +48,7 @@ public class TweakerManager {
 	public void addAssistant(String name, Object assistant) {
 		assistants.put(name, id -> assistant);
 		String[] split = name.split("\\.");
-		legacyAssistants.put(split[split.length - 1], id -> assistant);
+		legacyAssistants.put(split[split.length - 1], bridge -> assistant);
 	}
 
 	/**
@@ -56,7 +57,7 @@ public class TweakerManager {
 	 * @param factory A function that takes an identifier and returns an object of a class to use in scripts.
 	 * For deprecation purposes, the final part of the package-notated name will be passed directly to the script on its own.
 	 */
-	public void addAssistantFactory(String name, Function<Identifier, Object> factory) {
+	public void addAssistantFactory(String name, Function<ScriptBridge, Object> factory) {
 		assistants.put(name, factory);
 		String[] split = name.split("\\.");
 		legacyAssistants.put(split[split.length - 1], factory);
@@ -67,7 +68,7 @@ public class TweakerManager {
 	 */
 	@Deprecated
 	public void addLegacyAssistant(String callName, Object assistant) {
-		legacyAssistants.put(callName, id -> assistant);
+		legacyAssistants.put(callName, bridge -> assistant);
 	}
 
 	/**
@@ -75,7 +76,7 @@ public class TweakerManager {
 	 */
 	@Deprecated
 	public void addLegacyAssistantFactory(String callName, Function<Identifier, Object> factory) {
-		legacyAssistants.put(callName, factory);
+		legacyAssistants.put(callName, convertFactory(factory));
 	}
 
 	public void addStackFactory(Identifier id, TweakerStackFactory getter) {
@@ -86,11 +87,11 @@ public class TweakerManager {
 		return tweakers;
 	}
 
-	public Object getAssistant(String name, Identifier scriptFrom) {
+	public Object getAssistant(String name, ScriptBridge scriptFrom) {
 		return assistants.get(name).apply(scriptFrom);
 	}
 
-	public Map<String, Function<Identifier, Object>> getLegacyAssistants() {
+	public Map<String, Function<ScriptBridge, Object>> getLegacyAssistants() {
 		return legacyAssistants;
 	}
 
@@ -100,5 +101,9 @@ public class TweakerManager {
 
 	public String getTweakerName(Tweaker tweaker) {
 		return tweakerNames.get(tweaker);
+	}
+
+	private Function<ScriptBridge, Object> convertFactory(Function<Identifier, Object> factory) {
+		return bridge -> factory.apply(bridge.getId());
 	}
 }

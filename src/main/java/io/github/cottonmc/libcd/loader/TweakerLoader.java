@@ -81,10 +81,11 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 				}
 				try {
 					ScriptContext ctx = engine.getContext();
+					ScriptBridge bridge = new ScriptBridge(engine, script, tweaker);
 					for (String name : TweakerManager.INSTANCE.getLegacyAssistants().keySet()) {
-						ctx.setAttribute(name, TweakerManager.INSTANCE.getLegacyAssistants().get(name).apply(tweaker), ScriptContext.ENGINE_SCOPE);
+						ctx.setAttribute(name, TweakerManager.INSTANCE.getLegacyAssistants().get(name).apply(bridge), ScriptContext.ENGINE_SCOPE);
 					}
-					ctx.setAttribute("libcd", new ScriptBridge(engine, script, tweaker), ScriptContext.ENGINE_SCOPE);
+					ctx.setAttribute("libcd", bridge, ScriptContext.ENGINE_SCOPE);
 					ctx.setAttribute("log", new CDLogger(tweaker.getNamespace()), ScriptContext.ENGINE_SCOPE);
 					engine.eval(script);
 				} catch (ScriptException e) {

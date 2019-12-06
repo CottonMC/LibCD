@@ -28,6 +28,54 @@ public class MutableLootPool {
     }
 
     /**
+     * Set the number of rolls this pool makes.
+     * @param rolls How many rolls to make.
+     * @return This pool with the rolls set.
+     */
+    public MutableLootPool rolls(int rolls) {
+        poolJson.addProperty("rolls", rolls);
+        return this;
+    }
+
+    /**
+     * Set the range of rolls this pool can make.
+     * @param minRolls The minimum number of rolls to make.
+     * @param maxRolls The maximum number of rolls to make.
+     * @return This pool with the rolls set.
+     */
+    public MutableLootPool rolls(int minRolls, int maxRolls) {
+        JsonObject rolls = new JsonObject();
+        rolls.addProperty("min", minRolls);
+        rolls.addProperty("max", maxRolls);
+        poolJson.add("rolls", rolls);
+        return this;
+    }
+
+    /**
+     * Set the number of bonus rolls this pool makes.
+     * @param rolls How many bonus rolls to make.
+     * @return This pool with the bonus rolls set.
+     */
+    public MutableLootPool bonusRolls(int rolls) {
+        poolJson.addProperty("bonus_rolls", rolls);
+        return this;
+    }
+
+    /**
+     * Set the range of bonus rolls this pool can make.
+     * @param minRolls The minimum number of bonus rolls to make.
+     * @param maxRolls The maximum number of bonus rolls to make.
+     * @return This pool with the bonus rolls set.
+     */
+    public MutableLootPool bonusRolls(int minRolls, int maxRolls) {
+        JsonObject rolls = new JsonObject();
+        rolls.addProperty("min", minRolls);
+        rolls.addProperty("max", maxRolls);
+        poolJson.add("bonus_rolls", rolls);
+        return this;
+    }
+
+    /**
      * Remove an entry from the pool. Currently does not work with combined entries.
      * @param type The type of the entry.
      * @param name The name of the entry. Typically an item, tag, or loot table ID.
@@ -170,6 +218,10 @@ public class MutableLootPool {
      */
     public MutableLootPool addConditions(LootCondition... conditions) {
         for (LootCondition condition : conditions) {
+            if (condition == null) {
+                LootTweaker.INSTANCE.getLogger().error("Loot pool cannot take null condition, ignoring");
+                continue;
+            }
             getConditions().add(Gsons.PARSER.parse(Gsons.LOOT_TABLE.toJson(condition)));
         }
         return this;

@@ -97,6 +97,9 @@ public class MutableLootTable {
 	 */
 	public MutableLootTable addFunctions(LootFunction... functions) {
 		for (LootFunction function : functions) {
+			if (function == null) {
+				LootTweaker.INSTANCE.getLogger().error("Loot table cannot take null function, ignoring");
+			}
 			getFunctions().add(Gsons.PARSER.parse(Gsons.LOOT_TABLE.toJson(function)));
 		}
 		return this;

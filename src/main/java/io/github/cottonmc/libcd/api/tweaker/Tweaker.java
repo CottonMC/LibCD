@@ -29,10 +29,10 @@ public interface Tweaker {
 	String getApplyMessage();
 
 	/**
-	 * Prepare anything needed based on the script ID, like namespaces. Called before each script is run.
-	 * @param scriptId The ID of the script about to be run.
+	 * Prepare anything needed based on the script, like namespaces or other information. Called before each script is run.
+	 * @param bridge The bridge provided for this script, including info like the namespace, script engine, and script text.
 	 */
-	default void prepareFor(Identifier scriptId) {}
+	default void prepareFor(ScriptBridge bridge) {}
 
 	/**
 	 * @return A JsonObject containing information useful for debugging. Called when `/libcd debug export` is run.

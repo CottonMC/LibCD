@@ -43,10 +43,10 @@ repositories {
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:1.15-pre3"
-	mappings "net.fabricmc:yarn:1.15-pre3+build.2:v2"
+	minecraft "com.mojang:minecraft:1.15-pre6"
+	mappings "net.fabricmc:yarn:1.15-pre6+build.1:v2"
 	modApi "net.fabricmc:fabric-loader:0.7.2+build.174"
-	modApi "net.fabricmc.fabric-api:fabric-api:0.4.18+build.271-1.15"
+	modApi "net.fabricmc.fabric-api:fabric-api:0.4.20+build.273-1.15"
 	implementation "com.google.code.findbugs:jsr305:3.0.2"
 	
 	modApi "io.github.cottonmc:Jankson-Fabric:2.0.0+j1.2.0"
