@@ -80,6 +80,9 @@ public class TweakerLoader implements SimpleResourceReloadListener {
 					continue;
 				}
 				try {
+					if (!script.contains("libcd.require")) {
+						CDCommons.logger.warn("WARNING! Script %s doesn't use the new `libcd.require` system! It will break in a future update!", tweaker.toString());
+					}
 					ScriptContext ctx = engine.getContext();
 					ScriptBridge bridge = new ScriptBridge(engine, script, tweaker);
 					for (String name : TweakerManager.INSTANCE.getLegacyAssistants().keySet()) {
