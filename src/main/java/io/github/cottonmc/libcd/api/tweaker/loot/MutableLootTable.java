@@ -84,24 +84,29 @@ public class MutableLootTable {
 	 * Remove a pool from the table array.
 	 * @param index The index of the pool to remove. Will shift all other pools over.
 	 */
-	public void removePool(int index) {
+	public MutableLootTable removePool(int index) {
 		getPools().remove(index);
+		return this;
 	}
 
 	/**
-	 * Add a function to all drops from the table.
-	 * @param function The function to add, constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
+	 * Add functions to all drops from the table.
+	 * @param functions The functiosn to add, constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
 	 */
-	public void addFunction(LootFunction function) {
-		getFunctions().add(Gsons.PARSER.parse(Gsons.LOOT_TABLE.toJson(function)));
+	public MutableLootTable addFunctions(LootFunction... functions) {
+		for (LootFunction function : functions) {
+			getFunctions().add(Gsons.PARSER.parse(Gsons.LOOT_TABLE.toJson(function)));
+		}
+		return this;
 	}
 
 	/**
 	 * Remove a function from all drops from the table.
 	 * @param index The index of the function to remove.
 	 */
-	public void removeFunction(int index) {
+	public MutableLootTable removeFunction(int index) {
 		getFunctions().remove(index);
+		return this;
 	}
 
 	private JsonArray getPools() {

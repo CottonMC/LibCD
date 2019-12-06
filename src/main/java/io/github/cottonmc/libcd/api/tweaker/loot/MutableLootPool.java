@@ -8,6 +8,7 @@ import net.minecraft.loot.LootPool;
 import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.util.JsonHelper;
+import org.spongepowered.asm.mixin.Mutable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class MutableLootPool {
      * @param type The type of the entry.
      * @param name The name of the entry. Typically an item, tag, or loot table ID.
      */
-    public void removeEntry(String type, String name) {
+    public MutableLootPool removeEntry(String type, String name) {
         List<JsonElement> toRemove = new ArrayList<>();
         for (JsonElement elem : getEntries()) {
             if (elem instanceof JsonObject) {
@@ -47,33 +48,35 @@ public class MutableLootPool {
         for (JsonElement elem : toRemove) {
             getEntries().remove(elem);
         }
+        return this;
     }
 
-    /**
-     * Add a new leaf entry to the loot pool.
-     * @param type The type of entry to add.
-     * @param name The ID used to decide the drop.
-     * @param weight The weight of this entry in the pool.
-     * @param quality The quality of this entry in the pool. Used for luck/unluck status effects, along with Luck of the Sea enchantment.
-     * @param functions A list of functions to apply to this entry, each constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
-     * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
-     */
-    public void addLeafEntry(String type, String name, int weight, int quality, LootFunction[] functions, LootCondition[] conditions) {
-        addLeafEntry(type, name, weight, quality, functions, conditions, new JsonObject());
+    public MutableLootPool removeEntry(int index) {
+        getEntries().remove(index);
+        return this;
     }
 
-    /**
-     * Add a new leaf entry to the loot pool.
-     * @param type The type of entry to add.
-     * @param name The ID used to decide the drop.
-     * @param weight The weight of this entry in the pool.
-     * @param quality The quality of this entry in the pool. Used for luck/unluck status effects, along with Luck of the Sea enchantment.
-     * @param functions A list of functions to apply to this entry, each constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
-     * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
-     * @param extra Any extra JSON needed for this type of entry to function, as stringified JSON.
-     */
-    public void addLeafEntry(String type, String name, int weight, int quality, LootFunction[] functions, LootCondition[] conditions, String extra) {
-        addLeafEntry(type, name, weight, quality, functions, conditions, (JsonObject)Gsons.PARSER.parse(extra));
+    public MutableLootEntry getEntry(String type, String name) {
+        for (JsonElement elem: getEntries()) {
+            if (elem instanceof JsonObject) {
+                JsonObject obj = (JsonObject)elem;
+                String objType = JsonHelper.getString(obj, "type", "");
+                String objName = JsonHelper.getString(obj, "name", "");
+                if (objType.equals(type) && objName.equals(name)) return new MutableLootEntry(obj);
+            }
+        }
+        return null;
+    }
+
+    public MutableLootEntry getEntry(int index) {
+        return new MutableLootEntry(getEntries().get(index).getAsJsonObject());
+    }
+
+    public MutableLootPool addEntries(MutableLootEntry... entries) {
+        for (MutableLootEntry entry : entries) {
+            getEntries().add(entry.getJson());
+        }
+        return this;
     }
 
     /**
@@ -86,7 +89,7 @@ public class MutableLootPool {
      * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
      * @param extra Any extra JSON needed for this type of entry to function, as a JSON object.
      */
-    public void addLeafEntry(String type, String name, int weight, int quality, LootFunction[] functions, LootCondition[] conditions, JsonObject extra) {
+    public MutableLootPool addLeafEntry(String type, String name, int weight, int quality, LootFunction[] functions, LootCondition[] conditions, JsonObject extra) {
         JsonObject entry = new JsonObject();
         entry.addProperty("type", type);
         entry.addProperty("name", name);
@@ -110,62 +113,27 @@ public class MutableLootPool {
             entry.add(exEntry.getKey(), exEntry.getValue());
         }
         getEntries().add(entry);
-    }
-
-    /**
-     * Add a new loot drop based on an item.
-     * @param id The ID of the item to drop.
-     * @param weight The weight of this entry in the pool.
-     * @param quality The quality of this entry in the pool. Used for luck/unluck status effects, along with Luck of the Sea enchantment.
-     * @param functions A list of functions to apply to this entry, each constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
-     * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
-     */
-    public void addItemEntry(String id, int weight, int quality, LootFunction[] functions, LootCondition[] conditions) {
-        addLeafEntry("minecraft:item", id, weight, quality, functions, conditions, new JsonObject());
-    }
-
-    /**
-     * Add a new loot drop based on a tag.
-     * @param id The ID of the tag to select an item to drop from.
-     * @param weight The weight of this entry in the pool.
-     * @param quality The quality of this entry in the pool. Used for luck/unluck status effects, along with Luck of the Sea enchantment.
-     * @param functions A list of functions to apply to this entry, each constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
-     * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
-     * @param expand Whether to expand the tag into separate items.
-     */
-    public void addTagEntry(String id, int weight, int quality, LootFunction[] functions, LootCondition[] conditions, boolean expand) {
-        JsonObject json = new JsonObject();
-        json.addProperty("expand", expand);
-        addLeafEntry("minecraft:tag", id, weight, quality, functions, conditions, json);
-    }
-
-    /**
-     * Add a new loot drop based on another loot table.
-     * @param id The ID of the loot table to use.
-     * @param weight The weight of this entry in the pool.
-     * @param quality The quality of this entry in the pool. Used for luck/unluck status effects, along with Luck of the Sea enchantment.
-     * @param functions A list of functions to apply to this entry, each constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
-     * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
-     */
-    public void addTableEntry(String id, int weight, int quality, LootFunction[] functions, LootCondition[] conditions) {
-        addLeafEntry("minecraft:loot_table", id, weight, quality, functions, conditions);
+        return this;
     }
 
     /**
      * Add a condition that must be met for this pool to drop anything.
-     * @param condition A condition to meet, constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
+     * @param conditions Condition to meet, constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
      */
-    public void addCondition(LootCondition condition) {
-        JsonElement json = Gsons.PARSER.parse(Gsons.LOOT_TABLE.toJson(condition));
-        getConditions().add(json);
+    public MutableLootPool addConditions(LootCondition... conditions) {
+        for (LootCondition condition : conditions) {
+            getConditions().add(Gsons.PARSER.parse(Gsons.LOOT_TABLE.toJson(condition)));
+        }
+        return this;
     }
 
     /**
      * Remove a condition from this pool.
      * @param index The index of the condition to remove.
      */
-    public void removeCondition(int index) {
+    public MutableLootPool removeCondition(int index) {
         getConditions().remove(index);
+        return this;
     }
 
     private JsonArray getEntries() {
