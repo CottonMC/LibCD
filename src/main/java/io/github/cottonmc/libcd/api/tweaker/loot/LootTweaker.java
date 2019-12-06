@@ -89,7 +89,7 @@ public class LootTweaker implements Tweaker {
 	 */
 	public MutableLootTable getTable(String id) {
 		Identifier tableId = new Identifier(id);
-		if (!tables.containsKey(tableId)) {
+		if (tables.containsKey(tableId)) {
 			return tables.get(tableId);
 		} else {
 			LootTable table = lootManager.getSupplier(tableId);

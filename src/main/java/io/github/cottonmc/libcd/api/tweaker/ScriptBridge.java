@@ -20,7 +20,7 @@ public class ScriptBridge {
 	}
 
 	public Object require(String assistant) {
-		return TweakerManager.INSTANCE.getAssistant(assistant, id);
+		return TweakerManager.INSTANCE.getAssistant(assistant, this);
 	}
 
 	//TODO: be able to require other scripts, instead of just assistants?
