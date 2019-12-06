@@ -5,7 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * A logger with set prefixes for scripts. An instance is provided to every script as `libcd`.
+ * A logger with set prefixes for scripts. An instance is provided to every script as `log`.
  */
 public class CDLogger {
 	private String prefix;
