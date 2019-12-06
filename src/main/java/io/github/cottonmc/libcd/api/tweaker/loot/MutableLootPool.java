@@ -8,7 +8,6 @@ import net.minecraft.loot.LootPool;
 import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.util.JsonHelper;
-import org.spongepowered.asm.mixin.Mutable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,12 +27,11 @@ public class MutableLootPool {
         this.poolJson = json;
     }
 
-    //TODO: mutable entries?
-
     /**
      * Remove an entry from the pool. Currently does not work with combined entries.
      * @param type The type of the entry.
      * @param name The name of the entry. Typically an item, tag, or loot table ID.
+     * @return This pool with the entry removed.
      */
     public MutableLootPool removeEntry(String type, String name) {
         List<JsonElement> toRemove = new ArrayList<>();
@@ -56,6 +54,12 @@ public class MutableLootPool {
         return this;
     }
 
+    /**
+     * Get an entry based on the type and name.
+     * @param type The type of entry to get.
+     * @param name The name of the entry to get.
+     * @return The first entry that matchis this type and name, or null.
+     */
     public MutableLootEntry getEntry(String type, String name) {
         for (JsonElement elem: getEntries()) {
             if (elem instanceof JsonObject) {
@@ -68,10 +72,20 @@ public class MutableLootPool {
         return null;
     }
 
+    /**
+     * Get an entry from the pool's entry array.
+     * @param index The index of the entry to get.
+     * @return The entry at this index.
+     */
     public MutableLootEntry getEntry(int index) {
         return new MutableLootEntry(getEntries().get(index).getAsJsonObject());
     }
 
+    /**
+     * Add entries to the loot pool.
+     * @param entries The entries to add.
+     * @return This pool with the entries added.
+     */
     public MutableLootPool addEntries(MutableLootEntry... entries) {
         for (MutableLootEntry entry : entries) {
             getEntries().add(entry.getJson());
@@ -87,10 +101,11 @@ public class MutableLootPool {
      * @param quality The quality of this entry in the pool. Used for luck/unluck status effects, along with Luck of the Sea enchantment.
      * @param functions A list of functions to apply to this entry, each constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
      * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
+     * @return This pool with the entry added.
      */
     //TODO: remove?
-    public void addLeafEntry(String type, String name, int weight, int quality, LootFunction[] functions, LootCondition[] conditions) {
-        addLeafEntry(type, name, weight, quality, functions, conditions, new JsonObject());
+    public MutableLootPool addLeafEntry(String type, String name, int weight, int quality, LootFunction[] functions, LootCondition[] conditions) {
+        return addLeafEntry(type, name, weight, quality, functions, conditions, new JsonObject());
     }
 
     /**
@@ -102,10 +117,11 @@ public class MutableLootPool {
      * @param functions A list of functions to apply to this entry, each constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
      * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
      * @param extra Any extra JSON needed for this type of entry to function, as stringified JSON.
+     * @return This pool with the entry added.
      */
     //TODO: remove?
-    public void addLeafEntry(String type, String name, int weight, int quality, LootFunction[] functions, LootCondition[] conditions, String extra) {
-        addLeafEntry(type, name, weight, quality, functions, conditions, (JsonObject) Gsons.PARSER.parse(extra));
+    public MutableLootPool addLeafEntry(String type, String name, int weight, int quality, LootFunction[] functions, LootCondition[] conditions, String extra) {
+        return addLeafEntry(type, name, weight, quality, functions, conditions, (JsonObject) Gsons.PARSER.parse(extra));
     }
 
     /**
@@ -117,6 +133,7 @@ public class MutableLootPool {
      * @param functions A list of functions to apply to this entry, each constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
      * @param conditions A list of conditions to meet before this can drop, each constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
      * @param extra Any extra JSON needed for this type of entry to function, as a JSON object.
+     * @return This pool with the entry added.
      */
     //TODO: remove?
     public MutableLootPool addLeafEntry(String type, String name, int weight, int quality, LootFunction[] functions, LootCondition[] conditions, JsonObject extra) {
@@ -149,6 +166,7 @@ public class MutableLootPool {
     /**
      * Add a condition that must be met for this pool to drop anything.
      * @param conditions Condition to meet, constructed in {@link Conditions} (available through `libcd.require("libcd.loot.Conditions")`)
+     * @return This pool with the conditions added.
      */
     public MutableLootPool addConditions(LootCondition... conditions) {
         for (LootCondition condition : conditions) {
@@ -160,6 +178,7 @@ public class MutableLootPool {
     /**
      * Remove a condition from this pool.
      * @param index The index of the condition to remove.
+     * @return This pool with the conditions removed.
      */
     public MutableLootPool removeCondition(int index) {
         getConditions().remove(index);

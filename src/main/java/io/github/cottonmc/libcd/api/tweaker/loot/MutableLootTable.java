@@ -83,6 +83,7 @@ public class MutableLootTable {
 	/**
 	 * Remove a pool from the table array.
 	 * @param index The index of the pool to remove. Will shift all other pools over.
+	 * @return This table with the pool removed.
 	 */
 	public MutableLootTable removePool(int index) {
 		getPools().remove(index);
@@ -92,6 +93,7 @@ public class MutableLootTable {
 	/**
 	 * Add functions to all drops from the table.
 	 * @param functions The functiosn to add, constructed in {@link Functions} (available through `libcd.require("libcd.loot.Functions")`)
+	 * @return This table with the functions added.
 	 */
 	public MutableLootTable addFunctions(LootFunction... functions) {
 		for (LootFunction function : functions) {
@@ -103,6 +105,7 @@ public class MutableLootTable {
 	/**
 	 * Remove a function from all drops from the table.
 	 * @param index The index of the function to remove.
+	 * @return This table with the function removed.
 	 */
 	public MutableLootTable removeFunction(int index) {
 		getFunctions().remove(index);
