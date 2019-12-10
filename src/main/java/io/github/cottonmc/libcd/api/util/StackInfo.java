@@ -24,35 +24,35 @@ public class StackInfo {
 	/**
 	 * @return Whether the stack is empty.
 	 */
-	boolean isEmpty() {
+	public boolean isEmpty() {
 		return stack.isEmpty();
 	}
 
 	/**
 	 * @return The ID of the stack's item.
 	 */
-	String getItem() {
+	public String getItem() {
 		return Registry.ITEM.getId(stack.getItem()).toString();
 	}
 
 	/**
 	 * @return The count of items in the stack.
 	 */
-	int getCount() {
+	public int getCount() {
 		return stack.getCount();
 	}
 
 	/**
 	 * @return The stack's name.
 	 */
-	String getName() {
+	public String getName() {
 		return stack.getName().asString();
 	}
 
 	/**
 	 * @return How much damage the item has taken.
 	 */
-	int getDamage() {
+	public int getDamage() {
 		return stack.getDamage();
 	}
 
@@ -60,7 +60,7 @@ public class StackInfo {
 	 * @param enchantId The enchantment to check for.
 	 * @return The level of that enchantment, or 0 if it's not there.
 	 */
-	int getEnchantmentLevel(String enchantId) {
+	public int getEnchantmentLevel(String enchantId) {
 		if (!stack.hasEnchantments()) return 0;
 		Optional<Enchantment> opt = Registry.ENCHANTMENT.getOrEmpty(new Identifier(enchantId));
 		if (!opt.isPresent()) return 0;
@@ -72,7 +72,7 @@ public class StackInfo {
 	 * @param key The key to check the value of.
 	 * @return The object at that key.
 	 */
-	Object getTagValue(String key) {
+	public Object getTagValue(String key) {
 		CompoundTag tag = stack.getOrCreateTag();
 		return NbtUtils.getObjectFor(tag.get(key));
 	}
@@ -80,7 +80,7 @@ public class StackInfo {
 	/**
 	 * @return a non-modifiable view of the object's NBT, wrapped for usability.
 	 */
-	WrappedCompoundTag getTag() {
+	public WrappedCompoundTag getTag() {
 		return new WrappedCompoundTag(stack.getOrCreateTag());
 	}
 
