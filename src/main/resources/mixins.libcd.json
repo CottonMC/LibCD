@@ -1,7 +1,6 @@
 {
   "required": true,
   "package": "io.github.cottonmc.libcd.mixin",
-  "refmap": "mixins.libcd.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "MixinCookingRecipeFactory",
