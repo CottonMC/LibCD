@@ -12,9 +12,8 @@ public class CDLogger {
 	private Logger log;
 
 	public CDLogger(String prefix) {
-		String toUse = prefix.substring(0, 1).toUpperCase() + prefix.substring(1);
-		this.prefix = "LibCD|" + toUse;
-		this.log = LogManager.getFormatterLogger("LibCD|" + toUse);
+		this.prefix = "LibCD|" + prefix;
+		this.log = LogManager.getFormatterLogger("LibCD|" + prefix);
 	}
 
 	public CDLogger() {

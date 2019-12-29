@@ -22,6 +22,7 @@ import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
+import net.minecraft.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -45,7 +46,7 @@ public class CDContent implements LibCDInitializer {
 
 	@Override
 	public void initConditions(ConditionManager manager) {
-		manager.registerCondition(new Identifier(CDCommons.MODID, "mod_loaded"), (value) -> {
+		manager.registerCondition(new Identifier(CDCommons.MODID, "mod_loaded"), value -> {
 			if (value instanceof String) return FabricLoader.getInstance().isModLoaded((String) value);
 			if (value instanceof List) {
 				for (JsonElement el : (List<JsonElement>)value) {
@@ -59,21 +60,35 @@ public class CDContent implements LibCDInitializer {
 			}
 			throw new CDSyntaxError("mod_loaded must accept either a String or an Array!");
 		});
-		manager.registerCondition(new Identifier(CDCommons.MODID, "item_exists"), (value) -> {
+		manager.registerCondition(new Identifier(CDCommons.MODID, "item_exists"), value -> {
 			if (value instanceof String) return Registry.ITEM.get(new Identifier((String)value)) != Items.AIR;
 			if (value instanceof List) {
 				for (JsonElement el : (List<JsonElement>)value) {
-					if (!(el instanceof JsonPrimitive)) return false;
+					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("item_exists array must only contain Strings!");
 					Object obj = ((JsonPrimitive)el).getValue();
 					if (obj instanceof String) {
 						if (Registry.ITEM.get(new Identifier((String)obj)) == Items.AIR) return false;
-					}  else return false;
+					}  else throw new CDSyntaxError("item_exists array must only contain Strings!");
 				}
 				return true;
 			}
 			throw new CDSyntaxError("item_exists must accept either a String or an Array!");
 		});
-		manager.registerCondition(new Identifier(CDCommons.MODID, "not"), (value) -> {
+		manager.registerCondition(new Identifier(CDCommons.MODID, "item_tag_exists"), value -> {
+			if (value instanceof String) return ItemTags.getContainer().getKeys().contains(new Identifier((String)value));
+			if (value instanceof List) {
+				for (JsonElement el : (List<JsonElement>)value) {
+					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
+					Object obj = ((JsonPrimitive)el).getValue();
+					if (obj instanceof String) {
+						if (!ItemTags.getContainer().getKeys().contains(new Identifier((String)value))) return false;
+					}  else throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
+				}
+				return true;
+			}
+			throw new CDSyntaxError("item_tag_exists must accept either a String or an Array!");
+		});
+		manager.registerCondition(new Identifier(CDCommons.MODID, "not"), value -> {
 			if (value instanceof JsonObject) {
 				JsonObject json = (JsonObject)value;
 				for (String key : json.keySet()) {
@@ -86,7 +101,7 @@ public class CDContent implements LibCDInitializer {
 			}
 			throw new CDSyntaxError("not must accept an Object!");
 		});
-		manager.registerCondition(new Identifier(CDCommons.MODID, "or"), (value) -> {
+		manager.registerCondition(new Identifier(CDCommons.MODID, "or"), value -> {
 			if (value instanceof JsonArray) {
 				JsonArray json = (JsonArray) value;
 				for (JsonElement elem : json) {

@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.cottonmc.libcd.api.tweaker.Tweaker;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
 import io.github.cottonmc.libcd.api.tweaker.recipe.RecipeTweaker;
+import io.github.cottonmc.libcd.loader.TweakerLoader;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
@@ -20,6 +21,7 @@ public class DebugExportCommand implements Command<ServerCommandSource> {
 		try {
 			File file = FabricLoader.getInstance().getGameDirectory().toPath().resolve("debug/libcd.json5").toFile();
 			JsonObject json = new JsonObject();
+			json.put("Loader", TweakerLoader.getDebugObject());
 			for (Tweaker tweaker : TweakerManager.INSTANCE.getTweakers()) {
 				json.put(TweakerManager.INSTANCE.getTweakerName(tweaker), tweaker.getDebugInfo());
 			}

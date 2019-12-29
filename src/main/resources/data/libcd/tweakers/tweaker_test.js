@@ -28,6 +28,11 @@ RecipeTweaker.addShapeless(["minecraft:stone_pickaxe", "minecraft:diamond"], Twe
 
 //create a recipe for a stone pickaxe, a diamond, and an iron ingot -> a diamond pickaxe with 131 durability (the amount a stone pick has) left, along with an enchantment, lore and a custom name
 //re-declaring is optional, but good for safety.
+
+/*
+NOTE: The current form imports code from script `libcd:import_test.js`, which contains the following code:
+```js
+var TweakerUtils = libcd.require("libcd.util.TweakerUtils");
 var newPickStack = TweakerUtils.createItemStack("minecraft:diamond_pickaxe");
 newPickStack = TweakerUtils.setDamage(newPickStack, 1430);
 newPickStack = TweakerUtils.setName(newPickStack, "Patched Pickaxe");
@@ -39,7 +44,12 @@ newPickStack = TweakerUtils.addLore(newPickStack, [
     "should be able to mine",
     "better than usual."
 ]);
-RecipeTweaker.addShapeless(["minecraft:stone_pickaxe", "minecraft:diamond", "minecraft:iron_ingot"], newPickStack);
+```
+*/
+//import other test script
+var imported = libcd.importScript("libcd:import_test.js");
+//get the var defined in the other script to use as our output stack
+RecipeTweaker.addShapeless(["minecraft:stone_pickaxe", "minecraft:diamond", "minecraft:iron_ingot"], imported.getVar("newPickStack"));
 
 //create a recipe for a stick above a stone block with two oak planks on the right -> a crafting table
 RecipeTweaker.addShaped([[stick, "minecraft:oak_planks"], ["minecraft:stone", "minecraft:oak_planks"]], table);
