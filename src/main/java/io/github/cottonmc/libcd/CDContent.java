@@ -17,11 +17,14 @@ import io.github.cottonmc.libcd.api.tweaker.loot.LootTweaker;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
 import io.github.cottonmc.libcd.api.tweaker.recipe.RecipeTweaker;
 import net.fabricmc.loader.api.FabricLoader;
+
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -129,6 +132,21 @@ public class CDContent implements LibCDInitializer {
 			}
 			throw new CDSyntaxError("not must accept an Object!");
 		});
+		manager.registerCondition(new Identifier(CDCommons.MODID, "none"), value -> {
+			if (value instanceof JsonArray) {
+				JsonArray json = (JsonArray) value;
+				for (JsonElement elem : json) {
+					if (elem instanceof JsonObject) {
+						JsonObject obj = (JsonObject) elem;
+						for (String key : obj.keySet()) {
+							if (ConditionalData.testCondition(new Identifier(key), ConditionalData.parseElement(obj.get(key)))) return false;
+						}
+					}
+				}
+				return true;
+			}
+			throw new CDSyntaxError("none must accept an Array!");
+		});
 		manager.registerCondition(new Identifier(CDCommons.MODID, "or"), value -> {
 			if (value instanceof JsonArray) {
 				JsonArray json = (JsonArray) value;
@@ -142,6 +160,25 @@ public class CDContent implements LibCDInitializer {
 				}
 			}
 			throw new CDSyntaxError("or must accept an Array!");
+		});
+		manager.registerCondition(new Identifier(CDCommons.MODID, "xor"), value -> {
+			if (value instanceof JsonArray) {
+				JsonArray json = (JsonArray) value;
+				boolean ret = false;
+				for (JsonElement elem : json) {
+					if (elem instanceof JsonObject) {
+						JsonObject obj = (JsonObject) elem;
+						for (String key : obj.keySet()) {
+							if (ConditionalData.testCondition(new Identifier(key), ConditionalData.parseElement(obj.get(key)))) {
+								if(ret) return false;
+								else ret = true;
+							}
+						}
+					}
+				}
+				return ret;
+			}
+			throw new CDSyntaxError("xor must accept an Array!");
 		});
 		manager.registerCondition(new Identifier(CDCommons.MODID, "dev_mode"), value -> {
 			if (value instanceof Boolean) return (Boolean)value == LibCD.isDevMode();
