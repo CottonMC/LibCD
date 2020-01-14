@@ -88,6 +88,34 @@ public class CDContent implements LibCDInitializer {
 			}
 			throw new CDSyntaxError("item_tag_exists must accept either a String or an Array!");
 		});
+		manager.registerCondition(new Identifier(CDCommons.MODID, "block_exists"), value -> {
+			if (value instanceof String) return Registry.BLOCK.get(new Identifier((String)value)) != Blocks.AIR;
+			if (value instanceof List) {
+				for (JsonElement el : (List<JsonElement>)value) {
+					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("block_exists array must only contain Strings!");
+					Object obj = ((JsonPrimitive)el).getValue();
+					if (obj instanceof String) {
+						if (Registry.BLOCK.get(new Identifier((String)obj)) == Blocks.AIR) return false;
+					}  else throw new CDSyntaxError("block_exists array must only contain Strings!");
+				}
+				return true;
+			}
+			throw new CDSyntaxError("block_exists must accept either a String or an Array!");
+		});
+		manager.registerCondition(new Identifier(CDCommons.MODID, "block_tag_exists"), value -> {
+			if (value instanceof String) return BlockTags.getContainer().getKeys().contains(new Identifier((String)value));
+			if (value instanceof List) {
+				for (JsonElement el : (List<JsonElement>)value) {
+					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
+					Object obj = ((JsonPrimitive)el).getValue();
+					if (obj instanceof String) {
+						if (!BlockTags.getContainer().getKeys().contains(new Identifier((String)value))) return false;
+					}  else throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
+				}
+				return true;
+			}
+			throw new CDSyntaxError("block_tag_exists must accept either a String or an Array!");
+		});
 		manager.registerCondition(new Identifier(CDCommons.MODID, "not"), value -> {
 			if (value instanceof JsonObject) {
 				JsonObject json = (JsonObject)value;
