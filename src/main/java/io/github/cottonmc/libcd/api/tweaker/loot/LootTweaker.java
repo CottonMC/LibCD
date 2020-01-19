@@ -25,6 +25,8 @@ public class LootTweaker implements Tweaker {
 	private CDLogger logger;
 	private JsonObject tableDebug;
 
+	private LootTweaker() {}
+
 	@Override
 	public void prepareReload(ResourceManager manager) {
 		tableDebug = new JsonObject();

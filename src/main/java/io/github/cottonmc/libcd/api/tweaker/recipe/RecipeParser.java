@@ -1,17 +1,13 @@
 package io.github.cottonmc.libcd.api.tweaker.recipe;
 
 import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.mojang.datafixers.Dynamic;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
-import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
-import io.github.cottonmc.libcd.api.util.GsonOps;
 import io.github.cottonmc.libcd.api.util.NbtMatchType;
+import io.github.cottonmc.libcd.compat.nbtcrafting.IngredientAssembler;
+import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.datafixers.NbtOps;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -21,7 +17,6 @@ import net.minecraft.tag.Tag;
 import net.minecraft.util.DefaultedList;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
-import net.minecraft.util.registry.Registry;
 
 import java.util.*;
 
@@ -37,6 +32,8 @@ public class RecipeParser {
 	 */
 	public static Ingredient processIngredient(Object input) throws CDSyntaxError {
 		if (input instanceof Ingredient) return (Ingredient)input;
+		else if (input instanceof ItemStack) return hackStackIngredients((ItemStack)input);
+		else if (input instanceof ItemStack[]) return hackStackIngredients((ItemStack[])input);
 		else if (input instanceof String) {
 			String in = (String)input;
 			int index = in.indexOf('{');
@@ -309,22 +306,24 @@ public class RecipeParser {
 	/**
 	 * Thanks, ProGuard! The `Ingredient.ofStacks()` method is currently only in the client environment,
 	 * so I have to write this ugly, terrible hack to make it work!
-	 * Serializes the input stacks into a PacketByteBuf (or JSON if NBT Crafting is here to deal with NBT),
+	 * Serializes the input stacks into a PacketByteBuf,
 	 * then tricks the Ingredient class into deserializing them.
+	 * However, if NBT Crafting is here, I can just do it with that!
 	 * @param stacks The input stacks to support.
 	 * @return The ingredient object for the input stacks.
 	 */
 	public static Ingredient hackStackIngredients(ItemStack...stacks) {
 		if (FabricLoader.getInstance().isModLoaded("nbtcrafting")) {
-			if (stacks.length > 1) {
-				JsonArray array = new JsonArray();
-				for (ItemStack stack : stacks) {
-					array.add(serializeStack(stack));
-				}
-				return Ingredient.fromJson(array);
-			} else {
-				return Ingredient.fromJson(serializeStack(stacks[0]));
-			}
+//			if (stacks.length > 1) {
+//				JsonArray array = new JsonArray();
+//				for (ItemStack stack : stacks) {
+//					array.add(serializeStack(stack));
+//				}
+//				return Ingredient.fromJson(array);
+//			} else {
+//				return Ingredient.fromJson(serializeStack(stacks[0]));
+//			}
+			return IngredientAssembler.constructFromStacks(stacks);
 		} else {
 			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 			buf.writeVarInt(stacks.length);
@@ -335,14 +334,17 @@ public class RecipeParser {
 		}
 	}
 
-	private static JsonObject serializeStack(ItemStack stack) {
-		JsonObject ret = new JsonObject();
-		ret.addProperty("item", Registry.ITEM.getId(stack.getItem()).toString());
-		ret.addProperty("count", stack.getCount());
-		if (stack.hasTag()) {
-			JsonObject data = Dynamic.convert(NbtOps.INSTANCE, GsonOps.INSTANCE, stack.getTag()).getAsJsonObject();
-			ret.add("data", data);
-		}
-		return ret;
-	}
+	/*
+	 * Helpful if the NBT Crafting `constructFromStacks` doesn't work.
+	 */
+//	private static JsonObject serializeStack(ItemStack stack) {
+//		JsonObject ret = new JsonObject();
+//		ret.addProperty("item", Registry.ITEM.getId(stack.getItem()).toString());
+//		ret.addProperty("count", stack.getCount());
+//		if (stack.hasTag()) {
+//			JsonObject data = Dynamic.convert(NbtOps.INSTANCE, GsonOps.INSTANCE, stack.getTag()).getAsJsonObject();
+//			ret.add("data", data);
+//		}
+//		return ret;
+//	}
 }

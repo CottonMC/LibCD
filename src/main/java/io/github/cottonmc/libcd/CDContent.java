@@ -14,6 +14,7 @@ import io.github.cottonmc.libcd.api.tweaker.loot.Conditions;
 import io.github.cottonmc.libcd.api.tweaker.loot.Entries;
 import io.github.cottonmc.libcd.api.tweaker.loot.Functions;
 import io.github.cottonmc.libcd.api.tweaker.loot.LootTweaker;
+import io.github.cottonmc.libcd.api.tweaker.util.Nbt;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
 import io.github.cottonmc.libcd.api.tweaker.recipe.RecipeTweaker;
 import net.fabricmc.loader.api.FabricLoader;
@@ -34,6 +35,7 @@ public class CDContent implements LibCDInitializer {
 		manager.addTweaker("libcd.recipe.RecipeTweaker", RecipeTweaker.INSTANCE);
 		manager.addTweaker("libcd.loot.LootTweaker", LootTweaker.INSTANCE);
 		manager.addAssistant("libcd.util.TweakerUtils", TweakerUtils.INSTANCE);
+		manager.addAssistant("libcd.util.Nbt", Nbt.INSTANCE);
 		manager.addAssistant("libcd.loot.Conditions", Conditions.INSTANCE);
 		manager.addAssistant("libcd.loot.Functions", Functions.INSTANCE);
 		manager.addAssistant("libcd.loot.Entries", Entries.INSTANCE);

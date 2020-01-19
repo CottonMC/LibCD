@@ -1,5 +1,6 @@
 package io.github.cottonmc.libcd.api.tweaker;
 
+import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.CDLogger;
 import io.github.cottonmc.libcd.loader.TweakerLoader;
@@ -101,6 +102,7 @@ public class ScriptBridge {
 				return invocable.invokeFunction(funcName, args);
 			} catch (Exception e) {
 				CDCommons.logger.error("Error invoking function %s from script %s: %s", funcName, id.toString(), e.getMessage());
+				if (LibCD.isDevMode()) e.printStackTrace();
 				return null;
 			}
 		} else {
@@ -118,9 +120,6 @@ public class ScriptBridge {
 			CDCommons.logger.warn("WARNING! Script %s doesn't use the new `libcd.require` system! It may break in a future update!", id.toString());
 		}
 		ScriptContext ctx = engine.getContext();
-		for (String name : TweakerManager.INSTANCE.getLegacyAssistants().keySet()) {
-			ctx.setAttribute(name, TweakerManager.INSTANCE.getLegacyAssistants().get(name).apply(this), ScriptContext.ENGINE_SCOPE);
-		}
 		ctx.setAttribute("libcd", this, ScriptContext.ENGINE_SCOPE);
 		ctx.setAttribute("log", new CDLogger(id.toString()), ScriptContext.ENGINE_SCOPE);
 		try {
@@ -128,6 +127,7 @@ public class ScriptBridge {
 		} catch (ScriptException e) {
 			hasErrored = true;
 			CDCommons.logger.error("Error executing tweaker script %s: %s", id.toString(), e.getMessage());
+			if (LibCD.isDevMode()) e.printStackTrace();
 		}
 		hasRun = true;
 	}

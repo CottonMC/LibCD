@@ -18,6 +18,8 @@ import javax.annotation.Nullable;
 public class Conditions {
 	public static final Conditions INSTANCE = new Conditions();
 
+	private Conditions() {}
+
 	/**
 	 * Parse Stringified JSON into a special loot condition. Useful for complex or third-party conditions.
 	 * @param json Stringified JSON of the condition to add.

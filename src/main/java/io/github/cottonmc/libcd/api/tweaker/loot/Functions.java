@@ -3,14 +3,13 @@ package io.github.cottonmc.libcd.api.tweaker.loot;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import io.github.cottonmc.libcd.api.util.Gsons;
+import io.github.cottonmc.libcd.api.util.nbt.WrappedCompoundTag;
 import net.minecraft.loot.BinomialLootTableRange;
 import net.minecraft.loot.ConstantLootTableRange;
 import net.minecraft.loot.UniformLootTableRange;
 import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
-import net.minecraft.loot.function.FillPlayerHeadLootFunction;
-import net.minecraft.loot.function.LootFunction;
-import net.minecraft.loot.function.SetCountLootFunction;
+import net.minecraft.loot.function.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +20,8 @@ import java.util.List;
 public class Functions {
 	public static final Functions INSTANCE = new Functions();
 	private JsonParser parser = new JsonParser();
+
+	private Functions() {}
 
 	/**
 	 * Parse Stringified JSON into a special loot function. Useful for complex or third-party functions.
@@ -82,5 +83,15 @@ public class Functions {
 		}
 		LootContext.EntityTarget target = LootContext.EntityTarget.fromString(from);
 		return new FillPlayerHeadLootFunction(safeConditions.toArray(new LootCondition[]{}), target);
+	}
+
+	//TODO: somehow able to pass conditions?
+	/**
+	 * Set the NBT for a stack in a loot table
+	 * @param tag The wrapped form of the compound tag to set.
+	 * @return An assembled function, ready to add to a table or entry.
+	 */
+	public LootFunction setNbt(WrappedCompoundTag tag) {
+		return SetNbtLootFunction.builder(tag.getUnderlying()).build();
 	}
 }

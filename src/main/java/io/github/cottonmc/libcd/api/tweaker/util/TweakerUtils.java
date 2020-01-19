@@ -31,6 +31,9 @@ import net.minecraft.util.registry.Registry;
  */
 public class TweakerUtils {
 	public static final TweakerUtils INSTANCE = new TweakerUtils();
+
+	private TweakerUtils() {}
+
 	/**
 	 * Get a registered item inside a script.
 	 * @param id The id to search for.

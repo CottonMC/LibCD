@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
 public class Entries {
 	public static final Entries INSTANCE = new Entries();
 
+	private Entries() {}
+
 	/**
 	 * Create an item entry.
 	 * @param name The ID of the item to drop.

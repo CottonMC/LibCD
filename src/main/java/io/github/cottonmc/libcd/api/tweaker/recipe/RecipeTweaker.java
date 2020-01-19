@@ -40,6 +40,8 @@ public class RecipeTweaker implements Tweaker {
 	private CDLogger logger;
 	private JsonObject recipeDebug;
 
+	private RecipeTweaker() {}
+
 	/**
 	 * Used during data pack loading to set up recipe adding.
 	 * DO NOT CALL THIS YOURSELF, EVER. IT WILL LIKELY MESS THINGS UP.
