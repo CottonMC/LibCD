@@ -18,11 +18,14 @@ import io.github.cottonmc.libcd.api.tweaker.util.Nbt;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
 import io.github.cottonmc.libcd.api.tweaker.recipe.RecipeTweaker;
 import net.fabricmc.loader.api.FabricLoader;
+
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -90,6 +93,34 @@ public class CDContent implements LibCDInitializer {
 			}
 			throw new CDSyntaxError("item_tag_exists must accept either a String or an Array!");
 		});
+		manager.registerCondition(new Identifier(CDCommons.MODID, "block_exists"), value -> {
+			if (value instanceof String) return Registry.BLOCK.get(new Identifier((String)value)) != Blocks.AIR;
+			if (value instanceof List) {
+				for (JsonElement el : (List<JsonElement>)value) {
+					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("block_exists array must only contain Strings!");
+					Object obj = ((JsonPrimitive)el).getValue();
+					if (obj instanceof String) {
+						if (Registry.BLOCK.get(new Identifier((String)obj)) == Blocks.AIR) return false;
+					}  else throw new CDSyntaxError("block_exists array must only contain Strings!");
+				}
+				return true;
+			}
+			throw new CDSyntaxError("block_exists must accept either a String or an Array!");
+		});
+		manager.registerCondition(new Identifier(CDCommons.MODID, "block_tag_exists"), value -> {
+			if (value instanceof String) return BlockTags.getContainer().getKeys().contains(new Identifier((String)value));
+			if (value instanceof List) {
+				for (JsonElement el : (List<JsonElement>)value) {
+					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
+					Object obj = ((JsonPrimitive)el).getValue();
+					if (obj instanceof String) {
+						if (!BlockTags.getContainer().getKeys().contains(new Identifier((String)value))) return false;
+					}  else throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
+				}
+				return true;
+			}
+			throw new CDSyntaxError("block_tag_exists must accept either a String or an Array!");
+		});
 		manager.registerCondition(new Identifier(CDCommons.MODID, "not"), value -> {
 			if (value instanceof JsonObject) {
 				JsonObject json = (JsonObject)value;
@@ -102,6 +133,21 @@ public class CDContent implements LibCDInitializer {
 				}
 			}
 			throw new CDSyntaxError("not must accept an Object!");
+		});
+		manager.registerCondition(new Identifier(CDCommons.MODID, "none"), value -> {
+			if (value instanceof JsonArray) {
+				JsonArray json = (JsonArray) value;
+				for (JsonElement elem : json) {
+					if (elem instanceof JsonObject) {
+						JsonObject obj = (JsonObject) elem;
+						for (String key : obj.keySet()) {
+							if (ConditionalData.testCondition(new Identifier(key), ConditionalData.parseElement(obj.get(key)))) return false;
+						}
+					}
+				}
+				return true;
+			}
+			throw new CDSyntaxError("none must accept an Array!");
 		});
 		manager.registerCondition(new Identifier(CDCommons.MODID, "or"), value -> {
 			if (value instanceof JsonArray) {
@@ -116,6 +162,25 @@ public class CDContent implements LibCDInitializer {
 				}
 			}
 			throw new CDSyntaxError("or must accept an Array!");
+		});
+		manager.registerCondition(new Identifier(CDCommons.MODID, "xor"), value -> {
+			if (value instanceof JsonArray) {
+				JsonArray json = (JsonArray) value;
+				boolean ret = false;
+				for (JsonElement elem : json) {
+					if (elem instanceof JsonObject) {
+						JsonObject obj = (JsonObject) elem;
+						for (String key : obj.keySet()) {
+							if (ConditionalData.testCondition(new Identifier(key), ConditionalData.parseElement(obj.get(key)))) {
+								if(ret) return false;
+								else ret = true;
+							}
+						}
+					}
+				}
+				return ret;
+			}
+			throw new CDSyntaxError("xor must accept an Array!");
 		});
 		manager.registerCondition(new Identifier(CDCommons.MODID, "dev_mode"), value -> {
 			if (value instanceof Boolean) return (Boolean)value == LibCD.isDevMode();

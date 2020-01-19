@@ -15,9 +15,15 @@ LibConditionalData, or LibCD, adds hooks to conditionally load data pack element
 For conditional resources, add a file `<target resource with extension>.mcmeta`. This will be parsed as JSON to check whether the resource should be loaded. All conditions go in an array with the key `when:`, and are each given as an object with a single key-value pair. Each pair will specify a condition that *must* be met for the recipe to be loaded. There are four conditions pre-included, and other mods may add their own:
 
 - `libcd:mod_loaded` (passed a String or an array): Will return true if all mods with the given IDs are loaded.
-- `libcd:item_exists` (passed a String or an array): Will return true if all items with the given item IDs are loaded.
-- `libcd:not` (passed a single-element object) Will return true if the condition listed in the given object is *not* true.
+- `libcd:item_exists` (passed a String or an array): Will return true if all items with the given item IDs are registered.
+- `libcd:item_tag_exists` (passed a String or an array): Will return true if all item tags with the given IDs are registered.
+- `libcd:block_exists` (passed a String or an array): Will return true if all blocks with the given block IDs are registered.
+- `libcd:block_tag_exists` (passed a String or an array): Will return true if all block tags with the given IDs are registered.
+- `libcd:not` (passed a single-element object): Will return true if the condition listed in the given object is *not* true.
+- `libcd:none` (passed an array): Will return true if *all* conditions listed in the given array are *not* true.
 - `libcd:or` (passed an array, aliased to "or"): Will return true if *any* condition listed in the given array is true.
+- `libcd:xor` (passed an array): Will return true if *only one* condition listed in the given array is true.
+- `libcd:dev_mode` (passed a boolean): Will return true if the given boolean matches whether dev mode is on. (see the config)
 
 **WARNING**: Currently, conditions silently return false if they are passed an improper parameter. This will hopefully be changed in the future, but if you think something should be loaded and it isn't, check your conditions.
 
