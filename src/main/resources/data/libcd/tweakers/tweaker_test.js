@@ -21,8 +21,7 @@ RecipeTweaker.removeRecipesFor("minecraft:gold_nugget");
 RecipeTweaker.removeRecipesFor("minecraft:polished_andesite_slab", "minecraft:stonecutting");
 
 //create a recipe for a piece of tall grass and a piece of bonemeal or white dye -> a two-high piece of tall grass
-//TODO: currently crashing with NBT Crafting, gotta get an NPE fixed
-// RecipeTweaker.addShapeless(["minecraft:grass", RecipeTweaker.makeIngredient("fuzzy", "minecraft:bone_meal", "minecraft:white_dye")], TweakerUtils.createItemStack("minecraft:tall_grass"));
+RecipeTweaker.addShapeless(["minecraft:grass", RecipeTweaker.makeIngredient("fuzzy", "minecraft:bone_meal", "minecraft:white_dye")], TweakerUtils.createItemStack("minecraft:tall_grass"));
 
 //create a recipe for a stone pickaxe and a diamond -> a diamond pickaxe with 1 durability left
 RecipeTweaker.addShapeless(["minecraft:stone_pickaxe", "minecraft:diamond"], TweakerUtils.createItemStack("minecraft:diamond_pickaxe{Damage:1560}"));
@@ -96,7 +95,8 @@ for (var i = 0; i < logs.length; i++) {
 
 var builder = RecipeTweaker.builder("minecraft:smelting")
     .ingredient("ingredient", "minecraft:diamond")
-    .itemStack("result", "minecraft:obsidian@8")
+    // .itemStack("result", "minecraft:obsidian@8") TODO: mixins to support stacks in cooking/cutting recipes currently broken
+    .property("result", "minecraft:obsidian")
     .property("cookingtime", 200)
     .property("experience", 0.35);
 
@@ -104,7 +104,9 @@ RecipeTweaker.addRecipe(builder.build());
 
 builder = RecipeTweaker.builder("minecraft:stonecutting")
     .ingredient("ingredient", "minecraft:diamond_block")
-    .itemStack("result", "minecraft:diamond@9");
+    .property("result", "minecraft:diamond")
+    .property("count", 9);
+    // .itemStack("result", "minecraft:diamond@9"); TODO: mixins to support stacks in cooking/cutting recipes currently broken
 
 RecipeTweaker.addRecipe(builder.build());
 

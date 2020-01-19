@@ -37,8 +37,29 @@ public class RecipeParser {
 	 */
 	public static Ingredient processIngredient(Object input) throws CDSyntaxError {
 		if (input instanceof Ingredient) return (Ingredient)input;
-		else if (input instanceof ItemStack) return hackStackIngredients((ItemStack)input);
-		else if (input instanceof ItemStack[]) return hackStackIngredients((ItemStack[])input);
+		else if (input instanceof ItemStack) {
+			ItemStack stack = (ItemStack)input;
+			Ingredient ing = hackStackIngredients(stack);
+			if (stack.hasTag()) {
+				((IngredientAccessUtils)(Object)ing).libcd$setMatchType(NbtMatchType.EXACT);
+			}
+			return ing;
+		}
+		else if (input instanceof ItemStack[]) {
+			ItemStack[] stacks = (ItemStack[])input;
+			boolean needsTags = false;
+			for (int i = 0; i < stacks.length; i++) {
+				ItemStack stack = stacks[i];
+				if (stack.hasTag()) {
+					needsTags = true;
+				}
+			}
+			Ingredient ing = hackStackIngredients(stacks);
+			if (needsTags) {
+				((IngredientAccessUtils)(Object)ing).libcd$setMatchType(NbtMatchType.EXACT);
+			}
+			return ing;
+		}
 		else if (input instanceof String) {
 			String in = (String)input;
 			int index = in.indexOf('{');

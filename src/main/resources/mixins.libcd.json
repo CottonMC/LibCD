@@ -3,10 +3,6 @@
   "package": "io.github.cottonmc.libcd.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinCookingRecipeFactory",
-    "MixinCookingRecipeSerializer",
-    "MixinCuttingRecipeFactory",
-    "MixinCuttingRecipeSerializer",
     "MixinIngredient",
     "MixinLootManager",
     "MixinNamespaceResourceManager",
