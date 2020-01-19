@@ -3,33 +3,16 @@
 # LibConditionalData
 
 
-[>> Downloads <<](https://github.com/CottonMC/LibConditionalData/releases)
+[>> Downloads <<](https://github.com/CottonMC/LibCD/releases)
 
 *Improved data processing*
 
 **This mod is open source and under a permissive license.** As such, it can be included in any modpack on any platform without prior permission. We appreciate hearing about people using our mods, but you do not need to ask to use them. See the [LICENSE file](LICENSE) for more details.
 
-LibConditionalData, or LibCD, adds hooks to conditionally load data pack elements based on a metadata file. It's focused on being simple and extensible, along with being compatible with *any* resource type added by other mods.
+LibCapableData, or LibCD, is a suite of hooks to make data packs easier for both mod and pack developers. Conditions allow for conditional loading of data pack elements, and Tweakers allow programmatic adding and modifying of recipes, loot tables, and more.
 
-## Client Use
-For conditional resources, add a file `<target resource with extension>.mcmeta`. This will be parsed as JSON to check whether the resource should be loaded. All conditions go in an array with the key `when:`, and are each given as an object with a single key-value pair. Each pair will specify a condition that *must* be met for the recipe to be loaded. There are four conditions pre-included, and other mods may add their own:
+## Conditions
+Conditions are a framework for data-driven conditional loading of data pack elements. They're added with a `.mcmeta` system like resource pack metadata is. Tags are also given a `libcd` block for conditional entries outside of all-or-nothing loading.
 
-- `libcd:mod_loaded` (passed a String or an array): Will return true if all mods with the given IDs are loaded.
-- `libcd:item_exists` (passed a String or an array): Will return true if all items with the given item IDs are registered.
-- `libcd:item_tag_exists` (passed a String or an array): Will return true if all item tags with the given IDs are registered.
-- `libcd:block_exists` (passed a String or an array): Will return true if all blocks with the given block IDs are registered.
-- `libcd:block_tag_exists` (passed a String or an array): Will return true if all block tags with the given IDs are registered.
-- `libcd:not` (passed a single-element object): Will return true if the condition listed in the given object is *not* true.
-- `libcd:none` (passed an array): Will return true if *all* conditions listed in the given array are *not* true.
-- `libcd:or` (passed an array, aliased to "or"): Will return true if *any* condition listed in the given array is true.
-- `libcd:xor` (passed an array): Will return true if *only one* condition listed in the given array is true.
-- `libcd:dev_mode` (passed a boolean): Will return true if the given boolean matches whether dev mode is on. (see the config)
-
-**WARNING**: Currently, conditions silently return false if they are passed an improper parameter. This will hopefully be changed in the future, but if you think something should be loaded and it isn't, check your conditions.
-
-## Developer Use
-LibCD allows any mod to register their own conditions, to prevent recipe loadin based on config or more advanced logic. LibCD is available on the CurseForge maven.
-
-To add a new condition, call `LibConditionalData.registerCondition()`, passing an Identifier for the condition's name and a `Predicate<Object> for the use of the condition.
-
-The Object passed to the predicate will be a boxed primitive (Integer, Float, Boolean, etc.), a String, a List<JsonElement>, a JsonObject, or null. Use an `instanceof` check to be sure what you're being passed.
+## Tweakers
+While JSON is better for most cases of simple data, sometimes pack devs want to do something more complex or add a lot of very similar systems. On top of that, there's currently no way to append to forms of data like loot tables, with only replacement as an option for JSONs. Tweakers fix this by adding a programmatic system for manipulation of data-driven systems. The system is built on top of JSR-223, so it has support for JavaScript by default, and any language with a scripting adapter for it.
