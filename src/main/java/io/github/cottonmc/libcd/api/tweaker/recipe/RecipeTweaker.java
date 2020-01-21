@@ -75,8 +75,8 @@ public class RecipeTweaker implements Tweaker {
 	 * Used during data pack applying to directly apply recipes.
 	 * This is "safe" to call yourself, but will result in a *lot* of log spam.
 	 * NOTE: for some reason, Mojang decided to make the recipe map entirely immutable!
-	 *   I don't like this but I respect it, so this code will preserve the map's immutability,
-	 *   even though it might be a better idea to leave it mutable.
+	 *   I used to respect it, but realized this may take a lot of time in a tweaker-heavy
+	 *   modpack, so immutability is no longer preserved as of TODO: version this changes
 	 */
 	@Override
 	public void applyReload(ResourceManager manager, Executor executor) {
@@ -126,9 +126,9 @@ public class RecipeTweaker implements Tweaker {
 					logger.error("Failed to add recipe from tweaker - " + e.getMessage());
 				}
 			}
-			recipeMap.put(type, ImmutableMap.copyOf(map));
+			recipeMap.put(type, map);
 		}
-		((RecipeMapAccessor)recipeManager).libcd$setRecipeMap(ImmutableMap.copyOf(recipeMap));
+		((RecipeMapAccessor)recipeManager).libcd$setRecipeMap(recipeMap);
 		currentNamespace = "libcd";
 		recipeDebug.put("added", added);
 		recipeDebug.put("removed", removed);

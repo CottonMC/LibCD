@@ -9,6 +9,6 @@ public class CDConfig {
 	public String tweaker_subset = "";
 
 	@Comment("Whether dev-env files, like the test tweaker, should be loaded.\n" +
-			"Will always be treated as true in a mod development environment.")
+			"This will affect the loaded data for your game.")
 	public boolean dev_mode = false;
 }
