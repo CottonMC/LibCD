@@ -35,4 +35,26 @@ public abstract class MixinNamespaceResourceManager implements ResourceManager, 
 		}
 	}
 
+//	@Inject(method = "findResources", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+//	private void checkConditioalRecipes(String parent, Predicate<String> loadFilter, CallbackInfoReturnable<Collection<Identifier>> cir,
+//										List<Identifier> sortedResources) {
+//		List<Identifier> sortedCopy = new ArrayList<>(sortedResources);
+//		for (Identifier id : sortedCopy) {
+//			//don't try to load for things that use mcmetas already!
+//			if (id.getPath().contains(".mcmeta") || id.getPath().contains(".png")) continue;
+//			Identifier metaId = new Identifier(id.getNamespace(), id.getPath() + ".mcmeta");
+//			if (libcd$contains(metaId)) {
+//				try {
+//					Resource meta = getResource(metaId);
+//					String metaText = IOUtils.toString(meta.getInputStream(), Charsets.UTF_8);
+//					if (!ConditionalData.shouldLoad(id, metaText)) {
+//						sortedResources.remove(id);
+//					}
+//				} catch (IOException e) {
+//					CDCommons.logger.error("Error when accessing resource metadata for %s: %s", id.toString(), e.getMessage());
+//				}
+//			}
+//		}
+//	}
+
 }
