@@ -8,6 +8,9 @@
     "MixinNamespaceResourceManager",
     "MixinRecipeManager",
     "MixinResourceManagerImpl",
-    "MixinTagBuilder"
+    "MixinTagBuilder",
+    "MixinAdvancementRewards",
+    "MixinAdvancementRewardsBuilder",
+    "MixinAdvancementRewardsDeserializer"
   ]
 }
