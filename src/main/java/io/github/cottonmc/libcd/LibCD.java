@@ -46,6 +46,7 @@ public class LibCD implements ModInitializer {
 		FabricLoader.getInstance().getEntrypoints("libcd", LibCDInitializer.class).forEach(init -> {
 			init.initTweakers(TweakerManager.INSTANCE);
 			init.initConditions(ConditionManager.INSTANCE);
+			init.initAdvancementRewards(AdvancementRewardsManager.INSTANCE);
 		});
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new TweakerLoader());
 		CommandRegistry.INSTANCE.register(false, dispatcher -> {
@@ -94,15 +95,6 @@ public class LibCD implements ModInitializer {
 			libcdNode.addChild(debugNode);
 			dispatcher.getRoot().addChild(libcdNode);
 		});
-
-		// SYSTEM TEST
-		AdvancementRewardsManager.addRewardType(new Identifier("libcd:without_settings"),
-				(serverPlayerEntity) -> System.out.println("W/O S!"));
-		AdvancementRewardsManager.addRewardType(
-				new Identifier("libcd:with_settings"),
-				(json, typeOfT, context) ->  json.getAsJsonObject().get("setting1").getAsNumber(),
-				(serverPlayerEntity, settings) -> System.out.println("W S!" + settings)
-		);
 	}
 
 	private int changeSubset(CommandContext<ServerCommandSource> context, String setTo) {

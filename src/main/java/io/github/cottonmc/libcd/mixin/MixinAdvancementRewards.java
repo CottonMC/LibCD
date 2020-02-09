@@ -5,8 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.github.cottonmc.libcd.api.AdvancementRewardsManager;
-import io.github.cottonmc.libcd.impl.CustomRewardsSettingsUtils;
+import io.github.cottonmc.libcd.impl.CustomRewardsUtils;
 import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -17,37 +16,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 @Mixin(AdvancementRewards.class)
-public class MixinAdvancementRewards implements CustomRewardsSettingsUtils {
-    private final Map<Identifier, Object> customRewardsSettings = Maps.newHashMap();
+public class MixinAdvancementRewards implements CustomRewardsUtils {
+    private final Map<Identifier, JsonObject> settings = Maps.newHashMap();
+    private final Map<Identifier, BiConsumer<ServerPlayerEntity, JsonObject>> appliers = Maps.newHashMap();
 
     @Inject(method = "apply", at = @At("TAIL"))
     public void onApply(ServerPlayerEntity serverPlayerEntity, CallbackInfo ci) {
-        AdvancementRewardsManager.APPLIERS.forEach((id, applier) ->
-                applier.accept(serverPlayerEntity, getRewardSettings(id))
-        );
-    }
-
-    @Inject(method = "toString", at = @At("TAIL"), cancellable = true)
-    public void onToString(CallbackInfoReturnable<String> cir) {
-        cir.setReturnValue(cir.getReturnValue().replace("}",
-                ", libcd:custom=[" + getAllRewardsSettings().toString() + "]}"
-        ));
+        getAllAppliers().forEach((id, applier) -> applier.accept(serverPlayerEntity, getSettings(id)));
     }
 
     @Inject(method = "toJson", at = @At("TAIL"), cancellable = true)
     public void onToJson(CallbackInfoReturnable<JsonElement> cir) {
         JsonObject jsonObject = cir.getReturnValue().getAsJsonObject();
         JsonArray jsonArray = new JsonArray();
-        Gson gson = new Gson();
-        getAllRewardsSettings().forEach((id, o) -> {
-            if (o == null) {
+        getAllSettings().forEach((id, settings) -> {
+            if (settings == null) {
                 jsonArray.add(id.toString());
             } else {
                 JsonObject current = new JsonObject();
                 current.addProperty("name", id.toString());
-                current.add("value", gson.toJsonTree(o));
+                current.add("settings", settings);
                 jsonArray.add(current);
             }
         });
@@ -56,22 +47,42 @@ public class MixinAdvancementRewards implements CustomRewardsSettingsUtils {
     }
 
     @Override
-    public Map<Identifier, Object> getAllRewardsSettings() {
-        return customRewardsSettings;
+    public Map<Identifier, JsonObject> getAllSettings() {
+        return settings;
     }
 
     @Override
-    public void addAllRewardsSettings(Map<Identifier, Object> rewardsSettings) {
-        customRewardsSettings.putAll(rewardsSettings);
+    public void setAllSettings(Map<Identifier, JsonObject> rewardsSettings) {
+        settings.putAll(rewardsSettings);
     }
 
     @Override
-    public Object getRewardSettings(Identifier id) {
-        return customRewardsSettings.get(id);
+    public JsonObject getSettings(Identifier id) {
+        return settings.get(id);
     }
 
     @Override
-    public void addRewardSettings(Identifier id, Object o) {
-        customRewardsSettings.put(id, o);
+    public void setSettings(Identifier id, JsonObject settings) {
+        this.settings.put(id, settings);
+    }
+
+    @Override
+    public Map<Identifier, BiConsumer<ServerPlayerEntity, JsonObject>> getAllAppliers() {
+        return appliers;
+    }
+
+    @Override
+    public void setAllAppliers(Map<Identifier, BiConsumer<ServerPlayerEntity, JsonObject>> appliers) {
+        this.appliers.putAll(appliers);
+    }
+
+    @Override
+    public BiConsumer<ServerPlayerEntity, JsonObject> getApplier(Identifier id) {
+        return appliers.get(id);
+    }
+
+    @Override
+    public void setApplier(Identifier id, BiConsumer<ServerPlayerEntity, JsonObject> applier) {
+        appliers.put(id, applier);
     }
 }

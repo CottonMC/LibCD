@@ -3,14 +3,13 @@
   "package": "io.github.cottonmc.libcd.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "MixinAdvancementRewards",
+    "MixinAdvancementRewardsDeserializer",
     "MixinIngredient",
     "MixinLootManager",
     "MixinNamespaceResourceManager",
     "MixinRecipeManager",
     "MixinResourceManagerImpl",
-    "MixinTagBuilder",
-    "MixinAdvancementRewards",
-    "MixinAdvancementRewardsBuilder",
-    "MixinAdvancementRewardsDeserializer"
+    "MixinTagBuilder"
   ]
 }
