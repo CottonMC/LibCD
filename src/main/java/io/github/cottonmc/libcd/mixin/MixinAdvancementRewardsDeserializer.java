@@ -5,7 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.github.cottonmc.libcd.api.AdvancementRewardsManager;
+import io.github.cottonmc.libcd.api.advancement.AdvancementRewardsManager;
 import io.github.cottonmc.libcd.impl.CustomRewardsUtils;
 import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -40,11 +40,11 @@ public class MixinAdvancementRewardsDeserializer {
             if (element.isJsonObject()) {
                 JsonObject current = JsonHelper.asObject(element, "libcd:custom array entry");
                 Identifier id = new Identifier(JsonHelper.getString(current, "name"));
-                appliers.put(id, AdvancementRewardsManager.INSTANCE.getAppliers().get(id));
+                appliers.put(id, AdvancementRewardsManager.INSTANCE.getHandlers().get(id));
                 settings.put(id, JsonHelper.getObject(current, "settings"));
             } else {
                 Identifier id = new Identifier(JsonHelper.asString(element, "libcd:custom array entry"));
-                appliers.put(id, AdvancementRewardsManager.INSTANCE.getAppliers().get(id));
+                appliers.put(id, AdvancementRewardsManager.INSTANCE.getHandlers().get(id));
                 settings.put(id, null);
             }
         });

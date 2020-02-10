@@ -1,5 +1,6 @@
 package io.github.cottonmc.libcd.api;
 
+import io.github.cottonmc.libcd.api.advancement.AdvancementRewardsManager;
 import io.github.cottonmc.libcd.api.condition.ConditionManager;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
 
