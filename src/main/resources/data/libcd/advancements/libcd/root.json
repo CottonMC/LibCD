@@ -1,0 +1,40 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:grass_block"
+    },
+    "title": {
+      "translate": "advancements.story.root.title"
+    },
+    "description": {
+      "translate": "advancements.story.root.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png"
+  },
+  "criteria": {
+    "crafting_table": {
+      "trigger": "minecraft:impossible",
+      "conditions": {}
+    }
+  },
+  "requirements": [
+    [
+      "crafting_table"
+    ]
+  ],
+  "rewards": {
+    "libcd:custom": [
+      "libcd:without_settings",
+      {
+        "name": "libcd:with_settings",
+        "settings": {
+          "setting1": 77
+        }
+      }
+    ]
+  }
+}

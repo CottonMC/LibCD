@@ -4,6 +4,7 @@ import blue.endless.jankson.JsonArray;
 import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import blue.endless.jankson.JsonPrimitive;
+import io.github.cottonmc.libcd.api.AdvancementRewardsManager;
 import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
 import io.github.cottonmc.libcd.api.LibCDInitializer;
@@ -186,5 +187,24 @@ public class CDContent implements LibCDInitializer {
 			if (value instanceof Boolean) return (Boolean)value == LibCD.isDevMode();
 			throw new CDSyntaxError("dev_mode must accept a Boolean!");
 		});
+	}
+
+	@Override
+	public void initAdvancementRewards(AdvancementRewardsManager manager) {
+		if (LibCD.isDevMode()) {
+			manager.register(
+					new Identifier("libcd:without_settings"),
+					(serverPlayerEntity) -> CDCommons.logger.info(
+							"%s earned libcd:without_settings",
+							serverPlayerEntity.getDisplayName())
+			);
+			manager.register(
+					new Identifier("libcd:with_settings"),
+					(serverPlayerEntity, settings) -> CDCommons.logger.info(
+							"%s earned libcd:with_settings{setting1: %s}",
+							serverPlayerEntity.getDisplayName(),
+							settings.get("setting1").getAsNumber())
+			);
+		}
 	}
 }
