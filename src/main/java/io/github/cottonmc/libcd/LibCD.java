@@ -3,9 +3,6 @@ package io.github.cottonmc.libcd;
 import blue.endless.jankson.Jankson;
 import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonParseException;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.ArgumentCommandNode;
@@ -26,11 +23,9 @@ import net.minecraft.resource.ResourceType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.lang.reflect.Type;
 
 public class LibCD implements ModInitializer {
 

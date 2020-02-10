@@ -21,5 +21,5 @@ public interface LibCDInitializer {
 	 * Register custom advancement rewards.
 	 * @param manager The advancement rewards manager to register in.
 	 */
-	void initAdvancementRewards(AdvancementRewardsManager manager);
+	default void initAdvancementRewards(AdvancementRewardsManager manager) {}
 }

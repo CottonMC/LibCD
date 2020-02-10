@@ -191,14 +191,20 @@ public class CDContent implements LibCDInitializer {
 
 	@Override
 	public void initAdvancementRewards(AdvancementRewardsManager manager) {
-		// SYSTEM TEST
-		manager.register(
-				new Identifier("libcd:without_settings"),
-				(serverPlayerEntity) -> System.out.println("W/O S!")
-		);
-		manager.register(
-				new Identifier("libcd:with_settings"),
-				(serverPlayerEntity, settings) -> System.out.println("W S!" + settings.get("setting1").getAsNumber())
-		);
+		if (LibCD.isDevMode()) {
+			manager.register(
+					new Identifier("libcd:without_settings"),
+					(serverPlayerEntity) -> CDCommons.logger.info(
+							"%s earned libcd:without_settings",
+							serverPlayerEntity.getDisplayName())
+			);
+			manager.register(
+					new Identifier("libcd:with_settings"),
+					(serverPlayerEntity, settings) -> CDCommons.logger.info(
+							"%s earned libcd:with_settings{setting1: %s}",
+							serverPlayerEntity.getDisplayName(),
+							settings.get("setting1").getAsNumber())
+			);
+		}
 	}
 }
