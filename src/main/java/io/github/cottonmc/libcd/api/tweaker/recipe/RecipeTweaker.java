@@ -98,7 +98,7 @@ public class RecipeTweaker implements Tweaker {
 				} else logger.error("Could not find recipe to remove: " + recipeId.toString());
 			}
 			for (Identifier id : new HashSet<>(map.keySet())) {
-				Recipe recipe = map.get(id);
+				Recipe<?> recipe = map.get(id);
 				boolean shouldRemove = false;
 				if (recipe instanceof CustomOutputRecipe) {
 					Collection<Item> items = ((CustomOutputRecipe)recipe).getOutputItems();
@@ -172,6 +172,8 @@ public class RecipeTweaker implements Tweaker {
 			if (!toRemove.containsKey(type)) toRemove.put(type, new ArrayList<>());
 			List<Identifier> removal = toRemove.get(type);
 			removal.add(formatted);
+		} else {
+			getLogger().error("Tried to remove recipe %s that doesn't exist", id);
 		}
 	}
 
@@ -245,8 +247,7 @@ public class RecipeTweaker implements Tweaker {
 	 * Make an Ingredient object to pass to recipes from a string of inputs.
 	 * @param nbtMatch The NBT matching type to use: "none", "fuzzy", or "exact".
 	 * @param inputs The string forms of inputs to add to the Ingredient.
-	 * @return An Ingredient object to pass to recipes.
-	 * @throws CDSyntaxError If an input is malformed.
+	 * @return An Ingredient object to pass to recipes, or an empty ingredient if there's a malformed input..
 	 */
 	public Ingredient makeIngredient(String nbtMatch, String...inputs) {
 		List<ItemStack> stacks = new ArrayList<>();
@@ -257,6 +258,7 @@ public class RecipeTweaker implements Tweaker {
 				stacks.addAll(Arrays.asList(in));
 			} catch (CDSyntaxError e) {
 				logger.error("Could not add stack to ingredient: malformed stack string %s", input);
+				return Ingredient.EMPTY;
 			}
 		}
 		Ingredient ret = RecipeParser.hackStackIngredients(stacks.toArray(new ItemStack[]{}));
