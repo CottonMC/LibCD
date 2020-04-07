@@ -1,9 +1,7 @@
 package io.github.cottonmc.libcd.api.util.nbt;
 
 import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -172,30 +170,31 @@ public class WrappedCompoundTag {
 	}
 
 	/**
-	 * Check if the tag has a UUID.
-	 * @param key The key to check at.
-	 * @return Whether the tag has a UUID with this key.
-	 */
-	public boolean hasUuid(String key) {
-		return underlying.containsUuid(key);
-	}
-
-	/**
-	 * Get a UUID in the tag. Stored as two longs titled "<key>Most" and "<key>Least".
+	 * Reads a {@link UUID} from its NBT representation in this {@code CompoundTag}.
 	 * @param key The key to get from.
 	 * @return The value of the UUID tags with this key, or "00000000-0000-0000-0000-000000000000".
 	 */
-	public String getUuid(String key) {
-		return underlying.getUuid(key).toString();
+	public UUID getUuidNew(String key) {
+		return underlying.getUuidNew(key);
+	}
+
+	/**
+	 * Returns {@code true} if this {@code CompoundTag} contains a valid UUID representation associated with the given key.
+	 * A valid UUID is represented by an int array of length 4.
+	 * @param key The key to check at.
+	 * @return Whether the tag has a UUID with this key.
+	 */
+	public boolean containsUuidNew(String key) {
+		return underlying.containsUuidNew(key);
 	}
 
 	/**
 	 * Insert a UUID into the tag. Saved as two longs titled "<key>Most" and "<key>Least".
 	 * @param key The key to insert at.
-	 * @param value The UUID to insert.
+	 * @param value The long to insert.
 	 */
-	public void putUuid(String key, String value) {
-		underlying.putUuid(key, UUID.fromString(value));
+	public void putUuidNew(String key, UUID value) {
+		underlying.putUuidNew(key, value);
 	}
 
 	/**

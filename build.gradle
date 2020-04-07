@@ -2,7 +2,7 @@ plugins {
 	id "java"
 	id "eclipse"
 	id "idea"
-	id "fabric-loom" version "0.2.6-SNAPSHOT"
+	id "fabric-loom" version "0.2.7-SNAPSHOT"
 	id "maven-publish"
 	id "com.jfrog.artifactory" version "4.9.0"
 }
@@ -37,8 +37,8 @@ dependencies {
 	modApi "io.github.cottonmc:Jankson-Fabric:${project.jankson_version}"
 	include "io.github.cottonmc:Jankson-Fabric:${project.jankson_version}"
 
-	modCompileOnly ("com.github.Siphalor:nbt-crafting:1.15-SNAPSHOT") { transitive = false }
-	modRuntime ("com.github.Siphalor:nbt-crafting:1.15-SNAPSHOT") { transitive = false }
+	modCompileOnly ("com.github.Siphalor:nbt-crafting:1.16-2.0-SNAPSHOT") { transitive = false }
+	modRuntime ("com.github.Siphalor:nbt-crafting:1.16-2.0-SNAPSHOT") { transitive = false }
 }
 
 processResources {

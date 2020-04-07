@@ -64,7 +64,7 @@ public class StackInfo {
 		if (!stack.hasEnchantments()) return 0;
 		Optional<Enchantment> opt = Registry.ENCHANTMENT.getOrEmpty(new Identifier(enchantId));
 		if (!opt.isPresent()) return 0;
-		Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
+		Map<Enchantment, Integer> enchants = EnchantmentHelper.get(stack);
 		return enchants.getOrDefault(opt.get(), 0);
 	}
 
