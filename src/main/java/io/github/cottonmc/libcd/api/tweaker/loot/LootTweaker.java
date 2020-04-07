@@ -6,7 +6,10 @@ import io.github.cottonmc.libcd.api.tweaker.ScriptBridge;
 import io.github.cottonmc.libcd.api.tweaker.Tweaker;
 import io.github.cottonmc.libcd.impl.LootTableMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
-import net.minecraft.loot.*;
+import net.minecraft.loot.LootManager;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.LootTableReporter;
+import net.minecraft.loot.LootTables;
 import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReloadListener;
@@ -94,7 +97,7 @@ public class LootTweaker implements Tweaker {
 		if (tables.containsKey(tableId)) {
 			return tables.get(tableId);
 		} else {
-			LootTable table = lootManager.getSupplier(tableId);
+			LootTable table = lootManager.getTable(tableId);
 			MutableLootTable mutable = new MutableLootTable(table);
 			tables.put(tableId, mutable);
 			return mutable;

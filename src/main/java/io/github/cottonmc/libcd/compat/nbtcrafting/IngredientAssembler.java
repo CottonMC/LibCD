@@ -2,7 +2,7 @@ package io.github.cottonmc.libcd.compat.nbtcrafting;
 
 import de.siphalor.nbtcrafting.ingredient.IIngredient;
 import de.siphalor.nbtcrafting.ingredient.IngredientStackEntry;
-import de.siphalor.nbtcrafting.util.ICloneable;
+import de.siphalor.nbtcrafting.util.duck.ICloneable;
 import io.github.cottonmc.libcd.api.tweaker.recipe.RecipeTweaker;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;

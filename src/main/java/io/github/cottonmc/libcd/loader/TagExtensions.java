@@ -24,13 +24,11 @@ public final class TagExtensions {
     /**
      * Loads the tag extensions for a given tag from the JSON object.
      *
-     * @param getter a getter converting from value ID to optional value
      * @param json the JSON object
-     * @param <T> the tag value type
      */
-    public static <T> ExtensionResult<T> load(Function<Identifier, Optional<T>> getter, JsonObject json) {
+    public static ExtensionResult load(JsonObject json) {
         boolean shouldReplace = false;
-        List<Tag.Entry<T>> entries = new ArrayList<>();
+        List<Tag.Entry> entries = new ArrayList<>();
         List<String> warnings = new ArrayList<>();
 
         if (json.containsKey("replace")) {
@@ -65,22 +63,17 @@ public final class TagExtensions {
                         if (value == null) {
                             warnings.add("Could not convert JSON element '" + values.get(i) + "' to a string in tag extensions! Skipping...");
                         } else if (value.startsWith("#")) {
-                            entries.add(new Tag.TagEntry<>(new Identifier(value.substring(1))));
+                            entries.add(new Tag.TagEntry(new Identifier(value.substring(1))));
                         } else {
-                            @Nullable T tagEntry = getter.apply(new Identifier(value)).orElse(null);
-                            if (tagEntry == null) {
-                                warnings.add("Unknown tag value '" + value + "' in LibCD tag extensions! Skipping...");
-                                continue;
-                            }
-
-                            entries.add(new Tag.CollectionEntry<>(Collections.singleton(tagEntry)));
+                            // value is stored as an Identifier in an ObjectEntry and then later read/verified in ObjectEntry#resolve.
+                            entries.add(new Tag.ObjectEntry(new Identifier(value)));
                         }
                     }
                 }
             }
         }
 
-        return new ExtensionResult<>(shouldReplace, entries, warnings);
+        return new ExtensionResult(shouldReplace, entries, warnings);
     }
 
     private static boolean testCondition(JsonElement condition, List<String> warnings) {
@@ -111,12 +104,12 @@ public final class TagExtensions {
         return true;
     }
 
-    public static final class ExtensionResult<T> {
+    public static final class ExtensionResult {
         private final boolean shouldReplace;
-        private final List<Tag.Entry<T>> entries;
+        private final List<Tag.Entry> entries;
         private final List<String> warnings;
 
-        public ExtensionResult(boolean shouldReplace, List<Tag.Entry<T>> entries, List<String> warnings) {
+        public ExtensionResult(boolean shouldReplace, List<Tag.Entry> entries, List<String> warnings) {
             this.shouldReplace = shouldReplace;
             this.entries = entries;
             this.warnings = warnings;
@@ -126,7 +119,7 @@ public final class TagExtensions {
             return shouldReplace;
         }
 
-        public List<Tag.Entry<T>> getEntries() {
+        public List<Tag.Entry> getEntries() {
             return entries;
         }
 

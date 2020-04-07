@@ -13,18 +13,18 @@ import java.util.Map;
 
 @Mixin(LootManager.class)
 public class MixinLootManager implements LootTableMapAccessor {
-	@Shadow private Map<Identifier, LootTable> suppliers;
+	@Shadow private Map<Identifier, LootTable> tables;
 
 	@Shadow @Final private LootConditionManager conditionManager;
 
 	@Override
 	public Map<Identifier, LootTable> libcd$getLootTableMap() {
-		return suppliers;
+		return tables;
 	}
 
 	@Override
 	public void libcd$setLootTableMap(Map<Identifier, LootTable> map) {
-		this.suppliers = map;
+		this.tables = map;
 	}
 
 	@Override
