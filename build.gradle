@@ -23,7 +23,7 @@ minecraft {
 
 repositories {
 	mavenCentral()
-	maven { url "http://server.bbkr.space:8081/artifactory/libs-release" }
+	maven { url "https://server.bbkr.space/artifactory/libs-release" }
 	maven { url "https://www.jitpack.io" }
 }
 
@@ -38,7 +38,7 @@ dependencies {
 	include "io.github.cottonmc:Jankson-Fabric:${project.jankson_version}"
 
 	modCompileOnly ("com.github.Siphalor:nbt-crafting:1.16-2.0-SNAPSHOT") { transitive = false }
-	modRuntime ("com.github.Siphalor:nbt-crafting:1.16-2.0-SNAPSHOT") { transitive = false }
+//	modRuntime ("com.github.Siphalor:nbt-crafting:1.16-2.0-SNAPSHOT") { transitive = false } //only for testing
 }
 
 processResources {
@@ -104,7 +104,7 @@ publishing {
 
 artifactory {
 	if (project.hasProperty("artifactoryUsername")) {
-		contextUrl = "http://server.bbkr.space:8081/artifactory/"
+		contextUrl = "https://server.bbkr.space/artifactory/"
 		publish {
 			repository {
 				if (version.contains("SNAPSHOT")) {
