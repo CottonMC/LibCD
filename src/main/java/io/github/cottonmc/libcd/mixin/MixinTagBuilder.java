@@ -18,19 +18,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Mixin(Tag.Builder.class)
 public class MixinTagBuilder implements TagBuilderWarningAccessor {
-    @Shadow
-    @Final
-    private Set<Tag.Entry> entries;
 
+    @Shadow @Final private List<Tag.class_5145> entries;
     @Unique
     private final List<Object> libcdWarnings = new ArrayList<>();
 
-    @Inject(method = "read", at = @At(value = "INVOKE", target = "Ljava/util/Set;addAll(Ljava/util/Collection;)Z", remap = false))
-    private void onFromJson(JsonObject json, CallbackInfoReturnable<Tag.Builder> cir) {
+    @Inject(method = "read", at = @At(value = "RETURN", remap = false))
+    private void onFromJson(JsonObject json, String string, CallbackInfoReturnable<Tag.Builder> cir) {
         try {
             if (json.has("libcd")) {
                 TagExtensions.ExtensionResult result = TagExtensions.load(
@@ -43,7 +40,10 @@ public class MixinTagBuilder implements TagBuilderWarningAccessor {
                     entries.clear();
                 }
 
-                entries.addAll(result.getEntries());
+                result.getEntries().forEach((entry) -> {
+                    this.entries.add(class_5145Accessor.createClass_5145(entry, string));
+                });
+
                 libcdWarnings.addAll(result.getWarnings());
             }
         } catch (Exception e) {
