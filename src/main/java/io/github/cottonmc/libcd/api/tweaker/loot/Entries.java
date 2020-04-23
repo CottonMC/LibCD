@@ -39,7 +39,7 @@ public class Entries {
 	 */
 	public MutableLootEntry defaultedTag(String name) {
 		JsonObject json = new JsonObject();
-		json.addProperty("type", "libcd:tag");
+		json.addProperty("type", "libcd:defaulted_tag");
 		json.addProperty("name", name);
 		return new MutableLootEntry(json);
 	}
