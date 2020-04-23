@@ -30,6 +30,7 @@ public final class TagExtensions {
         boolean shouldReplace = false;
         List<Tag.Entry> entries = new ArrayList<>();
         List<String> warnings = new ArrayList<>();
+        Identifier defaultEntry = null;
 
         if (json.containsKey("replace")) {
             shouldReplace = testCondition(json.get("replace"), warnings);
@@ -73,7 +74,11 @@ public final class TagExtensions {
             }
         }
 
-        return new ExtensionResult(shouldReplace, entries, warnings);
+        if (json.containsKey("default")) {
+            defaultEntry = new Identifier(json.get(String.class, "default"));
+        }
+
+        return new ExtensionResult(shouldReplace, entries, warnings, defaultEntry);
     }
 
     private static boolean testCondition(JsonElement condition, List<String> warnings) {
@@ -108,11 +113,13 @@ public final class TagExtensions {
         private final boolean shouldReplace;
         private final List<Tag.Entry> entries;
         private final List<String> warnings;
+        private final Identifier defaultEntry;
 
-        public ExtensionResult(boolean shouldReplace, List<Tag.Entry> entries, List<String> warnings) {
+        public ExtensionResult(boolean shouldReplace, List<Tag.Entry> entries, List<String> warnings, Identifier defaultEntry) {
             this.shouldReplace = shouldReplace;
             this.entries = entries;
             this.warnings = warnings;
+            this.defaultEntry = defaultEntry;
         }
 
         public boolean shouldReplace() {
@@ -125,6 +132,10 @@ public final class TagExtensions {
 
         public List<String> getWarnings() {
             return warnings;
+        }
+
+        public Identifier getDefaultEntry() {
+            return defaultEntry;
         }
     }
 }
