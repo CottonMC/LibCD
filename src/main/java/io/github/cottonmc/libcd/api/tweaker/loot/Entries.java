@@ -33,6 +33,18 @@ public class Entries {
 	}
 
 	/**
+	 * Create a defaulted tag entry.
+	 * @param name The ID of the tag to get the default drop from.
+	 * @return A modifiable form of an entry for this defaulted tag
+	 */
+	public MutableLootEntry defaultedTag(String name) {
+		JsonObject json = new JsonObject();
+		json.addProperty("type", "libcd:defaulted_tag");
+		json.addProperty("name", name);
+		return new MutableLootEntry(json);
+	}
+
+	/**
 	 * Create a table entry.
 	 * @param name The ID of the loot table to drop from.
 	 * @return A modifiable form of an entry for this table.

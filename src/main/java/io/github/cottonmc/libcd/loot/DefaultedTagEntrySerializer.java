@@ -18,15 +18,14 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
 
-public class DefaultedTagEntrySerializer extends LeafEntry.Serializer<ItemEntry> {
-	private static final ItemEntry.Serializer serializer = new ItemEntry.Serializer();
+public class DefaultedTagEntrySerializer extends LeafEntry.Serializer<DefaultedTagEntry> {
 
 	public DefaultedTagEntrySerializer() {
-		super(new Identifier(LibCD.MODID, "tag"), ItemEntry.class);
+		super(new Identifier(LibCD.MODID, "defaulted_tag"), DefaultedTagEntry.class);
 	}
 
 	@Override
-	protected ItemEntry fromJson(JsonObject entryJson, JsonDeserializationContext context, int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
+	protected DefaultedTagEntry fromJson(JsonObject entryJson, JsonDeserializationContext context, int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
 		String tagName = JsonHelper.getString(entryJson, "name");
 		Tag<Item> itemTag = ItemTags.getContainer().get(new Identifier(tagName));
 		if (itemTag == null) {
@@ -36,7 +35,6 @@ public class DefaultedTagEntrySerializer extends LeafEntry.Serializer<ItemEntry>
 		if (item == Items.AIR) {
 			throw new JsonSyntaxException("No items in tag " + tagName);
 		}
-		entryJson.addProperty("name", Registry.ITEM.getId(item).toString());
-		return ((ItemEntrySerializerAccessor) serializer).invokeFromJson(entryJson, context, weight, quality, conditions, functions);
+		return new DefaultedTagEntry(item, weight, quality, conditions, functions);
 	}
 }
