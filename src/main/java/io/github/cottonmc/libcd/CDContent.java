@@ -89,7 +89,7 @@ public class CDContent implements LibCDInitializer {
 					if (obj instanceof String) {
 						Identifier id = new Identifier((String) obj);
 						if (!ItemTags.getContainer().getKeys().contains(id)) return false;
-						if (ItemTags.getContainer().get(id).entries().isEmpty()) return false;
+						if (ItemTags.getContainer().get(id).values().isEmpty()) return false;
 					}  else throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
 				}
 				return true;
@@ -119,7 +119,7 @@ public class CDContent implements LibCDInitializer {
 					if (obj instanceof String) {
 						Identifier id = new Identifier((String) obj);
 						if (!BlockTags.getContainer().getKeys().contains(id)) return false;
-						if (ItemTags.getContainer().get(id).entries().isEmpty()) return false;
+						if (ItemTags.getContainer().get(id).values().isEmpty()) return false;
 					}  else throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
 				}
 				return true;

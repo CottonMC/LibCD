@@ -6,6 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
@@ -40,7 +41,7 @@ public class HeldItemCommand implements Command<ServerCommandSource> {
 			.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, description.toString()));
 		
 		feedback.setStyle(clickableStyle);
-		player.sendMessage(feedback);
+		player.sendMessage(feedback, MessageType.CHAT);
 		
 		return 1;
 	}
