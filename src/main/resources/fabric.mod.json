@@ -22,6 +22,7 @@
   "mixins": [
     "mixins.libcd.json"
   ],
+  "accessWidener": "libcd.aw",
   "depends": {
     "fabricloader": ">=0.4.0"
   },

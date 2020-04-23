@@ -87,7 +87,9 @@ public class CDContent implements LibCDInitializer {
 					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
 					Object obj = ((JsonPrimitive)el).getValue();
 					if (obj instanceof String) {
-						if (!ItemTags.getContainer().getKeys().contains(new Identifier((String)obj))) return false;
+						Identifier id = new Identifier((String) obj);
+						if (!ItemTags.getContainer().getKeys().contains(id)) return false;
+						if (ItemTags.getContainer().get(id).entries().isEmpty()) return false;
 					}  else throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
 				}
 				return true;
@@ -115,7 +117,9 @@ public class CDContent implements LibCDInitializer {
 					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
 					Object obj = ((JsonPrimitive)el).getValue();
 					if (obj instanceof String) {
-						if (!BlockTags.getContainer().getKeys().contains(new Identifier((String)obj))) return false;
+						Identifier id = new Identifier((String) obj);
+						if (!BlockTags.getContainer().getKeys().contains(id)) return false;
+						if (ItemTags.getContainer().get(id).entries().isEmpty()) return false;
 					}  else throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
 				}
 				return true;

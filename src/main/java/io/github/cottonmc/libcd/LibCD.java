@@ -15,7 +15,9 @@ import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
 import io.github.cottonmc.libcd.command.DebugExportCommand;
 import io.github.cottonmc.libcd.command.HeldItemCommand;
 import io.github.cottonmc.libcd.loader.TweakerLoader;
+import io.github.cottonmc.libcd.loot.DefaultedTagEntrySerializer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.loot.v1.LootEntryTypeRegistry;
 import net.fabricmc.fabric.api.registry.CommandRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
@@ -28,6 +30,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 public class LibCD implements ModInitializer {
+	public static final String MODID = "libcd";
 
 	public static CDConfig config;
 
@@ -38,17 +41,18 @@ public class LibCD implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		config = loadConfig();
-		FabricLoader.getInstance().getEntrypoints("libcd", LibCDInitializer.class).forEach(init -> {
+		FabricLoader.getInstance().getEntrypoints(MODID, LibCDInitializer.class).forEach(init -> {
 			init.initTweakers(TweakerManager.INSTANCE);
 			init.initConditions(ConditionManager.INSTANCE);
 			init.initAdvancementRewards(AdvancementRewardsManager.INSTANCE);
 		});
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new TweakerLoader());
+		LootEntryTypeRegistry.INSTANCE.register(new DefaultedTagEntrySerializer());
 		CommandRegistry.INSTANCE.register(false, dispatcher -> {
 			
 			//New nodes
 			LiteralCommandNode<ServerCommandSource> libcdNode = CommandManager
-					.literal("libcd")
+					.literal(MODID)
 					.build();
 
 			LiteralCommandNode<ServerCommandSource> subsetNode = CommandManager
@@ -100,7 +104,7 @@ public class LibCD implements ModInitializer {
 		return 1;
 	}
 
-	public CDConfig loadConfig() {
+	public static CDConfig loadConfig() {
 		try {
 			Jankson jankson = CDCommons.newJankson();
 			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("libcd.json5").toFile();
@@ -121,7 +125,7 @@ public class LibCD implements ModInitializer {
 		return new CDConfig();
 	}
 
-	public void saveConfig(CDConfig config) {
+	public static void saveConfig(CDConfig config) {
 		try {
 			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("libcd.json5").toFile();
 			JsonElement json = CDCommons.newJankson().toJson(config);
