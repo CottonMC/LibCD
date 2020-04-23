@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.Dynamic;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
+import io.github.cottonmc.libcd.api.tag.TagHelper;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
 import io.github.cottonmc.libcd.api.util.GsonOps;
 import io.github.cottonmc.libcd.api.util.NbtMatchType;
@@ -110,31 +111,45 @@ public class RecipeParser {
 		else if (input instanceof String) {
 			String in = (String)input;
 			int atIndex = in.lastIndexOf('@');
+			int nbtIndex = in.indexOf('{');
 			int count = 1;
 			if (atIndex != -1 && atIndex > in.lastIndexOf('}')) {
 				count = Integer.parseInt(in.substring(atIndex + 1));
 				in = in.substring(0, atIndex);
 			}
-			if (in.contains("->") && in.indexOf("->") < in.indexOf('{')) {
+			Item item;
+			String nbt = "";
+			if (in.indexOf('#') == 0) {
+				if (nbtIndex != -1) {
+					nbt = in.substring(nbtIndex);
+					in = in.substring(0, nbtIndex);
+				}
+				String tag = in.substring(1);
+				Tag<Item> itemTag = ItemTags.getContainer().get(new Identifier(tag));
+				if (itemTag == null) throw new CDSyntaxError("Failed to get item tag for output: " + in);
+				item = TagHelper.ITEM.getDefaultEntry(itemTag);
+			} else if (in.contains("->") && in.indexOf("->") < in.indexOf('{')) {
 				ItemStack stack = TweakerUtils.INSTANCE.getSpecialStack(in);
 				if (stack.isEmpty())
-					throw new CDSyntaxError("Failed to get special stack for input: " + in);
+					throw new CDSyntaxError("Failed to get special stack for output: " + in);
 				if (stack.isStackable()) {
 					stack.setCount(count);
 				}
 				return stack;
 			} else {
-				int nbtIndex = in.indexOf('{');
 				if (nbtIndex != -1) {
-					String nbt = in.substring(nbtIndex);
+					nbt = in.substring(nbtIndex);
 					in = in.substring(0, nbtIndex);
-					ItemStack stack = new ItemStack(TweakerUtils.INSTANCE.getItem(in), count);
-					TweakerUtils.INSTANCE.addNbtToStack(stack, nbt);
-					return stack;
-				} else {
-					return new ItemStack(TweakerUtils.INSTANCE.getItem(in), count);
 				}
+				item = TweakerUtils.INSTANCE.getItem(in);
 			}
+
+			ItemStack stack = new ItemStack(item, count);
+			if (!nbt.equals("")) {
+				TweakerUtils.INSTANCE.addNbtToStack(stack, nbt);
+			}
+
+			return stack;
 		}
 		else throw new CDSyntaxError("Illegal object passed to recipe parser of type " + input.getClass().getName());
 	}

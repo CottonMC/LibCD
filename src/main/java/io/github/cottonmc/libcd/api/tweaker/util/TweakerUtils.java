@@ -3,6 +3,7 @@ package io.github.cottonmc.libcd.api.tweaker.util;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.cottonmc.libcd.api.CDCommons;
+import io.github.cottonmc.libcd.api.tag.TagHelper;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
 import io.github.cottonmc.libcd.api.tweaker.TweakerStackFactory;
 import io.github.cottonmc.libcd.api.tweaker.recipe.RecipeParser;
@@ -14,6 +15,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringNbtReader;
@@ -41,6 +43,18 @@ public class TweakerUtils {
 	 */
 	public Item getItem(String id) {
 		return Registry.ITEM.get(new Identifier(id));
+	}
+
+	/**
+	 * Get the default item from an item tag.
+	 * @param id The ID of the tag to get from.
+	 * @return The default item for that tag.
+	 */
+	public Item getDefaultItem(String id) {
+		Identifier tagId = new Identifier(id);
+		Tag<Item> tag = ItemTags.getContainer().get(tagId);
+		if (tag == null) return Items.AIR;
+		return TagHelper.ITEM.getDefaultEntry(tag);
 	}
 
 	/**
