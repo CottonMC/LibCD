@@ -14,6 +14,13 @@ public class WrappedPlayer {
 	}
 
 	/**
+	 * @return Whether the player is real or not.
+	 */
+	public boolean exists() {
+		return true;
+	}
+
+	/**
 	 * @return The current health of the player.
 	 */
 	public float getHealth() {

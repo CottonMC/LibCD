@@ -2,6 +2,7 @@ package io.github.cottonmc.libcd.api.tweaker.recipe;
 
 import io.github.cottonmc.libcd.api.CDLogger;
 import io.github.cottonmc.libcd.api.tweaker.ScriptBridge;
+import io.github.cottonmc.libcd.api.util.DummyPlayer;
 import io.github.cottonmc.libcd.api.util.StackInfo;
 import io.github.cottonmc.libcd.api.util.WorldInfo;
 import io.github.cottonmc.libcd.api.util.WrappedPlayer;
@@ -30,12 +31,11 @@ public class CustomSpecialCraftingRecipe extends SpecialCraftingRecipe {
 		super(id);
 	}
 
-	//TODO: make sure this is only called on server?
 	@Override
 	public boolean matches(CraftingInventory inv, World world) {
 		try {
 			PlayerEntity player = CraftingUtils.findPlayer(inv);
-			Object result = bridge.invokeFunction("matches", CraftingUtils.getInvStacks(inv), inv.getWidth(), inv.getHeight(), player != null? new WrappedPlayer(player) : null, new WorldInfo(world));
+			Object result = bridge.invokeFunction("matches", CraftingUtils.getInvStacks(inv), inv.getWidth(), inv.getHeight(), player != null? new WrappedPlayer(player) : DummyPlayer.INSTANCE, new WorldInfo(world));
 			if (result instanceof Boolean) return (Boolean) result;
 			else {
 				logger.error("Could not check match for custom special crafting recipe %s, returning false: function 'matches' must return, boolean but returned %s instead", getId(), result.getClass().getName());
@@ -47,11 +47,11 @@ public class CustomSpecialCraftingRecipe extends SpecialCraftingRecipe {
 		return false;
 	}
 
-	//TODO: make sure this is only called on server?
 	@Override
 	public ItemStack craft(CraftingInventory inv) {
 		try {
-			Object result = bridge.invokeFunction("preview", CraftingUtils.getInvStacks(inv), inv.getWidth(), inv.getHeight(), new WrappedPlayer(CraftingUtils.findPlayer(inv)));
+			PlayerEntity player = CraftingUtils.findPlayer(inv);
+			Object result = bridge.invokeFunction("preview", CraftingUtils.getInvStacks(inv), inv.getWidth(), inv.getHeight(), player != null? new WrappedPlayer(player) : DummyPlayer.INSTANCE);
 			if (result == null) {
 				logger.error("Could not get preview output for custom special crafting recipe %s, returning empty stack: function 'preview' must not return null", getId());
 				return ItemStack.EMPTY;
@@ -66,7 +66,7 @@ public class CustomSpecialCraftingRecipe extends SpecialCraftingRecipe {
 
 	@Override
 	public boolean fits(int width, int height) {
-		return true; //TODO: this doesn't matter, since it's a special crafting recipe
+		return true; //this doesn't matter, since it's a special crafting recipe
 	}
 
 	//TODO: make sure this is only called on server?
@@ -75,7 +75,7 @@ public class CustomSpecialCraftingRecipe extends SpecialCraftingRecipe {
 		DefaultedList<ItemStack> remainingStacks = super.getRemainingStacks(inv);
 		try {
 			PlayerEntity player = CraftingUtils.findPlayer(inv);
-			bridge.invokeFunction("craft", CraftingUtils.getInvStacks(inv), player != null? new WrappedPlayer(player) : null, new StackInfo(craft(inv)));
+			bridge.invokeFunction("craft", CraftingUtils.getInvStacks(inv), player != null? new WrappedPlayer(player) : DummyPlayer.INSTANCE, new StackInfo(craft(inv)));
 		} catch (Exception e) {
 			logger.error("Could not fully craft custom special crafting recipe %s, ignoring: %s", getId(), e.getMessage());
 		}

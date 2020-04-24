@@ -2,10 +2,7 @@ package io.github.cottonmc.libcd.api.tweaker.recipe;
 
 import io.github.cottonmc.libcd.api.CDLogger;
 import io.github.cottonmc.libcd.api.tweaker.ScriptBridge;
-import io.github.cottonmc.libcd.api.util.MutableStack;
-import io.github.cottonmc.libcd.api.util.StackInfo;
-import io.github.cottonmc.libcd.api.util.WorldInfo;
-import io.github.cottonmc.libcd.api.util.WrappedPlayer;
+import io.github.cottonmc.libcd.api.util.*;
 import io.github.cottonmc.libcd.api.util.crafting.CraftingUtils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
@@ -26,14 +23,13 @@ public class CustomShapelessRecipe extends ShapelessRecipe {
 		this.logger = new CDLogger(bridge.getId().toString());
 	}
 
-	//TODO: make sure this is only called on server?
 	@Override
 	public boolean matches(CraftingInventory inv, World world) {
 		boolean matches = super.matches(inv, world);
 		if (!matches) return false;
 		try {
 			PlayerEntity player = CraftingUtils.findPlayer(inv);
-			Object result = bridge.invokeFunction("matches", CraftingUtils.getInvStacks(inv), inv.getWidth(), inv.getHeight(), player != null? new WrappedPlayer(player) : null, new WorldInfo(world));
+			Object result = bridge.invokeFunction("matches", CraftingUtils.getInvStacks(inv), inv.getWidth(), inv.getHeight(), player != null? new WrappedPlayer(player) : DummyPlayer.INSTANCE, new WorldInfo(world));
 			if (result instanceof Boolean) return (Boolean) result;
 			else {
 				logger.error("Could not check match for custom shapeless recipe %s, returning standard match: function 'matches' must return boolean but returned %s", getId(), result.getClass().getName());
@@ -45,14 +41,13 @@ public class CustomShapelessRecipe extends ShapelessRecipe {
 		return super.matches(inv, world);
 	}
 
-	//TODO: make sure this is only called on server?
 	@Override
 	public ItemStack craft(CraftingInventory inv) {
 		ItemStack stack = super.craft(inv);
 		try {
 			MutableStack mutableStack = new MutableStack(stack);
 			PlayerEntity player = CraftingUtils.findPlayer(inv);
-			Object result = bridge.invokeFunction("preview", CraftingUtils.getInvStacks(inv), inv.getWidth(), inv.getHeight(), player != null? new WrappedPlayer(player) : null, mutableStack );
+			Object result = bridge.invokeFunction("preview", CraftingUtils.getInvStacks(inv), inv.getWidth(), inv.getHeight(), player != null? new WrappedPlayer(player) : DummyPlayer.INSTANCE, mutableStack );
 			return result == null? mutableStack.get() : RecipeParser.processItemStack(result);
 		} catch (Exception e) {
 			logger.error("Could not get preview output for custom shapeless recipe %s, returning standard output: %s", getId(), e.getMessage());
@@ -60,13 +55,12 @@ public class CustomShapelessRecipe extends ShapelessRecipe {
 		}
 	}
 
-	//TODO: make sure this is only called on server?
 	@Override
 	public DefaultedList<ItemStack> getRemainingStacks(CraftingInventory inv) {
 		DefaultedList<ItemStack> remainingStacks = super.getRemainingStacks(inv);
 		try {
 			PlayerEntity player = CraftingUtils.findPlayer(inv);
-			bridge.invokeFunction("craft", CraftingUtils.getInvStacks(inv), player != null? new WrappedPlayer(player) : null, new StackInfo(craft(inv)));
+			bridge.invokeFunction("craft", CraftingUtils.getInvStacks(inv), player != null? new WrappedPlayer(player) : DummyPlayer.INSTANCE, new StackInfo(craft(inv)));
 		} catch (Exception e) {
 			logger.error("Could not fully craft custom shapeless recipe %s, ignoring: %s", getId(), e.getMessage());
 		}
