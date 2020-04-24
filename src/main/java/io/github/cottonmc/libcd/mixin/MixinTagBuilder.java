@@ -60,7 +60,7 @@ public class MixinTagBuilder implements TagBuilderWarningAccessor {
     }
 
     @Override
-    public List<Object> getWarnings() {
+    public List<Object> libcd$getWarnings() {
         return libcdWarnings;
     }
 

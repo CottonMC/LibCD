@@ -5,18 +5,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.api.tag.TagHelper;
-import io.github.cottonmc.libcd.mixin.ItemEntrySerializerAccessor;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.loot.condition.LootCondition;
-import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.entry.LeafEntry;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.registry.Registry;
 
 public class DefaultedTagEntrySerializer extends LeafEntry.Serializer<DefaultedTagEntry> {
 

@@ -9,6 +9,7 @@ import io.github.cottonmc.libcd.api.tag.TagHelper;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
 import io.github.cottonmc.libcd.api.util.GsonOps;
 import io.github.cottonmc.libcd.api.util.NbtMatchType;
+import io.github.cottonmc.libcd.api.util.MutableStack;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
@@ -37,17 +38,24 @@ public class RecipeParser {
 	 * @return the Ingredient for the given id
 	 */
 	public static Ingredient processIngredient(Object input) throws CDSyntaxError {
-		if (input instanceof Ingredient) return (Ingredient)input;
-		else if (input instanceof ItemStack) {
-			ItemStack stack = (ItemStack)input;
+		if (input instanceof Ingredient) return (Ingredient) input;
+		else if (input instanceof MutableStack) {
+			ItemStack stack = ((MutableStack) input).get();
 			Ingredient ing = hackStackIngredients(stack);
 			if (stack.hasTag()) {
-				((IngredientAccessUtils)(Object)ing).libcd$setMatchType(NbtMatchType.EXACT);
+				((IngredientAccessUtils) (Object) ing).libcd$setMatchType(NbtMatchType.EXACT);
 			}
 			return ing;
 		}
-		else if (input instanceof ItemStack[]) {
-			ItemStack[] stacks = (ItemStack[])input;
+		else if (input instanceof ItemStack) {
+			ItemStack stack = (ItemStack) input;
+			Ingredient ing = hackStackIngredients(stack);
+			if (stack.hasTag()) {
+				((IngredientAccessUtils) (Object) ing).libcd$setMatchType(NbtMatchType.EXACT);
+			}
+			return ing;
+		} else if (input instanceof ItemStack[]) {
+			ItemStack[] stacks = (ItemStack[]) input;
 			boolean needsTags = false;
 			for (int i = 0; i < stacks.length; i++) {
 				ItemStack stack = stacks[i];
@@ -57,12 +65,11 @@ public class RecipeParser {
 			}
 			Ingredient ing = hackStackIngredients(stacks);
 			if (needsTags) {
-				((IngredientAccessUtils)(Object)ing).libcd$setMatchType(NbtMatchType.EXACT);
+				((IngredientAccessUtils) (Object) ing).libcd$setMatchType(NbtMatchType.EXACT);
 			}
 			return ing;
-		}
-		else if (input instanceof String) {
-			String in = (String)input;
+		} else if (input instanceof String) {
+			String in = (String) input;
 			int index = in.indexOf('{');
 			String nbt = "";
 			NbtMatchType type = NbtMatchType.NONE;
@@ -107,9 +114,10 @@ public class RecipeParser {
 	}
 
 	public static ItemStack processItemStack(Object input) throws CDSyntaxError {
-		if (input instanceof ItemStack) return (ItemStack)input;
+		if (input instanceof ItemStack) return (ItemStack) input;
+		else if (input instanceof MutableStack) return ((MutableStack) input).get();
 		else if (input instanceof String) {
-			String in = (String)input;
+			String in = (String) input;
 			int atIndex = in.lastIndexOf('@');
 			int nbtIndex = in.indexOf('{');
 			int count = 1;

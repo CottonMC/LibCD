@@ -24,7 +24,7 @@ public class HeldItemCommand implements Command<ServerCommandSource> {
 		String idString = (id==null) ? "unknown" : id.toString();
 		description.append(idString);
 		
-		BaseText feedback = new LiteralText(idString);
+		BaseText feedback = new LiteralText(idString); //TODO: the new modifiable-text class once it's remapped
 		
 		CompoundTag tag = toDescribe.getTag();
 		if (tag!=null) {

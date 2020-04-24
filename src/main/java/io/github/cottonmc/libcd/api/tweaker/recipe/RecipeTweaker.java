@@ -195,6 +195,11 @@ public class RecipeTweaker implements Tweaker {
 		}
 	}
 
+	/**
+	 * Remove all recipes outputting a certain item and of a certain recipe type from the recipe manager.
+	 * @param id The id of the output item to remove recipes for.
+	 * @param type The type of recipe to remove recipes for.
+	 */
 	public void removeRecipesFor(String id, String type) {
 		if (!canAddRecipes) throw new RuntimeException("Someone tried to remove recipes via LibCD outside of reload time!");
 		Identifier formatted = new Identifier(id);
@@ -478,6 +483,122 @@ public class RecipeTweaker implements Tweaker {
 		} catch (Exception e) {
 			logger.error("Error parsing stonecutter recipe - " + e.getMessage());
 		}
+	}
+
+	public void addCustomShaped(ScriptBridge bridge, Object[][] inputs, Object output) {
+		addCustomShaped(bridge, inputs, output, "");
+	}
+
+	/**
+	 * Add a custom, script-based shaped recipe from a 2D array of inputs, like a standard CraftTweaker recipe.
+	 * @param bridge The ScriptBridge of the script to use, obtained via `libcd.importScript()`.
+	 * @param inputs the 2D array (array of arrays) of inputs to use.
+	 * @param output The output of the recipe.
+	 * @param group The recipe group to go in, or "" for none.
+	 */
+	public void addCustomShaped(ScriptBridge bridge, Object[][] inputs, Object output, String group) {
+		try {
+			Object[] processed = RecipeParser.processGrid(inputs);
+			int width = inputs[0].length;
+			int height = inputs.length;
+			addCustomShaped(bridge, processed, output, width, height, group);
+		} catch (Exception e) {
+			logger.error("Error parsing 2D array custom shaped recipe - " + e.getMessage());
+		}
+	}
+
+	public void addCustomShaped(ScriptBridge bridge, Object[] inputs, Object output, int width, int height) {
+		addCustomShaped(bridge, inputs, output, width, height, "");
+	}
+
+	/**
+	 * Register a custom, script-based shaped crafting recipe from a 1D array of inputs.
+	 * @param bridge The ScriptBridge of the script to use, obtained via `libcd.importScript()`.
+	 * @param inputs The input item or tag ids required in order: left to right, top to bottom.
+	 * @param output The output of the recipe.
+	 * @param width How many rows the recipe needs.
+	 * @param height How many columns the recipe needs.
+	 * @param group The recipe group to go in, or "" for none.
+	 */
+	public void addCustomShaped(ScriptBridge bridge, Object[] inputs, Object output, int width, int height, String group) {
+		try {
+			ItemStack stack = RecipeParser.processItemStack(output);
+			Identifier recipeId = getRecipeId(stack);
+			DefaultedList<Ingredient> ingredients = DefaultedList.ofSize(width * height, Ingredient.EMPTY);
+			for (int i = 0; i < Math.min(inputs.length, width * height); i++) {
+				Object id = inputs[i];
+				if (id == null || id.equals("") || id.equals("minecraft:air")) continue;
+				ingredients.set(i, RecipeParser.processIngredient(id));
+			}
+			addRecipe(new CustomShapedRecipe(bridge, recipeId, group, width, height, ingredients, stack));
+		} catch (Exception e) {
+			logger.error("Error parsing 1D array custom shaped recipe - " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	public void addCustomDictShaped(ScriptBridge bridge, String[] pattern, Map<String, Object> dictionary, Object output) {
+		addCustomDictShaped(bridge, pattern, dictionary, output, "");
+	}
+
+	/**
+	 * Register a custom, script-based shaped crafting recipe from a pattern and dictionary.
+	 * @param bridge The ScriptBridge of the script to use, obtained via `libcd.importScript()`.
+	 * @param pattern A crafting pattern like one you'd find in a vanilla recipe JSON.
+	 * @param dictionary A map of single characters to item or tag ids.
+	 * @param output The output of the recipe.
+	 * @param group The recipe group to go in, or "" for none.
+	 */
+	public void addCustomDictShaped(ScriptBridge bridge, String[] pattern, Map<String, Object> dictionary, Object output, String group) {
+		try {
+			ItemStack stack = RecipeParser.processItemStack(output);
+			Identifier recipeId = getRecipeId(stack);
+			pattern = RecipeParser.processPattern(pattern);
+			Map<String, Ingredient> map = RecipeParser.processDictionary(dictionary);
+			int x = pattern[0].length();
+			int y = pattern.length;
+			DefaultedList<Ingredient> ingredients = RecipeParser.getIngredients(pattern, map, x, y);
+			addRecipe(new CustomShapedRecipe(bridge, recipeId, group, x, y, ingredients, stack));
+		} catch (Exception e) {
+			logger.error("Error parsing custom dictionary shaped recipe - " + e.getMessage());
+		}
+	}
+
+	public void addCustomShapeless(ScriptBridge bridge, Object[] inputs, Object output) {
+		addCustomShapeless(bridge, inputs, output, "");
+	}
+
+	/**
+	 * Register a custom, script-based shapeless crafting recipe from an array of inputs.
+	 * @param bridge The ScriptBridge of the script to use, obtained via `libcd.importScript()`.
+	 * @param inputs A list of input item or tag ids required for the recipe.
+	 * @param output The output of the recipe.
+	 * @param group The recipe group to go in, or "" for none.
+	 */
+	public void addCustomShapeless(ScriptBridge bridge, Object[] inputs, Object output, String group) {
+		try {
+			ItemStack stack = RecipeParser.processItemStack(output);
+			Identifier recipeId = getRecipeId(stack);
+			DefaultedList<Ingredient> ingredients = DefaultedList.of();
+			for (int i = 0; i < Math.min(inputs.length, 9); i++) {
+				Object id = inputs[i];
+				if (id.equals("")) continue;
+				ingredients.add(i, RecipeParser.processIngredient(id));
+			}
+			addRecipe(new CustomShapelessRecipe(bridge, recipeId, group, ingredients, stack));
+		} catch (Exception e) {
+			logger.error("Error custom parsing shapeless recipe - " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Register a fully custom, dynamic, and script-based crafting recipe.
+	 * @param bridge The ScriptBridge of the script to use, obtained via `libcd.importScript()`.
+	 */
+	public void addCustomSpecialCrafting(ScriptBridge bridge) {
+		triedRecipeCount++;
+		Identifier recipeId = new Identifier(currentNamespace, "tweaked/special-" + triedRecipeCount);
+		addRecipe(new CustomSpecialCraftingRecipe(bridge, recipeId));
 	}
 
 	public CDLogger getLogger() {

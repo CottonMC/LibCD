@@ -12,6 +12,7 @@ import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.LibCDInitializer;
 import io.github.cottonmc.libcd.api.condition.ConditionManager;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
+import io.github.cottonmc.libcd.api.util.crafting.CustomSpecialRecipeSerializer;
 import io.github.cottonmc.libcd.command.DebugExportCommand;
 import io.github.cottonmc.libcd.command.HeldItemCommand;
 import io.github.cottonmc.libcd.loader.TweakerLoader;
@@ -21,10 +22,13 @@ import net.fabricmc.fabric.api.loot.v1.LootEntryTypeRegistry;
 import net.fabricmc.fabric.api.registry.CommandRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,6 +52,7 @@ public class LibCD implements ModInitializer {
 		});
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new TweakerLoader());
 		LootEntryTypeRegistry.INSTANCE.register(new DefaultedTagEntrySerializer());
+		Registry.register(Registry.RECIPE_SERIALIZER, new Identifier(MODID, "custom_special_crafting"), CustomSpecialRecipeSerializer.INSTANCE);
 		CommandRegistry.INSTANCE.register(false, dispatcher -> {
 			
 			//New nodes

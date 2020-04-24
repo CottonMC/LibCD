@@ -16,7 +16,7 @@ import java.util.Optional;
  * A class with read-only info about a stack, accessible outside of obf. The stack and its NBT cannot be modified from a StackInfo.
  */
 public class StackInfo {
-	private ItemStack stack;
+	protected ItemStack stack;
 	public StackInfo(ItemStack stack) {
 		this.stack = stack.copy();
 	}
@@ -78,7 +78,8 @@ public class StackInfo {
 	}
 
 	/**
-	 * @return a non-modifiable view of the object's NBT, wrapped for usability.
+	 * NOTE: This is modifiable in {@link MutableStack}, but not in StackInfo.
+	 * @return a view of the object's NBT, wrapped for usability.
 	 */
 	public WrappedCompoundTag getTag() {
 		return new WrappedCompoundTag(stack.getOrCreateTag());
