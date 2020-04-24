@@ -3,8 +3,6 @@
   "package": "io.github.cottonmc.libcd.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-
-    "class_5145Accessor",
     "ItemEntrySerializerAccessor",
     "MixinAdvancementRewards",
     "MixinAdvancementRewardsDeserializer",
@@ -17,6 +15,7 @@
     "MixinResourceManagerImpl",
     "MixinShapedRecipe",
     "MixinTagBuilder",
-    "MixinTagContainer"
+    "MixinTagContainer",
+    "TagEntryAccessor"
   ]
 }

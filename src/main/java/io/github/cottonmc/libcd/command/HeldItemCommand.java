@@ -9,11 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -28,7 +24,7 @@ public class HeldItemCommand implements Command<ServerCommandSource> {
 		String idString = (id==null) ? "unknown" : id.toString();
 		description.append(idString);
 		
-		Text feedback = new LiteralText(idString);
+		BaseText feedback = new LiteralText(idString);
 		
 		CompoundTag tag = toDescribe.getTag();
 		if (tag!=null) {
@@ -36,8 +32,8 @@ public class HeldItemCommand implements Command<ServerCommandSource> {
 			feedback.append(tag.toText());
 		}
 		
-		Style clickableStyle = new Style()
-			.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to copy to clipboard")))
+		Style clickableStyle = Style.field_24360
+			.setHoverEvent(new HoverEvent(HoverEvent.class_5247.field_24342, new LiteralText("Click to copy to clipboard")))
 			.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, description.toString()));
 		
 		feedback.setStyle(clickableStyle);

@@ -27,7 +27,7 @@ import java.util.function.Function;
 @Mixin(Tag.Builder.class)
 public class MixinTagBuilder implements TagBuilderWarningAccessor {
 
-    @Shadow @Final private List<Tag.class_5145> entries;
+    @Shadow @Final private List<Tag.TrackedEntry> entries;
     @Unique
     private final List<Object> libcdWarnings = new ArrayList<>();
 
@@ -48,7 +48,7 @@ public class MixinTagBuilder implements TagBuilderWarningAccessor {
                 }
 
                 result.getEntries().forEach((entry) -> {
-                    this.entries.add(class_5145Accessor.createClass_5145(entry, string));
+                    this.entries.add(TagEntryAccessor.createTrackedEntry(entry, string));
                 });
 
                 libcdWarnings.addAll(result.getWarnings());
