@@ -24,7 +24,7 @@ public class HeldItemCommand implements Command<ServerCommandSource> {
 		String idString = (id==null) ? "unknown" : id.toString();
 		description.append(idString);
 		
-		BaseText feedback = new LiteralText(idString); //TODO: the new modifiable-text class once it's remapped
+		MutableText feedback = new LiteralText(idString);
 		
 		CompoundTag tag = toDescribe.getTag();
 		if (tag!=null) {
@@ -32,9 +32,9 @@ public class HeldItemCommand implements Command<ServerCommandSource> {
 			feedback.append(tag.toText());
 		}
 		
-		Style clickableStyle = Style.field_24360
-			.setHoverEvent(new HoverEvent(HoverEvent.class_5247.field_24342, new LiteralText("Click to copy to clipboard")))
-			.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, description.toString()));
+		Style clickableStyle = Style.EMPTY
+			.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to copy to clipboard")))
+			.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, description.toString()));
 		
 		feedback.setStyle(clickableStyle);
 		player.sendMessage(feedback, MessageType.CHAT);
