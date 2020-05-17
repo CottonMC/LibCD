@@ -11,6 +11,9 @@ import io.github.cottonmc.libcd.api.advancement.AdvancementRewardsManager;
 import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.LibCDInitializer;
 import io.github.cottonmc.libcd.api.condition.ConditionManager;
+import io.github.cottonmc.libcd.api.init.AdvancementInitializer;
+import io.github.cottonmc.libcd.api.init.ConditionInitializer;
+import io.github.cottonmc.libcd.api.init.TweakerInitializer;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
 import io.github.cottonmc.libcd.api.util.crafting.CustomSpecialRecipeSerializer;
 import io.github.cottonmc.libcd.command.DebugExportCommand;
@@ -18,6 +21,7 @@ import io.github.cottonmc.libcd.command.HeldItemCommand;
 import io.github.cottonmc.libcd.loader.TweakerLoader;
 import io.github.cottonmc.libcd.loot.DefaultedTagEntrySerializer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.loot.v1.LootEntryTypeRegistry;
 import net.fabricmc.fabric.api.registry.CommandRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -45,6 +49,9 @@ public class LibCD implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		config = loadConfig();
+		FabricLoader.getInstance().getEntrypoints(MODID + ":tweakers", TweakerInitializer.class).forEach(init -> init.initTweakers(TweakerManager.INSTANCE));
+		FabricLoader.getInstance().getEntrypoints(MODID + "conditions", ConditionInitializer.class).forEach(init -> init.initConditions(ConditionManager.INSTANCE));
+		FabricLoader.getInstance().getEntrypoints(MODID + "advancement_rewards", AdvancementInitializer.class).forEach(init -> init.initAdvancementRewards(AdvancementRewardsManager.INSTANCE));
 		FabricLoader.getInstance().getEntrypoints(MODID, LibCDInitializer.class).forEach(init -> {
 			init.initTweakers(TweakerManager.INSTANCE);
 			init.initConditions(ConditionManager.INSTANCE);
@@ -53,7 +60,7 @@ public class LibCD implements ModInitializer {
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new TweakerLoader());
 		LootEntryTypeRegistry.INSTANCE.register(new DefaultedTagEntrySerializer());
 		Registry.register(Registry.RECIPE_SERIALIZER, new Identifier(MODID, "custom_special_crafting"), CustomSpecialRecipeSerializer.INSTANCE);
-		CommandRegistry.INSTANCE.register(false, dispatcher -> {
+		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
 			
 			//New nodes
 			LiteralCommandNode<ServerCommandSource> libcdNode = CommandManager

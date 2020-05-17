@@ -17,6 +17,9 @@
     ],
     "libcd": [
       "io.github.cottonmc.libcd.CDContent"
+    ],
+    "libcd:advancement_rewards": [
+      "io.github.cottonmc.libcd.DevAdvancementRewards"
     ]
   },
   "mixins": [
