@@ -20,11 +20,11 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-@Mixin(AdvancementRewards.Deserializer.class)
+@Mixin(AdvancementRewards.class)
 public class MixinAdvancementRewardsDeserializer {
-    @Inject(method = "deserialize", at = @At("TAIL"), cancellable = true)
-    public void onDeserialize(
-            JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext,
+    @Inject(method = "fromJson", at = @At("TAIL"), cancellable = true)
+    private static void onDeserialize(
+            JsonObject json,
             CallbackInfoReturnable<AdvancementRewards> cir
     ) {
         CustomRewardsUtils value = (CustomRewardsUtils) cir.getReturnValue();
@@ -33,7 +33,7 @@ public class MixinAdvancementRewardsDeserializer {
         Map<Identifier, JsonObject> settings = Maps.newHashMap();
 
         JsonHelper.getArray(
-                JsonHelper.asObject(jsonElement, "rewards"),
+                JsonHelper.asObject(json, "rewards"),
                 "libcd:custom",
                 new JsonArray()
         ).forEach(element -> {

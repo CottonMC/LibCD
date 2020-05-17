@@ -200,13 +200,13 @@ public class CDContent implements LibCDInitializer {
 					new Identifier("libcd:without_settings"),
 					(serverPlayerEntity) -> CDCommons.logger.info(
 							"%s earned libcd:without_settings",
-							serverPlayerEntity.getDisplayName())
+							serverPlayerEntity.getDisplayName().asString())
 			);
 			manager.register(
 					new Identifier("libcd:with_settings"),
 					(serverPlayerEntity, settings) -> CDCommons.logger.info(
 							"%s earned libcd:with_settings{setting1: %s}",
-							serverPlayerEntity.getDisplayName(),
+							serverPlayerEntity.getDisplayName().asString(),
 							settings.get("setting1").getAsNumber())
 			);
 		}

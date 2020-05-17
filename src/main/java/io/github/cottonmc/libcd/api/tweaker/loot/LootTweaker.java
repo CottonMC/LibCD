@@ -62,7 +62,7 @@ public class LootTweaker implements Tweaker {
 			logger.error("Tried to redefine empty loot table, ignoring");
 		}
 		LootTableReporter reporter = new LootTableReporter(LootContextTypes.GENERIC, ((LootTableMapAccessor)lootManager).libcd$getConditionManager()::get, toAdd::get);
-		toAdd.forEach((id, table) -> check(reporter, id, table));
+		toAdd.forEach((id, table) -> validate(reporter, id, table));
 		reporter.getMessages().forEach((context, message) -> {
 			logger.error("Found validation problem in modified table %s: %s", context, message);
 			Identifier id = new Identifier(context.substring(1, context.indexOf('}')));
@@ -73,8 +73,8 @@ public class LootTweaker implements Tweaker {
 		((LootTableMapAccessor)lootManager).libcd$setLootTableMap(tableMap);
 	}
 
-	private void check(LootTableReporter reporter, Identifier id, LootTable table) {
-		table.check(reporter.withContextType(table.getType()).withSupplier("{" + id + "}", id));
+	private void validate(LootTableReporter reporter, Identifier id, LootTable table) {
+		table.validate(reporter.withContextType(table.getType()).withTable("{" + id + "}", id));
 	}
 
 	@Override
