@@ -50,8 +50,8 @@ public class LibCD implements ModInitializer {
 	public void onInitialize() {
 		config = loadConfig();
 		FabricLoader.getInstance().getEntrypoints(MODID + ":tweakers", TweakerInitializer.class).forEach(init -> init.initTweakers(TweakerManager.INSTANCE));
-		FabricLoader.getInstance().getEntrypoints(MODID + "conditions", ConditionInitializer.class).forEach(init -> init.initConditions(ConditionManager.INSTANCE));
-		FabricLoader.getInstance().getEntrypoints(MODID + "advancement_rewards", AdvancementInitializer.class).forEach(init -> init.initAdvancementRewards(AdvancementRewardsManager.INSTANCE));
+		FabricLoader.getInstance().getEntrypoints(MODID + ":conditions", ConditionInitializer.class).forEach(init -> init.initConditions(ConditionManager.INSTANCE));
+		FabricLoader.getInstance().getEntrypoints(MODID + ":advancement_rewards", AdvancementInitializer.class).forEach(init -> init.initAdvancementRewards(AdvancementRewardsManager.INSTANCE));
 		FabricLoader.getInstance().getEntrypoints(MODID, LibCDInitializer.class).forEach(init -> {
 			init.initTweakers(TweakerManager.INSTANCE);
 			init.initConditions(ConditionManager.INSTANCE);
