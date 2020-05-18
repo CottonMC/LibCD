@@ -8,6 +8,8 @@ import io.github.cottonmc.libcd.api.tweaker.ScriptBridge;
 import io.github.cottonmc.libcd.api.tweaker.Tweaker;
 import io.github.cottonmc.libcd.LibCD;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
+import io.github.cottonmc.parchment.api.Script;
+import io.github.cottonmc.parchment.api.ScriptLoader;
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -23,28 +25,25 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+//TODO: add another system to ScriptDataLoader to allow subsets and stuff, so I don't need to do this all myself?
 public class TweakerLoader implements SimpleResourceReloadListener<Map<Identifier, ScriptBridge>> {
 	public static Map<Identifier, ScriptBridge> SCRIPTS = new HashMap<>();
-	public static final ScriptEngineManager SCRIPT_MANAGER = new ScriptEngineManager();
 
 	@Override
-	public CompletableFuture load(ResourceManager manager, Profiler profiler, Executor executor) {
+	public CompletableFuture<Map<Identifier, ScriptBridge>> load(ResourceManager manager, Profiler profiler, Executor executor) {
 		return CompletableFuture.supplyAsync(() -> {
-			SCRIPTS.clear();
+			Map<Identifier, ScriptBridge> scripts = new HashMap<>();
 			Collection<Identifier> resources = manager.findResources("tweakers", name -> true);
 			for (Identifier fileId : resources) {
 				int localPath = fileId.getPath().indexOf('/')+1;
 				Identifier scriptId = new Identifier(fileId.getNamespace(), fileId.getPath().substring(localPath));
 				try {
 					Resource res = manager.getResource(fileId);
-					String script = IOUtils.toString(res.getInputStream(), StandardCharsets.UTF_8);
-					String extension = scriptId.getPath().substring(scriptId.getPath().lastIndexOf('.') + 1);
-					ScriptEngine engine = SCRIPT_MANAGER.getEngineByExtension(extension);
-					if (engine == null) {
-						CDCommons.logger.error("Engine for tweaker script not found: " + scriptId.toString());
-						continue;
+					ScriptBridge script = (ScriptBridge) ScriptLoader.INSTANCE.loadScript(ScriptBridge::new, scriptId, res.getInputStream());
+					ScriptBridge oldScript = scripts.put(scriptId, script);
+					if (oldScript != null) {
+						CDCommons.logger.error("Duplicate script file ignored with ID %s", scriptId.toString());
 					}
-					SCRIPTS.put(scriptId, new ScriptBridge(engine, script, scriptId));
 				} catch (IOException e) {
 					CDCommons.logger.error("Error when accessing tweaker script %s: %s", scriptId.toString(), e.getMessage());
 				}
@@ -56,14 +55,11 @@ public class TweakerLoader implements SimpleResourceReloadListener<Map<Identifie
 					Identifier scriptId = new Identifier(fileId.getNamespace(), fileId.getPath().substring("tweakers_".length()));
 					try {
 						Resource res = manager.getResource(fileId);
-						String script = IOUtils.toString(res.getInputStream(), StandardCharsets.UTF_8);
-						String extension = scriptId.getPath().substring(scriptId.getPath().lastIndexOf('.') + 1);
-						ScriptEngine engine = SCRIPT_MANAGER.getEngineByExtension(extension);
-						if (engine == null) {
-							CDCommons.logger.error("Engine for tweaker script not found: " + scriptId.toString());
-							continue;
+						ScriptBridge script = (ScriptBridge) ScriptLoader.INSTANCE.loadScript(ScriptBridge::new, scriptId, res.getInputStream());
+						ScriptBridge oldScript = scripts.put(scriptId, script);
+						if (oldScript != null) {
+							CDCommons.logger.error("Duplicate script file ignored with ID %s", scriptId.toString());
 						}
-						SCRIPTS.put(scriptId, new ScriptBridge(engine, script, scriptId));
 					} catch (IOException e) {
 						CDCommons.logger.error("Error when accessing tweaker script %s (in subset %s): %s", scriptId.toString(), subset, e.getMessage());
 					}
@@ -76,14 +72,15 @@ public class TweakerLoader implements SimpleResourceReloadListener<Map<Identifie
 	@Override
 	public CompletableFuture<Void> apply(Map<Identifier, ScriptBridge> scripts, ResourceManager manager, Profiler profiler, Executor executor) {
 		return CompletableFuture.runAsync(() -> {
+			SCRIPTS = scripts;
 			for (Tweaker tweaker : TweakerManager.INSTANCE.getTweakers()) {
 				tweaker.prepareReload(manager);
 			}
 			int loaded = 0;
-			for (Identifier id : SCRIPTS.keySet()) {
-				ScriptBridge script = SCRIPTS.get(id);
+			for (Identifier id : scripts.keySet()) {
+				ScriptBridge script = scripts.get(id);
 				if (!script.hasRun()) script.run();
-				if (!script.hasErrored()) loaded++;
+				if (!script.hadError()) loaded++;
 			}
 			List<String> applied = new ArrayList<>();
 			for (Tweaker tweaker : TweakerManager.INSTANCE.getTweakers()) {
@@ -95,7 +92,7 @@ public class TweakerLoader implements SimpleResourceReloadListener<Map<Identifie
 		});
 	}
 
-	public String formatApplied(List<String> messages) {
+	private String formatApplied(List<String> messages) {
 		StringBuilder ret = new StringBuilder();
 		for (int i = 0; i < messages.size(); i++) {
 			String message = messages.get(i);
