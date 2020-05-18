@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.Dynamic;
+import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
 import io.github.cottonmc.libcd.api.tag.TagHelper;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
@@ -125,18 +126,18 @@ public class RecipeParser {
 				count = Integer.parseInt(in.substring(atIndex + 1));
 				in = in.substring(0, atIndex);
 			}
-			Item item;
 			String nbt = "";
+			if (nbtIndex != -1) {
+				nbt = in.substring(nbtIndex);
+				in = in.substring(0, nbtIndex);
+			}
+			Item item;
 			if (in.indexOf('#') == 0) {
-				if (nbtIndex != -1) {
-					nbt = in.substring(nbtIndex);
-					in = in.substring(0, nbtIndex);
-				}
 				String tag = in.substring(1);
 				Tag<Item> itemTag = ItemTags.getContainer().get(new Identifier(tag));
 				if (itemTag == null) throw new CDSyntaxError("Failed to get item tag for output: " + in);
 				item = TagHelper.ITEM.getDefaultEntry(itemTag);
-			} else if (in.contains("->") && in.indexOf("->") < in.indexOf('{')) {
+			} else if (in.contains("->")) {
 				ItemStack stack = TweakerUtils.INSTANCE.getSpecialStack(in);
 				if (stack.isEmpty())
 					throw new CDSyntaxError("Failed to get special stack for output: " + in);
@@ -145,10 +146,6 @@ public class RecipeParser {
 				}
 				return stack;
 			} else {
-				if (nbtIndex != -1) {
-					nbt = in.substring(nbtIndex);
-					in = in.substring(0, nbtIndex);
-				}
 				item = TweakerUtils.INSTANCE.getItem(in);
 			}
 

@@ -60,12 +60,12 @@ public class TweakerLoader implements SimpleResourceReloadListener<Map<Identifie
 						if (oldScript != null) {
 							CDCommons.logger.error("Duplicate script file ignored with ID %s", scriptId.toString());
 						}
-					} catch (IOException e) {
+					} catch (IOException | IllegalArgumentException e) {
 						CDCommons.logger.error("Error when accessing tweaker script %s (in subset %s): %s", scriptId.toString(), subset, e.getMessage());
 					}
 				}
 			}
-			return SCRIPTS;
+			return scripts;
 		});
 	}
 

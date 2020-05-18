@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * A logger with set prefixes for scripts. An instance is provided to every script as `log`.
  */
+//TODO: remove this now that log4j is gone?
 public class CDLogger {
 	private String prefix;
 	private Logger log;
