@@ -32,8 +32,7 @@ public final class ItemTagHelper implements TagHelper<Item> {
 			int index = LibCD.config.namespace_preference.indexOf(namespace);
 			if (index == -1) {
 				LibCD.config.namespace_preference.add(namespace);
-				LibCD.
-				saveConfig(LibCD.config);
+				LibCD.saveConfig(LibCD.config);
 				index = LibCD.config.namespace_preference.indexOf(namespace);
 			}
 			if (ret == Items.AIR) {
