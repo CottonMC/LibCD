@@ -169,13 +169,15 @@ public class WrappedCompoundTag {
 		underlying.putLong(key, value);
 	}
 
+	// TODO: Remove "New" suffix from UUID methods
+
 	/**
 	 * Reads a {@link UUID} from its NBT representation in this {@code CompoundTag}.
 	 * @param key The key to get from.
 	 * @return The value of the UUID tags with this key, or "00000000-0000-0000-0000-000000000000".
 	 */
 	public UUID getUuidNew(String key) {
-		return underlying.getUuidNew(key);
+		return underlying.getUuid(key);
 	}
 
 	/**
@@ -185,16 +187,16 @@ public class WrappedCompoundTag {
 	 * @return Whether the tag has a UUID with this key.
 	 */
 	public boolean containsUuidNew(String key) {
-		return underlying.containsUuidNew(key);
+		return underlying.containsUuid(key);
 	}
 
 	/**
-	 * Insert a UUID into the tag. Saved as two longs titled "<key>Most" and "<key>Least".
+	 * Insert a UUID into the tag. Saved as an integer array.
 	 * @param key The key to insert at.
 	 * @param value The long to insert.
 	 */
 	public void putUuidNew(String key, UUID value) {
-		underlying.putUuidNew(key, value);
+		underlying.putUuid(key, value);
 	}
 
 	/**

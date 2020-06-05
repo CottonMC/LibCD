@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.cottonmc.libcd.api.util.Gsons;
+import io.github.cottonmc.libcd.mixin.ReferenceLootConditionAccessor;
 import net.minecraft.loot.condition.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringNbtReader;
@@ -165,7 +166,7 @@ public class Conditions {
 	 * @return An assembled condition, ready to add to a pool or entry.
 	 */
 	public LootCondition predicate(String id) {
-		return new ReferenceLootCondition(new Identifier(id));
+		return ReferenceLootConditionAccessor.callConstructor(new Identifier(id));
 	}
 
 }

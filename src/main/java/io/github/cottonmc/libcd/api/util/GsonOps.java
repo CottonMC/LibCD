@@ -1,23 +1,17 @@
 package io.github.cottonmc.libcd.api.util;
 
-import com.google.gson.JsonElement;
-import com.mojang.datafixers.types.JsonOps;
-
-import java.util.Optional;
+import com.mojang.serialization.JsonOps;
 
 /**
  * A version of JsonOps that has the patch from Mojang/DataFixerUpper#42.
+ *
+ * @deprecated Now that the fix is merged, use JsonOps.
  */
+@Deprecated
 public class GsonOps extends JsonOps {
     public static final GsonOps INSTANCE = new GsonOps();
 
-    protected GsonOps() {}
-
-    @Override
-    public Optional<Number> getNumberValue(final JsonElement input) {
-        if (input.isJsonPrimitive() && input.getAsJsonPrimitive().isBoolean()) {
-            return Optional.of(input.getAsBoolean() ? 1 : 0);
-        }
-        return super.getNumberValue(input);
+    protected GsonOps() {
+        super(false);
     }
 }

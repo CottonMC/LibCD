@@ -4,14 +4,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.github.cottonmc.libcd.api.util.Gsons;
 import net.minecraft.loot.condition.LootCondition;
-import net.minecraft.loot.entry.LootEntry;
+import net.minecraft.loot.entry.LootPoolEntry;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.util.JsonHelper;
 
 public class MutableLootEntry {
 	private JsonObject entryJson;
 
-	public MutableLootEntry(LootEntry entry) {
+	public MutableLootEntry(LootPoolEntry entry) {
 		this((JsonObject)Gsons.PARSER.parse(Gsons.LOOT_TABLE.toJson(entry)));
 	}
 
@@ -159,7 +159,7 @@ public class MutableLootEntry {
 		return entryJson;
 	}
 
-	public LootEntry get() {
-		return Gsons.LOOT_TABLE.fromJson(entryJson, LootEntry.class);
+	public LootPoolEntry get() {
+		return Gsons.LOOT_TABLE.fromJson(entryJson, LootPoolEntry.class);
 	}
 }

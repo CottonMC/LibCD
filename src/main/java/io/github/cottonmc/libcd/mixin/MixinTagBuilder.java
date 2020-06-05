@@ -1,9 +1,9 @@
 package io.github.cottonmc.libcd.mixin;
 
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.Dynamic;
-import io.github.cottonmc.libcd.api.util.GsonOps;
-import io.github.cottonmc.libcd.api.util.JanksonOps;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
+import io.github.cottonmc.jankson.JanksonOps;
 import io.github.cottonmc.libcd.impl.TagBuilderWarningAccessor;
 import io.github.cottonmc.libcd.loader.TagExtensions;
 import io.github.cottonmc.libcd.tag.ItemTagHelper;
@@ -39,7 +39,7 @@ public class MixinTagBuilder implements TagBuilderWarningAccessor {
             if (json.has("libcd")) {
                 TagExtensions.ExtensionResult result = TagExtensions.load(
                         (blue.endless.jankson.JsonObject) Dynamic.convert(
-                                GsonOps.INSTANCE, JanksonOps.INSTANCE, JsonHelper.getObject(json, "libcd")
+                                JsonOps.INSTANCE, JanksonOps.INSTANCE, JsonHelper.getObject(json, "libcd")
                         )
                 );
 

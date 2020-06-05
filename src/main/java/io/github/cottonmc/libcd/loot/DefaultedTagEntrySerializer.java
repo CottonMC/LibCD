@@ -17,10 +17,6 @@ import net.minecraft.util.JsonHelper;
 
 public class DefaultedTagEntrySerializer extends LeafEntry.Serializer<DefaultedTagEntry> {
 
-	public DefaultedTagEntrySerializer() {
-		super(new Identifier(LibCD.MODID, "defaulted_tag"), DefaultedTagEntry.class);
-	}
-
 	@Override
 	protected DefaultedTagEntry fromJson(JsonObject entryJson, JsonDeserializationContext context, int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
 		String tagName = JsonHelper.getString(entryJson, "name");

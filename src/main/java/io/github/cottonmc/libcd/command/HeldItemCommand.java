@@ -37,7 +37,7 @@ public class HeldItemCommand implements Command<ServerCommandSource> {
 			.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, description.toString()));
 		
 		feedback.setStyle(clickableStyle);
-		player.sendMessage(feedback, MessageType.CHAT);
+		player.sendMessage(feedback, false);
 		
 		return 1;
 	}
