@@ -3,12 +3,11 @@ package io.github.cottonmc.libcd.api.tweaker.recipe;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.Dynamic;
-import io.github.cottonmc.libcd.api.CDCommons;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
 import io.github.cottonmc.libcd.api.tag.TagHelper;
 import io.github.cottonmc.libcd.api.tweaker.util.TweakerUtils;
-import io.github.cottonmc.libcd.api.util.GsonOps;
 import io.github.cottonmc.libcd.api.util.NbtMatchType;
 import io.github.cottonmc.libcd.api.util.MutableStack;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
@@ -388,7 +387,7 @@ public class RecipeParser {
 		ret.addProperty("item", Registry.ITEM.getId(stack.getItem()).toString());
 		ret.addProperty("count", stack.getCount());
 		if (stack.hasTag()) {
-			JsonObject data = Dynamic.convert(NbtOps.INSTANCE, GsonOps.INSTANCE, stack.getTag()).getAsJsonObject();
+			JsonObject data = Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, stack.getTag()).getAsJsonObject();
 			ret.add("data", data);
 		}
 		return ret;

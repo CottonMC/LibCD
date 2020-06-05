@@ -22,12 +22,13 @@ import io.github.cottonmc.libcd.loader.TweakerLoader;
 import io.github.cottonmc.libcd.loot.DefaultedTagEntrySerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.loot.v1.LootEntryTypeRegistry;
 import net.fabricmc.fabric.api.registry.CommandRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.loot.entry.LootPoolEntryType;
 import net.minecraft.resource.ResourceType;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.TranslatableText;
@@ -58,7 +59,7 @@ public class LibCD implements ModInitializer {
 			init.initAdvancementRewards(AdvancementRewardsManager.INSTANCE);
 		});
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new TweakerLoader());
-		LootEntryTypeRegistry.INSTANCE.register(new DefaultedTagEntrySerializer());
+		Registry.register(Registry.LOOT_POOL_ENTRY_TYPE, new Identifier(LibCD.MODID, "defaulted_tag"), new LootPoolEntryType(new DefaultedTagEntrySerializer()));
 		Registry.register(Registry.RECIPE_SERIALIZER, new Identifier(MODID, "custom_special_crafting"), CustomSpecialRecipeSerializer.INSTANCE);
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
 			
@@ -112,7 +113,9 @@ public class LibCD implements ModInitializer {
 		config.tweaker_subset = setTo;
 		saveConfig(config);
 		context.getSource().sendFeedback(new TranslatableText("libcd.reload.success"), false);
-		(context.getSource()).getMinecraftServer().reload();
+		MinecraftServer server = context.getSource().getMinecraftServer();
+		// TODO: Use a cleaner approach than executing /reload
+		server.getCommandManager().execute(server.getCommandSource(), "reload");
 		return 1;
 	}
 

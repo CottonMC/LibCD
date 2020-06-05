@@ -2,8 +2,8 @@ package io.github.cottonmc.libcd.mixin;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.JsonOps;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import io.github.cottonmc.libcd.api.tag.TagHelper;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.item.Item;

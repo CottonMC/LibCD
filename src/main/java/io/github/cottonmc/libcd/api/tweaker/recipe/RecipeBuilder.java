@@ -1,8 +1,8 @@
 package io.github.cottonmc.libcd.api.tweaker.recipe;
 
 import com.google.gson.*;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.JsonOps;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.item.ItemStack;

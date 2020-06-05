@@ -18,6 +18,7 @@
     "MixinShapedRecipe",
     "MixinTagBuilder",
     "MixinTagContainer",
+    "ReferenceLootConditionAccessor",
     "TagEntryAccessor"
   ]
 }
