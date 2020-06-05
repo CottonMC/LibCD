@@ -12,6 +12,7 @@ import io.github.cottonmc.libcd.api.util.NbtMatchType;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.impl.RecipeMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
+import net.minecraft.class_5357;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -482,6 +483,24 @@ public class RecipeTweaker implements Tweaker {
 			addRecipe(new StonecuttingRecipe(recipeId, group, ingredient, stack));
 		} catch (Exception e) {
 			logger.error("Error parsing stonecutter recipe - " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Register a recipe to forge in the smithing table.
+	 * @param base The base input item or tag id.
+	 * @param addition The addition input item or tag id.
+	 * @param output The output of the recipe.
+	 */
+	public void addSmithing(Object base, Object addition, Object output) {
+		try {
+			ItemStack stack = RecipeParser.processItemStack(output);
+			Identifier recipeId = getRecipeId(stack);
+			Ingredient baseIng = RecipeParser.processIngredient(base);
+			Ingredient addIng = RecipeParser.processIngredient(addition);
+			addRecipe(new class_5357(recipeId, baseIng, addIng, stack));
+		} catch (Exception e) {
+			logger.error("Error parsing smithing recipe - " + e.getMessage());
 		}
 	}
 

@@ -15,18 +15,18 @@ import io.github.cottonmc.libcd.api.init.AdvancementInitializer;
 import io.github.cottonmc.libcd.api.init.ConditionInitializer;
 import io.github.cottonmc.libcd.api.init.TweakerInitializer;
 import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
-import io.github.cottonmc.libcd.api.util.crafting.CustomSpecialRecipeSerializer;
+import io.github.cottonmc.libcd.api.tweaker.recipe.CustomSpecialCraftingRecipe;
 import io.github.cottonmc.libcd.command.DebugExportCommand;
 import io.github.cottonmc.libcd.command.HeldItemCommand;
 import io.github.cottonmc.libcd.loader.TweakerLoader;
 import io.github.cottonmc.libcd.loot.DefaultedTagEntrySerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.registry.CommandRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.loot.entry.LootPoolEntryType;
+import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.SpecialRecipeSerializer;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
@@ -42,6 +42,8 @@ public class LibCD implements ModInitializer {
 	public static final String MODID = "libcd";
 
 	public static CDConfig config;
+
+	public static RecipeSerializer<CustomSpecialCraftingRecipe> CUSTOM_SPECIAL_SERIALIZER;
 
 	public static boolean isDevMode() {
 		return config.dev_mode;
@@ -60,7 +62,7 @@ public class LibCD implements ModInitializer {
 		});
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new TweakerLoader());
 		Registry.register(Registry.LOOT_POOL_ENTRY_TYPE, new Identifier(LibCD.MODID, "defaulted_tag"), new LootPoolEntryType(new DefaultedTagEntrySerializer()));
-		Registry.register(Registry.RECIPE_SERIALIZER, new Identifier(MODID, "custom_special_crafting"), CustomSpecialRecipeSerializer.INSTANCE);
+		CUSTOM_SPECIAL_SERIALIZER = Registry.register(Registry.RECIPE_SERIALIZER, new Identifier(MODID, "custom_special_crafting"), new SpecialRecipeSerializer<>(CustomSpecialCraftingRecipe::new));
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
 			
 			//New nodes
