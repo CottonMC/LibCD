@@ -19,7 +19,7 @@ group = "${project.maven_group}"
 version = "${project.mod_version}+${project.minecraft_version}"
 
 minecraft {
-	accessWidener = file("src/main/resources/libcd.aw")
+	accessWidener = file("src/main/resources/libcd.accesswidener")
 }
 
 repositories {
