@@ -10,7 +10,7 @@ import net.minecraft.loot.condition.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.predicate.item.ItemPredicate;
-import net.minecraft.tag.ItemTags;
+import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -119,7 +119,7 @@ public class Conditions {
 		ItemPredicate.Builder builder = ItemPredicate.Builder.create();
 		if (item.indexOf('#') == 0) {
 			Identifier id = new Identifier(item.substring(1));
-			builder.tag(ItemTags.getContainer().get(id));
+			builder.tag(TagContainers.instance().items().get(id));
 		} else {
 			Identifier id = new Identifier(item);
 			builder.item(Registry.ITEM.get(id));

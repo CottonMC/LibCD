@@ -19,8 +19,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
@@ -85,7 +85,7 @@ public class RecipeParser {
 			}
 			if (in.indexOf('#') == 0) {
 				String tag = in.substring(1);
-				Tag<Item> itemTag = ItemTags.getContainer().get(new Identifier(tag));
+				Tag<Item> itemTag = TagContainers.instance().items().get(new Identifier(tag));
 				if (itemTag == null) throw new CDSyntaxError("Failed to get item tag for input: " + in);
 				for (Item item : itemTag.values()) {
 					stacks.add(new ItemStack(item));
@@ -133,7 +133,7 @@ public class RecipeParser {
 			Item item;
 			if (in.indexOf('#') == 0) {
 				String tag = in.substring(1);
-				Tag<Item> itemTag = ItemTags.getContainer().get(new Identifier(tag));
+				Tag<Item> itemTag = TagContainers.instance().items().get(new Identifier(tag));
 				if (itemTag == null) throw new CDSyntaxError("Failed to get item tag for output: " + in);
 				item = TagHelper.ITEM.getDefaultEntry(itemTag);
 			} else if (in.contains("->")) {

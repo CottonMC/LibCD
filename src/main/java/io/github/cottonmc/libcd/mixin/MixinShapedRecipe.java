@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.tag.ItemTags;
+import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +27,7 @@ public class MixinShapedRecipe {
 		if (json.has("tag")) {
 			String tagName = JsonHelper.getString(json, "tag");
 			Identifier id = new Identifier(tagName);
-			net.minecraft.tag.Tag<Item> itemTag = ItemTags.getContainer().get(id);
+			net.minecraft.tag.Tag<Item> itemTag = TagContainers.instance().items().get(id);
 			if (itemTag == null) {
 				throw new JsonSyntaxException("Unknown tag " + tagName);
 			}

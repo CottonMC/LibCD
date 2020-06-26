@@ -12,7 +12,6 @@ import io.github.cottonmc.libcd.api.util.NbtMatchType;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.github.cottonmc.libcd.impl.RecipeMapAccessor;
 import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
-import net.minecraft.class_5357;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -498,7 +497,7 @@ public class RecipeTweaker implements Tweaker {
 			Identifier recipeId = getRecipeId(stack);
 			Ingredient baseIng = RecipeParser.processIngredient(base);
 			Ingredient addIng = RecipeParser.processIngredient(addition);
-			addRecipe(new class_5357(recipeId, baseIng, addIng, stack));
+			addRecipe(new SmithingRecipe(recipeId, baseIng, addIng, stack));
 		} catch (Exception e) {
 			logger.error("Error parsing smithing recipe - " + e.getMessage());
 		}
