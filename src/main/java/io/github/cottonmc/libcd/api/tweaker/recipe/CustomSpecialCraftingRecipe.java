@@ -38,7 +38,7 @@ public class CustomSpecialCraftingRecipe extends SpecialCraftingRecipe {
 			Object result = bridge.invokeFunction("matches", CraftingUtils.getInvStacks(inv), inv.getWidth(), inv.getHeight(), player != null? new WrappedPlayer(player) : DummyPlayer.INSTANCE, new WorldInfo(world));
 			if (result instanceof Boolean) return (Boolean) result;
 			else {
-				logger.error("Could not check match for custom special crafting recipe %s, returning false: function 'matches' must return, boolean but returned %s instead", getId(), result.getClass().getName());
+				logger.error("Could not check match for custom special crafting recipe %s, returning false: function 'matches' must returna  boolean, but returned %s instead", getId(), result.getClass().getName());
 				return false;
 			}
 		} catch (Exception e) {
