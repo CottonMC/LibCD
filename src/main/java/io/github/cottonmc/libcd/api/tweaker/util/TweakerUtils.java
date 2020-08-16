@@ -21,8 +21,8 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainers;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
@@ -52,7 +52,7 @@ public class TweakerUtils {
 	 */
 	public Item getDefaultItem(String id) {
 		Identifier tagId = new Identifier(id);
-		Tag<Item> tag = TagContainers.instance().items().get(tagId);
+		Tag<Item> tag = ServerTagManagerHolder.getTagManager().getItems().getTag(tagId);
 		if (tag == null) return Items.AIR;
 		return TagHelper.ITEM.getDefaultEntry(tag);
 	}
@@ -288,7 +288,7 @@ public class TweakerUtils {
 	 * @return An array of items in the tag.
 	 */
 	public String[] getItemsInTag(String tagId) {
-		Tag<Item> tag = TagContainers.instance().items().get(new Identifier(tagId));
+		Tag<Item> tag = ServerTagManagerHolder.getTagManager().getItems().getTag(new Identifier(tagId));
 		if (tag == null) return new String[0];
 		Object[] items = tag.values().toArray();
 		String[] res = new String[items.length];

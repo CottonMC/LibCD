@@ -13,14 +13,14 @@ import io.github.cottonmc.libcd.api.util.MutableStack;
 import io.github.cottonmc.libcd.impl.IngredientAccessUtils;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.datafixer.NbtOps;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
@@ -28,7 +28,7 @@ import net.minecraft.util.registry.Registry;
 import java.util.*;
 
 /**
- * Helper class to make public versions private recipe methods
+ * Helper class to make public versions of private recipe methods
  */
 public class RecipeParser {
 
@@ -85,7 +85,7 @@ public class RecipeParser {
 			}
 			if (in.indexOf('#') == 0) {
 				String tag = in.substring(1);
-				Tag<Item> itemTag = TagContainers.instance().items().get(new Identifier(tag));
+				Tag<Item> itemTag = ServerTagManagerHolder.getTagManager().getItems().getTag(new Identifier(tag));
 				if (itemTag == null) throw new CDSyntaxError("Failed to get item tag for input: " + in);
 				for (Item item : itemTag.values()) {
 					stacks.add(new ItemStack(item));
@@ -133,7 +133,7 @@ public class RecipeParser {
 			Item item;
 			if (in.indexOf('#') == 0) {
 				String tag = in.substring(1);
-				Tag<Item> itemTag = TagContainers.instance().items().get(new Identifier(tag));
+				Tag<Item> itemTag = ServerTagManagerHolder.getTagManager().getItems().getTag(new Identifier(tag));
 				if (itemTag == null) throw new CDSyntaxError("Failed to get item tag for output: " + in);
 				item = TagHelper.ITEM.getDefaultEntry(itemTag);
 			} else if (in.contains("->")) {

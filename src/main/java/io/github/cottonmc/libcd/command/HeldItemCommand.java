@@ -33,7 +33,7 @@ public class HeldItemCommand implements Command<ServerCommandSource> {
 		}
 		
 		Style clickableStyle = Style.EMPTY
-			.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to copy to clipboard")))
+			.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to copy to clipboard")))
 			.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, description.toString()));
 		
 		feedback.setStyle(clickableStyle);

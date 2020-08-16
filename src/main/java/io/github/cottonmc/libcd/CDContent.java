@@ -26,7 +26,7 @@ import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
-import net.minecraft.tag.TagContainers;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -54,6 +54,7 @@ public class CDContent implements LibCDInitializer {
 		manager.registerCondition(new Identifier(CDCommons.MODID, "mod_loaded"), value -> {
 			if (value instanceof String) return FabricLoader.getInstance().isModLoaded((String) value);
 			if (value instanceof List) {
+				//noinspection unchecked
 				for (JsonElement el : (List<JsonElement>)value) {
 					if (!(el instanceof JsonPrimitive)) return false;
 					Object obj = ((JsonPrimitive)el).getValue();
@@ -68,6 +69,7 @@ public class CDContent implements LibCDInitializer {
 		manager.registerCondition(new Identifier(CDCommons.MODID, "item_exists"), value -> {
 			if (value instanceof String) return Registry.ITEM.get(new Identifier((String)value)) != Items.AIR;
 			if (value instanceof List) {
+				//noinspection unchecked
 				for (JsonElement el : (List<JsonElement>)value) {
 					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("item_exists array must only contain Strings!");
 					Object obj = ((JsonPrimitive)el).getValue();
@@ -80,15 +82,16 @@ public class CDContent implements LibCDInitializer {
 			throw new CDSyntaxError("item_exists must accept either a String or an Array!");
 		});
 		manager.registerCondition(new Identifier(CDCommons.MODID, "item_tag_exists"), value -> {
-			if (value instanceof String) return TagContainers.instance().items().getKeys().contains(new Identifier((String)value));
+			if (value instanceof String) return ServerTagManagerHolder.getTagManager().getItems().getTagIds().contains(new Identifier((String)value));
 			if (value instanceof List) {
+				//noinspection unchecked
 				for (JsonElement el : (List<JsonElement>)value) {
 					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
 					Object obj = ((JsonPrimitive)el).getValue();
 					if (obj instanceof String) {
 						Identifier id = new Identifier((String) obj);
-						if (!TagContainers.instance().items().getKeys().contains(id)) return false;
-						if (TagContainers.instance().items().get(id).values().isEmpty()) return false;
+						if (!ServerTagManagerHolder.getTagManager().getItems().getTagIds().contains(id)) return false;
+						if (ServerTagManagerHolder.getTagManager().getItems().getTagOrEmpty(id).values().isEmpty()) return false;
 					}  else throw new CDSyntaxError("item_tag_exists array must only contain Strings!");
 				}
 				return true;
@@ -98,6 +101,7 @@ public class CDContent implements LibCDInitializer {
 		manager.registerCondition(new Identifier(CDCommons.MODID, "block_exists"), value -> {
 			if (value instanceof String) return Registry.BLOCK.get(new Identifier((String)value)) != Blocks.AIR;
 			if (value instanceof List) {
+				//noinspection unchecked
 				for (JsonElement el : (List<JsonElement>)value) {
 					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("block_exists array must only contain Strings!");
 					Object obj = ((JsonPrimitive)el).getValue();
@@ -110,15 +114,16 @@ public class CDContent implements LibCDInitializer {
 			throw new CDSyntaxError("block_exists must accept either a String or an Array!");
 		});
 		manager.registerCondition(new Identifier(CDCommons.MODID, "block_tag_exists"), value -> {
-			if (value instanceof String) return TagContainers.instance().blocks().getKeys().contains(new Identifier((String)value));
+			if (value instanceof String) return ServerTagManagerHolder.getTagManager().getBlocks().getTagIds().contains(new Identifier((String)value));
 			if (value instanceof List) {
+				//noinspection unchecked
 				for (JsonElement el : (List<JsonElement>)value) {
 					if (!(el instanceof JsonPrimitive)) throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
 					Object obj = ((JsonPrimitive)el).getValue();
 					if (obj instanceof String) {
 						Identifier id = new Identifier((String) obj);
-						if (!TagContainers.instance().blocks().getKeys().contains(id)) return false;
-						if (TagContainers.instance().blocks().get(id).values().isEmpty()) return false;
+						if (!ServerTagManagerHolder.getTagManager().getBlocks().getTagIds().contains(id)) return false;
+						if (ServerTagManagerHolder.getTagManager().getBlocks().getTagOrEmpty(id).values().isEmpty()) return false;
 					}  else throw new CDSyntaxError("block_tag_exists array must only contain Strings!");
 				}
 				return true;

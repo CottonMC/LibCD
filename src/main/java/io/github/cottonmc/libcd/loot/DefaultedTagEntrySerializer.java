@@ -9,8 +9,8 @@ import net.minecraft.item.Items;
 import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.entry.LeafEntry;
 import net.minecraft.loot.function.LootFunction;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
@@ -19,7 +19,7 @@ public class DefaultedTagEntrySerializer extends LeafEntry.Serializer<DefaultedT
 	@Override
 	protected DefaultedTagEntry fromJson(JsonObject entryJson, JsonDeserializationContext context, int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
 		String tagName = JsonHelper.getString(entryJson, "name");
-		Tag<Item> itemTag = TagContainers.instance().items().get(new Identifier(tagName));
+		Tag<Item> itemTag = ServerTagManagerHolder.getTagManager().getItems().getTag(new Identifier(tagName));
 		if (itemTag == null) {
 			throw new JsonSyntaxException("Unknown tag " + tagName);
 		}
