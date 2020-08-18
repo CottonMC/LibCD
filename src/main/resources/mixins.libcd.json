@@ -5,6 +5,7 @@
   "mixins": [
     "MixinAdvancementRewards",
     "MixinAdvancementRewardsDeserializer",
+    "MixinNamespaceResourceManager",
     "MixinResourceManagerImpl",
     "MixinShapedRecipe",
     "MixinTagBuilder",

@@ -54,7 +54,7 @@ public class LibCD implements ModInitializer {
 
 	public static void saveConfig(CDConfig config) {
 		try {
-			File file = FabricLoader.getInstance().getConfigDir().resolve("libcd.json5").toFile();
+			File file = FabricLoader.getInstance().getConfigDir().resolve("libcd.json").toFile();
 			String result = CDCommons.newGson().toJson(config);
 			if (!file.exists()) file.createNewFile();
 			FileOutputStream out = new FileOutputStream(file,false);
