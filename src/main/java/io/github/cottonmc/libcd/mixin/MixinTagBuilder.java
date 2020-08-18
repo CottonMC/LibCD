@@ -1,16 +1,12 @@
 package io.github.cottonmc.libcd.mixin;
 
 import com.google.gson.JsonObject;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.JsonOps;
-import io.github.cottonmc.jankson.JanksonOps;
 import io.github.cottonmc.libcd.impl.TagBuilderWarningAccessor;
 import io.github.cottonmc.libcd.loader.TagExtensions;
 import io.github.cottonmc.libcd.tag.ItemTagHelper;
 import net.minecraft.item.Item;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,19 +33,13 @@ public class MixinTagBuilder implements TagBuilderWarningAccessor {
     private void onFromJson(JsonObject json, String string, CallbackInfoReturnable<Tag.Builder> info) {
         try {
             if (json.has("libcd")) {
-                TagExtensions.ExtensionResult result = TagExtensions.load(
-                        (blue.endless.jankson.JsonObject) Dynamic.convert(
-                                JsonOps.INSTANCE, JanksonOps.INSTANCE, JsonHelper.getObject(json, "libcd")
-                        )
-                );
+                TagExtensions.ExtensionResult result = TagExtensions.load(json);
 
                 if (result.shouldReplace()) {
                     entries.clear();
                 }
 
-                result.getEntries().forEach((entry) -> {
-                    this.entries.add(TagEntryAccessor.createTrackedEntry(entry, string));
-                });
+                result.getEntries().forEach((entry) -> this.entries.add(TagEntryAccessor.createTrackedEntry(entry, string)));
 
                 libcdWarnings.addAll(result.getWarnings());
                 defaultEntry = result.getDefaultEntry();

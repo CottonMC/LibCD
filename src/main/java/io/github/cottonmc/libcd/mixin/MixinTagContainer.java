@@ -38,9 +38,9 @@ public class MixinTagContainer<T> {
             for (Object warning : warnings) {
                 if (warning instanceof Throwable) {
                     Throwable t = (Throwable) warning;
-                    CDCommons.logger.error("\t- %s", t.getMessage(), t);
+                    CDCommons.logger.error("\t- {}", t.getMessage(), t);
                 } else {
-                    CDCommons.logger.warn("\t- %s", warning);
+                    CDCommons.logger.warn("\t- {}", warning);
                 }
             }
 

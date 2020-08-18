@@ -1,49 +1,25 @@
 package io.github.cottonmc.libcd;
 
-import blue.endless.jankson.Jankson;
-import blue.endless.jankson.JsonElement;
-import blue.endless.jankson.JsonObject;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.tree.ArgumentCommandNode;
-import com.mojang.brigadier.tree.LiteralCommandNode;
-import io.github.cottonmc.libcd.api.advancement.AdvancementRewardsManager;
+import com.google.gson.Gson;
 import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.LibCDInitializer;
+import io.github.cottonmc.libcd.api.advancement.AdvancementRewardsManager;
 import io.github.cottonmc.libcd.api.condition.ConditionManager;
 import io.github.cottonmc.libcd.api.init.AdvancementInitializer;
 import io.github.cottonmc.libcd.api.init.ConditionInitializer;
-import io.github.cottonmc.libcd.api.init.TweakerInitializer;
-import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
-import io.github.cottonmc.libcd.api.tweaker.recipe.CustomSpecialCraftingRecipe;
-import io.github.cottonmc.libcd.command.DebugExportCommand;
-import io.github.cottonmc.libcd.command.HeldItemCommand;
-import io.github.cottonmc.libcd.loader.TweakerLoader;
 import io.github.cottonmc.libcd.loot.DefaultedTagEntrySerializer;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.loot.entry.LootPoolEntryType;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.SpecialRecipeSerializer;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
 
 public class LibCD implements ModInitializer {
 	public static final String MODID = "libcd";
 
 	public static CDConfig config;
-
-	public static RecipeSerializer<CustomSpecialCraftingRecipe> CUSTOM_SPECIAL_SERIALIZER;
 
 	public static boolean isDevMode() {
 		return config.dev_mode;
@@ -52,101 +28,34 @@ public class LibCD implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		config = loadConfig();
-		FabricLoader.getInstance().getEntrypoints(MODID + ":tweakers", TweakerInitializer.class).forEach(init -> init.initTweakers(TweakerManager.INSTANCE));
 		FabricLoader.getInstance().getEntrypoints(MODID + ":conditions", ConditionInitializer.class).forEach(init -> init.initConditions(ConditionManager.INSTANCE));
 		FabricLoader.getInstance().getEntrypoints(MODID + ":advancement_rewards", AdvancementInitializer.class).forEach(init -> init.initAdvancementRewards(AdvancementRewardsManager.INSTANCE));
 		FabricLoader.getInstance().getEntrypoints(MODID, LibCDInitializer.class).forEach(init -> {
-			init.initTweakers(TweakerManager.INSTANCE);
 			init.initConditions(ConditionManager.INSTANCE);
 			init.initAdvancementRewards(AdvancementRewardsManager.INSTANCE);
 		});
-		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new TweakerLoader());
 		Registry.register(Registry.LOOT_POOL_ENTRY_TYPE, new Identifier(LibCD.MODID, "defaulted_tag"), new LootPoolEntryType(new DefaultedTagEntrySerializer()));
-		CUSTOM_SPECIAL_SERIALIZER = Registry.register(Registry.RECIPE_SERIALIZER, new Identifier(MODID, "custom_special_crafting"), new SpecialRecipeSerializer<>(CustomSpecialCraftingRecipe::new));
-		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
-			
-			//New nodes
-			LiteralCommandNode<ServerCommandSource> libcdNode = CommandManager
-					.literal(MODID)
-					.build();
-
-			LiteralCommandNode<ServerCommandSource> subsetNode = CommandManager
-					.literal("subset")
-					.requires(source -> source.hasPermissionLevel(3))
-					.build();
-
-			ArgumentCommandNode<ServerCommandSource, String> setSubsetNode = CommandManager
-					.argument("subset", StringArgumentType.string())
-					.executes(context -> changeSubset(context, context.getArgument("subset", String.class)))
-					.build();
-
-			LiteralCommandNode<ServerCommandSource> resetSubsetNode = CommandManager
-					.literal("-reset")
-					.executes(context -> changeSubset(context, ""))
-					.build();
-			
-			LiteralCommandNode<ServerCommandSource> heldNode = CommandManager
-					.literal("held")
-					.executes(new HeldItemCommand())
-					.build();
-
-			LiteralCommandNode<ServerCommandSource> debugNode = CommandManager
-					.literal("debug")
-					.requires(source -> source.hasPermissionLevel(3))
-					.build();
-
-			LiteralCommandNode<ServerCommandSource> debugExportNode = CommandManager
-					.literal("export")
-					.executes(new DebugExportCommand())
-					.build();
-
-			//Stitch nodes together
-			subsetNode.addChild(setSubsetNode);
-			subsetNode.addChild(resetSubsetNode);
-			libcdNode.addChild(subsetNode);
-			libcdNode.addChild(heldNode);
-			debugNode.addChild(debugExportNode);
-			libcdNode.addChild(debugNode);
-			dispatcher.getRoot().addChild(libcdNode);
-		});
-	}
-
-	private int changeSubset(CommandContext<ServerCommandSource> context, String setTo) {
-		config.tweaker_subset = setTo;
-		saveConfig(config);
-		context.getSource().sendFeedback(new TranslatableText("libcd.reload.success"), false);
-		MinecraftServer server = context.getSource().getMinecraftServer();
-		// TODO: Use a cleaner approach than executing /reload
-		server.getCommandManager().execute(server.getCommandSource(), "reload");
-		return 1;
 	}
 
 	public static CDConfig loadConfig() {
 		try {
-			Jankson jankson = CDCommons.newJankson();
-			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("libcd.json5").toFile();
+			Gson gson = CDCommons.newGson();
+			File file = FabricLoader.getInstance().getConfigDir().resolve("libcd.json").toFile();
 			if (!file.exists()) saveConfig(new CDConfig());
-			JsonObject json = jankson.load(file);
-			CDConfig result =  jankson.fromJson(json, CDConfig.class);
-			JsonElement jsonElementNew = jankson.toJson(new CDConfig());
-			if(jsonElementNew instanceof JsonObject){
-				JsonObject jsonNew = (JsonObject) jsonElementNew;
-				if(json.getDelta(jsonNew).size()>= 0){
-					saveConfig(result);
-				}
-			}
-			return result;
-		} catch (Exception e) {
+			FileReader reader = new FileReader(file);
+			return(gson.fromJson(reader, CDConfig.class));
+			//TODO: delta thing? probs not lol
+		} catch (IOException e) {
 			CDCommons.logger.error("Error loading config: {}", e.getMessage());
 		}
+
 		return new CDConfig();
 	}
 
 	public static void saveConfig(CDConfig config) {
 		try {
-			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("libcd.json5").toFile();
-			JsonElement json = CDCommons.newJankson().toJson(config);
-			String result = json.toJson(true, true);
+			File file = FabricLoader.getInstance().getConfigDir().resolve("libcd.json5").toFile();
+			String result = CDCommons.newGson().toJson(config);
 			if (!file.exists()) file.createNewFile();
 			FileOutputStream out = new FileOutputStream(file,false);
 			out.write(result.getBytes());

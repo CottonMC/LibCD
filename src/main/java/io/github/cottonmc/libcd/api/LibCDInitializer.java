@@ -4,20 +4,11 @@ import io.github.cottonmc.libcd.api.advancement.AdvancementRewardsManager;
 import io.github.cottonmc.libcd.api.condition.ConditionManager;
 import io.github.cottonmc.libcd.api.init.AdvancementInitializer;
 import io.github.cottonmc.libcd.api.init.ConditionInitializer;
-import io.github.cottonmc.libcd.api.init.TweakerInitializer;
-import io.github.cottonmc.libcd.api.tweaker.TweakerManager;
 
 /**
- * Initializer that initializes tweakers, conditions, and advancement rewards all at once.
+ * Initializer that initializes conditions and advancement rewards at once.
  */
-public interface LibCDInitializer extends TweakerInitializer, ConditionInitializer, AdvancementInitializer {
-
-	/**
-	 * Register tweakers and assistant scripts.
-	 * @param manager The tweaker manager to register in.
-	 */
-	@Override
-	default void initTweakers(TweakerManager manager) {}
+public interface LibCDInitializer extends ConditionInitializer, AdvancementInitializer {
 
 	/**
 	 * Register conditions for conditional data.

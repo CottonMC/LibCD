@@ -3,7 +3,6 @@ package io.github.cottonmc.libcd.mixin;
 import com.google.common.base.Charsets;
 import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.condition.ConditionalData;
-import io.github.cottonmc.libcd.impl.ReloadListenersAccessor;
 import io.github.cottonmc.libcd.impl.ResourceSearcher;
 import net.minecraft.resource.*;
 import net.minecraft.util.Identifier;
@@ -21,9 +20,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 @Mixin(ReloadableResourceManagerImpl.class)
-public abstract class MixinResourceManagerImpl implements ReloadableResourceManager, ReloadListenersAccessor, ResourceSearcher {
-
-	@Shadow @Final private List<ResourceReloadListener> listeners;
+public abstract class MixinResourceManagerImpl implements ReloadableResourceManager,  ResourceSearcher {
 
 	@Shadow public abstract List<Resource> getAllResources(Identifier id) throws IOException;
 
@@ -45,21 +42,15 @@ public abstract class MixinResourceManagerImpl implements ReloadableResourceMana
 						sortedResources.remove(id);
 					}
 				} catch (IOException e) {
-					CDCommons.logger.error("Error when accessing resource metadata for %s: %s", id.toString(), e.getMessage());
+					CDCommons.logger.error("Error when accessing resource metadata for {}: {}", id.toString(), e.getMessage());
 				}
 			}
 		}
-	}
-
-	@Override
-	public List<ResourceReloadListener> libcd$getListeners() {
-		return listeners;
 	}
 
 	public boolean libcd$contains(Identifier id) {
 		ResourceManager manager = this.namespaceManagers.get(id.getNamespace());
 		return manager != null && ((ResourceSearcher) manager).libcd$contains(id);
 	}
-
 
 }

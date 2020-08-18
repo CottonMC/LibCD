@@ -1,9 +1,8 @@
 package io.github.cottonmc.libcd.loader;
 
-import blue.endless.jankson.JsonArray;
-import blue.endless.jankson.JsonElement;
-import blue.endless.jankson.JsonObject;
-import io.github.cottonmc.libcd.LibCD;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import io.github.cottonmc.libcd.api.CDCommons;
 import io.github.cottonmc.libcd.api.CDSyntaxError;
 import io.github.cottonmc.libcd.api.condition.ConditionalData;
@@ -11,11 +10,7 @@ import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
+import java.util.*;
 
 public final class TagExtensions {
     private TagExtensions() {
@@ -32,11 +27,11 @@ public final class TagExtensions {
         List<String> warnings = new ArrayList<>();
         Identifier defaultEntry = null;
 
-        if (json.containsKey("replace")) {
+        if (json.has("replace")) {
             shouldReplace = testCondition(json.get("replace"), warnings);
         }
 
-        if (json.containsKey("entries")) {
+        if (json.has("entries")) {
             JsonElement rawEntries = json.get("entries");
             if (!(rawEntries instanceof JsonArray)) {
                 throw new IllegalArgumentException("'entries' tag in LibCD tag extensions is not an array: " + rawEntries);
@@ -59,7 +54,7 @@ public final class TagExtensions {
 
                     JsonArray values = (JsonArray) rawValues;
                     for (int i = 0; i < values.size(); i++) {
-                        @Nullable String value = values.get(String.class, i);
+                        @Nullable String value = values.get(i).getAsString();
 
                         if (value == null) {
                             warnings.add("Could not convert JSON element '" + values.get(i) + "' to a string in tag extensions! Skipping...");
@@ -74,8 +69,8 @@ public final class TagExtensions {
             }
         }
 
-        if (json.containsKey("default")) {
-            defaultEntry = new Identifier(json.get(String.class, "default"));
+        if (json.has("default")) {
+            defaultEntry = new Identifier(json.get("default").getAsString());
         }
 
         return new ExtensionResult(shouldReplace, entries, warnings, defaultEntry);
@@ -93,7 +88,8 @@ public final class TagExtensions {
         }
 
         JsonObject obj = (JsonObject) condition;
-        for (String key : obj.keySet()) {
+        for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
+            String key = entry.getKey();
             Identifier id = key.equals("or") ? new Identifier(CDCommons.MODID, "or") : Identifier.tryParse(key);
             if (id == null || !ConditionalData.hasCondition(id)) {
                 warnings.add("Found unknown condition: " + key);
