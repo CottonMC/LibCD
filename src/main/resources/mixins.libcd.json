@@ -5,20 +5,10 @@
   "mixins": [
     "MixinAdvancementRewards",
     "MixinAdvancementRewardsDeserializer",
-    "MixinCookingRecipeSerializer",
-    "MixinCraftingInventory",
-    "MixinCraftingResultSlot",
-    "MixinCuttingRecipeSerializer",
-    "MixinIngredient",
-    "MixinLootManager",
-    "MixinNamespaceResourceManager",
-    "MixinPlayerScreenHandler",
-    "MixinRecipeManager",
     "MixinResourceManagerImpl",
     "MixinShapedRecipe",
     "MixinTagBuilder",
     "MixinTagContainer",
-    "ReferenceLootConditionAccessor",
     "TagEntryAccessor"
   ]
 }
