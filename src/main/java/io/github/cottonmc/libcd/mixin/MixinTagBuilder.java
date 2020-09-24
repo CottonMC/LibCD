@@ -7,6 +7,7 @@ import io.github.cottonmc.libcd.tag.ItemTagHelper;
 import net.minecraft.item.Item;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.JsonHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,7 +34,7 @@ public class MixinTagBuilder implements TagBuilderWarningAccessor {
     private void onFromJson(JsonObject json, String string, CallbackInfoReturnable<Tag.Builder> info) {
         try {
             if (json.has("libcd")) {
-                TagExtensions.ExtensionResult result = TagExtensions.load(json.getAsJsonObject("libcd"));
+                TagExtensions.ExtensionResult result = TagExtensions.load(JsonHelper.getObject(json, "libcd"));
 
                 if (result.shouldReplace()) {
                     entries.clear();
