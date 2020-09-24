@@ -33,7 +33,7 @@ public class MixinTagBuilder implements TagBuilderWarningAccessor {
     private void onFromJson(JsonObject json, String string, CallbackInfoReturnable<Tag.Builder> info) {
         try {
             if (json.has("libcd")) {
-                TagExtensions.ExtensionResult result = TagExtensions.load(json);
+                TagExtensions.ExtensionResult result = TagExtensions.load(json.getAsJsonObject("libcd"));
 
                 if (result.shouldReplace()) {
                     entries.clear();
