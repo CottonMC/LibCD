@@ -30,6 +30,8 @@
     "fabricloader": ">=0.4.0"
   },
   "custom": {
-    "badges": [ "library" ]
+    "modmenu": {
+      "badges": [ "library" ]
+    }
   }
 }
